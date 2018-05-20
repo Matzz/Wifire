@@ -1,6 +1,31 @@
 var templateCache = {};
 var $container = $('#content');
-
+function getFieldFormat(name, value) {
+	switch(name) {
+		case "romUrl":
+		case "spiffUrl":
+			return {type: "url"};
+		case "authMode":
+			return {type: "select", values: [
+				"Open",
+				"WEP",
+				"WEP PSK",
+				"WPA PSK",
+				"WPA2 PSK",
+				"WPA WPA2 PSK",
+				"WPA2 ENTERPRISE",
+				"MAX"
+			]}
+		default:
+			switch(typeof value) {
+			case "boolean": return {type: "checkbox"};
+			case "number": return {type: "number"};
+			default:
+				return {type: "text"};
+		}
+		
+	}
+}
 function compileTemplate(name) {
 	if(!templateCache[name]) {
 		templateCache[name] =  $('#'+name+'_tpl').map(function() {
@@ -12,10 +37,10 @@ function compileTemplate(name) {
 }
 
 function infoController(name) {
-	 $.get("/info").success(function(data) {
-			var template = compileTemplate(name);
-			$container.html(template({ rows: data }))
-		})
+	$.get("/info").success(function(data) {
+		var template = compileTemplate(name);
+		$container.html(template({ rows: data }))
+	})
 }
 
 function switchesController(name) {

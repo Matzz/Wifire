@@ -6,8 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wifire</title>
 <link href="bootstrap.min.css" rel="stylesheet">
-<link href="bootstrap-theme.min.css" rel="stylesheet">
-<link href="bootstrap-toggle.min.css" rel="stylesheet">
 <!--[if lt IE 9]>
 	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
 	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -15,21 +13,21 @@
 </head>
 <body>
 	<!-- Fixed navbar -->
-	<nav class="navbar navbar-inverse">
-		<div class="container">
-			<div class="navbar-header">
-				<a class="navbar-brand" href="#">Wifire</a>
-			</div>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+		<a class="navbar-brand" href="#">Wifire</a>
 
-			<ul class="nav navbar-nav">
-				<li><a href="#switches">Switches</a></li>
-				<li><a href="#editStation">Station config</a></li>
-				<li><a href="#editAp">Ap config</a></li>
-				<li><a href="#editOta">Ota config</a></li>
-			</ul>
-		</div>
+		<ul class="navbar-nav">
+			<li class="nav-item"><a class="nav-link" href="#editAp">Ap config</a></li>
+			<li class="nav-item"><a class="nav-link" href="#editStation">Station config</a></li>
+			<li class="nav-item"><a class="nav-link" href="#editOta">Ota config</a></li>
+		</ul>
 	</nav>
 	<div class="container" id="content"></div>
+
+	<script src="jquery.min.js"></script>
+	<script src="bootstrap.min.js"></script>
+	<script src="underscore.js"></script>
+	<script src="app.js"></script>
 	<script id="info_tpl" type="text/template">
 		<table class="">
 			<% for(i in rows) { %>
@@ -47,10 +45,42 @@
 		<form class="form-horizontal" id="form">
 			<% for(name in inputs) { %>
 			<% var input = inputs[name] %>
-			<div class="form-group">
-				<label class="control-label col-sm-3" for="form_<%= name %>"><%= name %></label>
-				<div class="col-sm-9">
-					<input type="text" class="form-control" id="form_<%= name %>" name="<%= name %>" value="<%= input %>">
+			<% var fieldFormat = getFieldFormat(name, inputs[name]) %>
+			<% var type = fieldFormat.type %>
+			<div class="form-group row">
+				<label class="col-sm-2 col-form-label" for="form_<%= name %>"><%= name %></label>
+				<div class="col-sm-10">
+					<% if(type=="checkbox") { %>
+      					<div class="form-check">
+							<input
+								type="checkbox"
+								class="form-check-input"
+								id="form_<%= name %>"
+								name="<%= name %>"
+								value="true"
+								checked="<%= (input ? "true" : "false") %>" />
+						</div>
+					<% } else if(type=="select") { %>
+						<select
+							type="<%= type %>"
+							class="form-control"
+							id="form_<%= name %>"
+							name="<%= name %>">
+						<% for(i in fieldFormat.values) { %>
+							<option value="<%= i %>" <%= fieldFormat.values[i]==input ? "selected" : "" %>>
+								<%= fieldFormat.values[i] %>
+							</option>
+						<% } %>
+						</select>
+					<% } else { %>
+						<input
+							type="<%= type %>"
+							class="form-control"
+							id="form_<%= name %>"
+							name="<%= name %>"
+							value="<%= input %>" />
+					<% } %>
+
 				</div>
 			</div>
 			<% } %>
@@ -59,11 +89,5 @@
 			</div>
 		</form>
 	</script>
-
-	<script src="jquery.min.js"></script>
-	<script src="bootstrap.min.js"></script>
-	<script src="bootstrap-toggle.min.js"></script>
-	<script src="underscore.js"></script>
-	<script src="app.js"></script>
 </body>
 </html>
