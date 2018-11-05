@@ -67,7 +67,7 @@
 							id="form_<%= name %>"
 							name="<%= name %>">
 						<% for(i in fieldFormat.values) { %>
-							<option value="<%= i %>" <%= fieldFormat.values[i]==input ? "selected" : "" %>>
+							<option value="<%= i %>" <%= i==input ? "selected=true" : "" %>>
 								<%= fieldFormat.values[i] %>
 							</option>
 						<% } %>
