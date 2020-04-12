@@ -1,7 +1,6 @@
-#ifndef APP_AVAIABLE_NETWORKS_PROVIDER
-#define APP_AVAIABLE_NETWORKS_PROVIDER
+#pragma once
 
-#include <SmingCore/SmingCore.h>
+#include <SmingCore.h>
 
 class AvaiableNetworksProvider {
 public:
@@ -9,5 +8,3 @@ public:
 	static void startScan();
 	static void networkScanCompleted(bool succeeded, BssList list);
 };
-
-#endif

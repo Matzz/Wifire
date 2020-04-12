@@ -37,7 +37,7 @@ function compileTemplate(name) {
 }
 
 function infoController(name) {
-	$.get("/info").success(function(data) {
+	$.getJSON("/info").success(function(data) {
 		var template = compileTemplate(name);
 		$container.html(template({ rows: data }))
 	})

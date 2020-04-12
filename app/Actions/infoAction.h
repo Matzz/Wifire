@@ -1,6 +1,5 @@
-#ifndef INFO_ACTION
-#define INFO_ACTION
-#include <SmingCore/SmingCore.h>
+#pragma once
+
+#include <SmingCore.h>
 
 void infoAction(HttpRequest &request, HttpResponse &response);
-#endif

@@ -1,7 +1,7 @@
 #ifndef APP_INFOPROVIDER_H_
 #define APP_INFOPROVIDER_H_
 
-#include <SmingCore/SmingCore.h>
+#include <SmingCore.h>
 #include <Wiring/WHashMap.h>
 
 class InfoProvider {

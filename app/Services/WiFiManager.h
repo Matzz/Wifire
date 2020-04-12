@@ -1,5 +1,4 @@
-#ifndef APP_SERVICES_WIFIMANAGER_H_
-#define APP_SERVICES_WIFIMANAGER_H_
+#pragma once
 
 #include "../Configuration/WiFiStationConfigProvider.h"
 #include "../Configuration/WiFiApConfigProvider.h"
@@ -19,5 +18,3 @@ protected:
 
 	bool connectStation(WiFiStationConfig& config);
 };
-
-#endif

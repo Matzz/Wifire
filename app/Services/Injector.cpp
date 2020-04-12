@@ -52,9 +52,9 @@ WebServer& Injector::getWebServer() {
 	return *webServer;
 }
 
-FtpServer& Injector::getFtpServer() {
+LazyFtpServer& Injector::getFtpServer() {
 	if (ftpServer == NULL) {
-		ftpServer = new FtpServer(ftpUser, ftpPassword, ftpPort);
+		ftpServer = new LazyFtpServer(ftpUser, ftpPassword, ftpPort);
 	}
 	return *ftpServer;
 }

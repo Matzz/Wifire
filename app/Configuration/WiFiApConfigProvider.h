@@ -1,6 +1,6 @@
-#ifndef APP_CONFIGURATION_WIFIAPCONFIGPROVIDER_H_
-#define APP_CONFIGURATION_WIFIAPCONFIGPROVIDER_H_
-#include <SmingCore/SmingCore.h>
+#pragma once
+
+#include <SmingCore.h>
 #include "FileConfig.h"
 
 class WiFiApConfig {
@@ -8,7 +8,7 @@ public:
 	bool enabled = true;
 	String ssid;
 	String password;
-	AUTH_MODE authMode;
+	WifiAuthMode authMode;
 	IPAddress ip;
 	bool hidden = false;
 	int channel = 7;
@@ -21,5 +21,3 @@ public:
 	WiFiApConfig load();
 	void save(WiFiApConfig cfg);
 };
-
-#endif

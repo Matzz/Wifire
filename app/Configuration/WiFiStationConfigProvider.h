@@ -1,6 +1,6 @@
-#ifndef APP_CONFIGURATION_WIFISTATIONCONFIGPROVIDER_H_
-#define APP_CONFIGURATION_WIFISTATIONCONFIGPROVIDER_H_
-#include <SmingCore/SmingCore.h>
+#pragma once
+
+#include <SmingCore.h>
 #include "FileConfig.h"
 
 class WiFiStationConfig {
@@ -21,5 +21,3 @@ public:
 
 	void save(WiFiStationConfig cfg);
 };
-
-#endif

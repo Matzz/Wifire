@@ -1,3 +1,4 @@
+#include <JsonObjectStream.h>
 #include "staticAction.h"
 
 void staticAction(HttpRequest &request, HttpResponse &response)

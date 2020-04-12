@@ -1,6 +1,6 @@
-#ifndef APP_ACTIONS_OTAUPDATE_H_
-#define APP_ACTIONS_OTAUPDATE_H_
-#include <SmingCore/SmingCore.h>
+#pragma once
+
+#include <SmingCore.h>
 #include "../Configuration/OtaConfigProvider.h"
 
 class OtaUpdater {
@@ -18,5 +18,3 @@ class OtaUpdater {
 		void update();
 		static void switchSlot();
 };
-
-#endif

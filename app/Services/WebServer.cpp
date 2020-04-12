@@ -1,6 +1,6 @@
 #include "WebServer.h"
 
-#include <SmingCore/SmingCore.h>
+#include <SmingCore.h>
 #include "InfoProvider.h"
 #include "../Actions/infoAction.h"
 #include "../Actions/staticAction.h"

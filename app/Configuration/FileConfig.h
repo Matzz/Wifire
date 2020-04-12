@@ -1,6 +1,9 @@
-#ifndef APP_SERVICES_FILECONFIG_H_
-#define APP_SERVICES_FILECONFIG_H_
-#include <SmingCore/SmingCore.h>
+#pragma once
+
+#include <SmingCore.h>
+#include <JsonObjectStream.h>
+#include <ArduinoJson.h>
+#define JSON_MAX_SIZE 1024
 
 class FileConfig {
 protected:
@@ -8,16 +11,14 @@ protected:
 
 	FileConfig(String fileName);
 
-	void saveJsonObject(JsonObject& json);
+	void saveJsonObject(JsonDocument& json);
 
-	JsonObject& loadJsonObject(JsonBuffer& jsonBuffer);
+	void loadJsonObject(JsonDocument& doc);
 
 	template<typename T>
-	T getOrElse(ArduinoJson::JsonObject& json, String field, T elseVal) {
-		return json.containsKey(field) ? json[field].as<T>() : elseVal;
+	T getOrElse(JsonDocument& doc, String field, T elseVal) {
+		return doc.containsKey(field) ? doc[field].as<T>() : elseVal;
 	}
 
-	IPAddress getIp(JsonObject& json, String field, IPAddress defaultIp = IPAddress());
+	IPAddress getIp(JsonDocument& json, String field, IPAddress defaultIp = IPAddress());
 };
-
-#endif

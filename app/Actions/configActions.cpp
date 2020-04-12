@@ -1,6 +1,5 @@
+#include <JsonObjectStream.h>
 #include "configActions.h"
-
-#include <SmingCore/SmingCore.h>
 #include "../Services/Injector.h"
 
 
@@ -9,7 +8,7 @@ void apGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	auto config = provider.load();
 
 	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject& json = stream->getRoot();
+	JsonObject json = stream->getRoot();
 
 	json["enabled"] = config.enabled;
 	json["ssid"] = config.ssid;
@@ -20,7 +19,7 @@ void apGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	json["channel"] = config.channel;
 	json["beaconInterval"] = config.beaconInterval;
 
-	response.sendJsonObject(stream);
+	response.sendNamedStream(stream);
 }
 
 void apSetConfigAction(HttpRequest &request, HttpResponse &response) {
@@ -30,7 +29,7 @@ void apSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	config.enabled = request.getPostParameter("enabled");
 	config.ssid = request.getPostParameter("ssid");
 	config.password = request.getPostParameter("password");
-	config.authMode = (AUTH_MODE) request.getPostParameter("authMode").toInt();
+	config.authMode = (WifiAuthMode) request.getPostParameter("authMode").toInt();
 	config.ip = IPAddress(request.getPostParameter("ip"));
 	config.hidden = request.getPostParameter("hidden");
 	config.channel = request.getPostParameter("channel").toInt();
@@ -39,9 +38,9 @@ void apSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	Serial.println("AP config saved.");
 
 	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject& json = stream->getRoot();
+	JsonObject json = stream->getRoot();
 	json["status"] = "successful";
-	response.sendJsonObject(stream);
+	response.sendNamedStream(stream);
 }
 
 void stationGetConfigAction(HttpRequest &request, HttpResponse &response) {
@@ -49,7 +48,7 @@ void stationGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	auto config = provider.load();
 
 	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject& json = stream->getRoot();
+	JsonObject json = stream->getRoot();
 
 	json["enabled"] = config.enabled;
 	json["ssid"] = config.ssid;
@@ -58,7 +57,7 @@ void stationGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	json["netmask"] = config.netmask.toString();
 	json["gateway"] = config.gateway.toString();
 
-	response.sendJsonObject(stream);
+	response.sendNamedStream(stream);
 }
 
 void stationSetConfigAction(HttpRequest &request, HttpResponse &response) {
@@ -75,9 +74,9 @@ void stationSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	Serial.println("Station config saved.");
 
 	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject& json = stream->getRoot();
+	JsonObject json = stream->getRoot();
 	json["status"] = "successful";
-	response.sendJsonObject(stream);
+	response.sendNamedStream(stream);
 }
 
 void otaGetConfigAction(HttpRequest &request, HttpResponse &response) {
@@ -85,12 +84,12 @@ void otaGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	auto config = provider.load();
 
 	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject& json = stream->getRoot();
+	JsonObject json = stream->getRoot();
 
 	json["romUrl"] = config.romUrl;
 	json["spiffUrl"] = config.spiffUrl;
 
-	response.sendJsonObject(stream);
+	response.sendNamedStream(stream);
 }
 
 void otaSetConfigAction(HttpRequest &request, HttpResponse &response) {
@@ -103,7 +102,7 @@ void otaSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	Serial.println("OTA config saved.");
 
 	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject& json = stream->getRoot();
+	JsonObject json = stream->getRoot();
 	json["status"] = "successful";
-	response.sendJsonObject(stream);
+	response.sendNamedStream(stream);
 }

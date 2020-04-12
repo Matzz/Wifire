@@ -1,7 +1,6 @@
-#ifndef APP_SERVICES_WEBSERVER_H_
-#define APP_SERVICES_WEBSERVER_H_
+#pragma once
 
-#include <SmingCore/SmingCore.h>
+#include <SmingCore.h>
 
 class WebServer {
 public:
@@ -12,5 +11,3 @@ public:
 	void start();
 	void bindActions();
 };
-
-#endif

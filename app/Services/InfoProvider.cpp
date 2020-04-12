@@ -1,7 +1,8 @@
 #include "InfoProvider.h"
 
-#include <SmingCore/SmingCore.h>
-#include <Wiring/WHashMap.h>
+#include <SmingCore.h>
+#include <WHashMap.h>
+#include <esp_spi_flash.h>
 
 HashMap<String, String>* InfoProvider::getInfo(bool showPassword)  {
 	auto map = new HashMap<String, String>;
@@ -9,7 +10,7 @@ HashMap<String, String>* InfoProvider::getInfo(bool showPassword)  {
 	(*map)["heap"] = String(system_get_free_heap_size(), 10);
 	(*map)["cpu frequency"] = String(system_get_cpu_freq(), 10);
 	(*map)["chip id"] = String(system_get_chip_id(), 10);
-	(*map)["flash id"] = String(spi_flash_get_id(), 10);
+(*map)["flash id"] = String(spi_flash_get_id(), 10);
 
 	(*map)["wifi station enabled"] = WifiStation.isEnabled() ? "true" : "false";
 	(*map)["wifi station channel"] = String(WifiStation.getChannel(), 10);

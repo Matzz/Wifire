@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wifire</title>
 <link href="bootstrap.min.css" rel="stylesheet">
+<link href="main.css" rel="stylesheet">
 <!--[if lt IE 9]>
 	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
 	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -13,7 +14,7 @@
 </head>
 <body>
 	<!-- Fixed navbar -->
-	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+	<nav class="main-navbar navbar navbar-expand-lg navbar-dark bg-primary">
 		<a class="navbar-brand" href="#">Wifire</a>
 
 		<ul class="navbar-nav">
@@ -29,7 +30,7 @@
 	<script src="underscore.js"></script>
 	<script src="app.js"></script>
 	<script id="info_tpl" type="text/template">
-		<table class="">
+		<table class="table">
 			<% for(i in rows) { %>
 				<tr>
 					<th><%= i %></th>
@@ -58,7 +59,7 @@
 								id="form_<%= name %>"
 								name="<%= name %>"
 								value="true"
-								checked="<%= (input ? "true" : "false") %>" />
+								<%= (input ? "checked " : "") %>" />
 						</div>
 					<% } else if(type=="select") { %>
 						<select

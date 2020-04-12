@@ -1,6 +1,6 @@
 #include "OtaUpdater.h"
 
-#include <SmingCore/SmingCore.h>
+#include <SmingCore.h>
 #include "../Configuration/OtaConfigProvider.h"
 
 uint8 OtaUpdater::activeSlot() {

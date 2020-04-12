@@ -1,14 +1,13 @@
-#ifndef APP_INJECTOR_H_
-#define APP_INJECTOR_H_
+#pragma once
 
-#include <SmingCore/SmingCore.h>
+#include <SmingCore.h>
 #include "OtaUpdater.h"
 #include "../Configuration/OtaConfigProvider.h"
 #include "../Configuration/WiFiApConfigProvider.h"
 #include "../Configuration/WiFiStationConfigProvider.h"
+#include "LazyFtpServer.h"
 #include "WiFiManager.h"
 #include "WebServer.h"
-#include "FtpServer.h"
 
 class Injector {
 private:
@@ -22,7 +21,7 @@ private:
 	OtaUpdater* otaUpdater;
 	WiFiManager* wiFiManager;
 	WebServer* webServer;
-	FtpServer* ftpServer;
+	LazyFtpServer* ftpServer;
 
 public:
 	static Injector& getInstance();
@@ -42,7 +41,5 @@ public:
 	OtaUpdater& getOtaUpdater();
 	WiFiManager& getWiFiManager();
 	WebServer& getWebServer();
-	FtpServer& getFtpServer();
+	LazyFtpServer& getFtpServer();
 };
-
-#endif

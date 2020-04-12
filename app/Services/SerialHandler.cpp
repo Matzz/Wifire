@@ -1,6 +1,6 @@
 #include "SerialHandler.h"
 
-#include <SmingCore/SmingCore.h>
+#include <SmingCore.h>
 #include "Injector.h"
 #include "InfoProvider.h"
 

@@ -1,6 +1,6 @@
 #include "OtaConfigProvider.h"
 
-#include <SmingCore/SmingCore.h>
+#include <SmingCore.h>
 #include "FileConfig.h"
 
 OtaConfigProvider::OtaConfigProvider(String fileName) :
@@ -8,18 +8,17 @@ OtaConfigProvider::OtaConfigProvider(String fileName) :
 
 OtaConfig OtaConfigProvider::load() {
 	Serial.println("Loading OTA config.");
-	StaticJsonBuffer<1024> jsonBuffer;
-	JsonObject& json = loadJsonObject(jsonBuffer);
+	StaticJsonDocument<JSON_MAX_SIZE> doc;
+	loadJsonObject(doc);
 	OtaConfig cfg;
-	cfg.romUrl = getOrElse(json, "romUrl", "");
-	cfg.spiffUrl = getOrElse(json, "spiffUrl", "");
+	cfg.romUrl = getOrElse(doc, "romUrl", "");
+	cfg.spiffUrl = getOrElse(doc, "spiffUrl", "");
 	return cfg;
 }
 
 void OtaConfigProvider::save(OtaConfig cfg) {
-	DynamicJsonBuffer jsonBuffer;
-	JsonObject& root = jsonBuffer.createObject();
-	root["romUrl"] = cfg.romUrl.c_str();
-	root["spiffUrl"] = cfg.spiffUrl.c_str();
-	saveJsonObject(root);
+	StaticJsonDocument<JSON_MAX_SIZE> doc;
+	doc["romUrl"] = cfg.romUrl.c_str();
+	doc["spiffUrl"] = cfg.spiffUrl.c_str();
+	saveJsonObject(doc);
 }

@@ -1,19 +1,19 @@
 #include "FileConfig.h"
-
-#include <SmingCore/SmingCore.h>
+#include "c_types.h"
+#include <JsonObjectStream.h>
 
 FileConfig::FileConfig(String fileName) : fileName(fileName) {
 }
 
-void FileConfig::saveJsonObject(JsonObject& json) {
-	auto length = json.measureLength()+10;
+void FileConfig::saveJsonObject(JsonDocument& doc) {
+	auto length = measureJson(doc)+10;
 	char *buffer = new char[length];
-	json.printTo(buffer, length);
+	serializeJson(doc, buffer, length);
 	fileSetContent(fileName, buffer);
 	delete[] buffer;
 }
 
-JsonObject& FileConfig::loadJsonObject(JsonBuffer& jsonBuffer) {
+void FileConfig::loadJsonObject(JsonDocument& doc) {
 	String jsonString;
 	if (fileExist(fileName)) {
 		jsonString = fileGetContent(fileName);
@@ -21,13 +21,12 @@ JsonObject& FileConfig::loadJsonObject(JsonBuffer& jsonBuffer) {
 	} else {
 		jsonString = String("{}");
 	}
-	JsonObject& jsonObj = jsonBuffer.parseObject(jsonString);
-	return jsonObj;
+	deserializeJson(doc, jsonString);
 }
 
-IPAddress FileConfig::getIp(JsonObject& json, String field, IPAddress defaultIp) {
-	if(json.containsKey(field)) {
-		String ipStr = json[field].asString();
+IPAddress FileConfig::getIp(JsonDocument& doc, String field, IPAddress defaultIp) {
+	if(doc.containsKey(field)) {
+		String ipStr = doc[field];
 		return IPAddress(ipStr);
 	} else {
 		return defaultIp;

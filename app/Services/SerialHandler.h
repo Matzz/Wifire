@@ -1,7 +1,6 @@
-#ifndef APP_SERVICES_SERIALHANDLER_H_
-#define APP_SERVICES_SERIALHANDLER_H_
+#pragma once
 
-#include <SmingCore/SmingCore.h>
+#include <SmingCore.h>
 
 class SerialHandler {
 public:
@@ -10,5 +9,3 @@ public:
 	static void callback(Stream& stream, char arrivedChar,
 			unsigned short availableCharsCount);
 };
-
-#endif /* APP_SERVICES_SERIALHANDLER_H_ */
