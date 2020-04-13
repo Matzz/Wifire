@@ -30,6 +30,13 @@ WiFiApConfigProvider& Injector::getWiFiApConfigProvider() {
 	return *wiFiApConfigProvider;
 }
 
+GPIOConfigProvider& Injector::getGPIOConfigProvider() {
+	if (gpioConfigProvider == NULL) {
+		gpioConfigProvider = new GPIOConfigProvider();
+	}
+	return *gpioConfigProvider;
+}
+
 OtaUpdater& Injector::getOtaUpdater() {
 	if (otaUpdater == NULL) {
 		otaUpdater = new OtaUpdater(spiffsAddresses, getOtaConfigProvider());

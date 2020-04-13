@@ -3,7 +3,7 @@
 #include <SmingCore.h>
 #include <JsonObjectStream.h>
 #include <ArduinoJson.h>
-#define JSON_MAX_SIZE 1024
+#define JSON_MAX_SIZE 2048
 
 class FileConfig {
 protected:

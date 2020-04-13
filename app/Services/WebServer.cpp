@@ -12,15 +12,18 @@ WebServer::WebServer(int port) :
 }
 void WebServer::start() {
 	server.listen(port);
+	Serial.println("BBBBBBBBBBBBBBBB");
 	bindActions();
 }
 void WebServer::bindActions() {
-	server.addPath("/info", infoAction);
-	server.addPath("/config/station/get", stationGetConfigAction);
-	server.addPath("/config/station/set", stationSetConfigAction);
-	server.addPath("/config/ap/get", apGetConfigAction);
-	server.addPath("/config/ap/set", apSetConfigAction);
-	server.addPath("/config/ota/get", otaGetConfigAction);
-	server.addPath("/config/ota/set", otaSetConfigAction);
-	server.setDefaultHandler(staticAction);
+	server.paths.set("/info", infoAction);
+	server.paths.set("/config/station/get", stationGetConfigAction);
+	server.paths.set("/config/station/set", stationSetConfigAction);
+	server.paths.set("/config/ap/get", apGetConfigAction);
+	server.paths.set("/config/ap/set", apSetConfigAction);
+	server.paths.set("/config/ota/get", otaGetConfigAction);
+	server.paths.set("/config/ota/set", otaSetConfigAction);
+	server.paths.set("/config/gpio/get", gpioGetConfigAction);
+	server.paths.set("/config/gpio/set", gpioSetConfigAction);
+	server.paths.setDefault(staticAction);
 }

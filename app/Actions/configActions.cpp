@@ -106,3 +106,35 @@ void otaSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	json["status"] = "successful";
 	response.sendNamedStream(stream);
 }
+
+void gpioGetConfigAction(HttpRequest &request, HttpResponse &response) {
+	auto provider = Injector::getInstance().getGPIOConfigProvider();
+	auto config = provider.load();
+
+	JsonObjectStream* stream = new JsonObjectStream();
+	JsonObject json = stream->getRoot();
+	JsonArray modesArr = json["modes"].to<JsonArray>();
+	JsonArray namesArr = json["names"].to<JsonArray>();
+	JsonArray pullUpsArr = json["pullUps"].to<JsonArray>();
+	Serial.println("Pre set output json");
+	for(int i=0; i<PIN_MAX; i++) {
+		modesArr.add(config.modes[i]);
+		namesArr.add(config.names[i]);
+		pullUpsArr.add(config.pullUps[i]);
+	}
+	Serial.println("After set output json");
+
+	response.sendNamedStream(stream);
+}
+
+void gpioSetConfigAction(HttpRequest &request, HttpResponse &response) {
+	auto provider = Injector::getInstance().getGPIOConfigProvider();
+	auto config = provider.load();
+
+	Serial.println("GPIO config saved.");
+
+	JsonObjectStream* stream = new JsonObjectStream();
+	JsonObject json = stream->getRoot();
+	json["status"] = "successful";
+	response.sendNamedStream(stream);
+}

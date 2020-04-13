@@ -5,6 +5,7 @@
 #include "../Configuration/OtaConfigProvider.h"
 #include "../Configuration/WiFiApConfigProvider.h"
 #include "../Configuration/WiFiStationConfigProvider.h"
+#include "../Configuration/GPIOConfigProvider.h"
 #include "LazyFtpServer.h"
 #include "WiFiManager.h"
 #include "WebServer.h"
@@ -18,6 +19,7 @@ private:
 	OtaConfigProvider* otaConfigProvider;
 	WiFiStationConfigProvider* wiFiStationConfigProvider;
 	WiFiApConfigProvider* wiFiApConfigProvider;
+	GPIOConfigProvider* gpioConfigProvider;
 	OtaUpdater* otaUpdater;
 	WiFiManager* wiFiManager;
 	WebServer* webServer;
@@ -38,6 +40,7 @@ public:
 	OtaConfigProvider& getOtaConfigProvider();
 	WiFiStationConfigProvider& getWiFiStationConfigProvider();
 	WiFiApConfigProvider& getWiFiApConfigProvider();
+	GPIOConfigProvider& getGPIOConfigProvider();
 	OtaUpdater& getOtaUpdater();
 	WiFiManager& getWiFiManager();
 	WebServer& getWebServer();

@@ -43,11 +43,6 @@ function infoController(name) {
 	})
 }
 
-function switchesController(name) {
-	$container.html(compileTemplate(name)());
-	$container.find('[data-toggle]').bootstrapToggle();
-}
-
 function editConfig(type) {
 	var formUrl = "/config/"+type+"/get";
 	var saveUrl = "/config/"+type+"/set";

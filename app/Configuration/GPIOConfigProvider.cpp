@@ -1,30 +1,36 @@
-//#include "GPIOConfigProvider.h"
-//
-//#include <array>
-//#include <SmingCore.h>
-//#include "FileConfig.h"
-//std::array::fill();
-//
-//
-//GPIOConfigProvider::GPIOConfigProvider(String fileName) :
-//			FileConfig(fileName) { }
-//
-//GPIOConfig GPIOConfigProvider::load() {
-//	Serial.println("Loading GPIO config.");
-//	StaticJsonBuffer<1024> jsonBuffer;
-//	JsonObject& json = loadJsonObject(jsonBuffer);
-//	GPIOConfig cfg;
-//	json.ar
-//	cfg.pinModes = getOrElse(json, "pinModes", "");
-//	cfg.names = getOrElse(json, "pinNames", DEFAULT_GPIO_NAMES);
-//	cfg.pullUp = getOrElse(json, "pinNames", DEFAULT_GPIO_NAMES);
-//	return cfg;
-//}
-//
-//void GPIOConfigProvider::save(GPIOConfig cfg) {
-//	DynamicJsonBuffer jsonBuffer;
-//	JsonObject& root = jsonBuffer.createObject();
-////	root["romUrl"] = cfg.romUrl.c_str();
-////	root["spiffUrl"] = cfg.spiffUrl.c_str();
-//	saveJsonObject(root);
-//}
+#include "GPIOConfigProvider.h"
+
+#include <SmingCore.h>
+#include "FileConfig.h"
+
+
+GPIOConfigProvider::GPIOConfigProvider(String fileName) :
+			FileConfig(fileName) { }
+
+GPIOConfig GPIOConfigProvider::load() {
+	Serial.println("Loading GPIO config.");
+	StaticJsonDocument<JSON_MAX_SIZE> doc;
+	loadJsonObject(doc);
+	GPIOConfig cfg;
+	Serial.println("Dec");
+	JsonArray modesArr = doc["modes"].as<JsonArray>();
+	JsonArray pullUpsArr = doc["pullUps"].as<JsonArray>();
+	JsonArray namesArr = doc["names"].as<JsonArray>();
+	Serial.println("Dec end");
+	int modesArrSize = modesArr.size();
+	int pullUpsArrSize = pullUpsArr.size();
+	int namesArrSize = namesArr.size();
+	for(int i=0; i<PIN_MAX; i++) {
+		cfg.modes[i] = i<modesArrSize ? modesArr[i] : INPUT;
+		cfg.pullUps[i] = i<pullUpsArrSize ? modesArr[i] : false;
+		cfg.names[i] = i<namesArrSize ? namesArr[i].as<String>() : "GPIO_"+String(i);
+
+	}
+	Serial.println("END");
+	return cfg;
+}
+
+void GPIOConfigProvider::save(GPIOConfig cfg) {
+	StaticJsonDocument<JSON_MAX_SIZE> doc;
+	saveJsonObject(doc);
+}
