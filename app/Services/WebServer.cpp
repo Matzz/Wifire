@@ -12,7 +12,6 @@ WebServer::WebServer(int port) :
 }
 void WebServer::start() {
 	server.listen(port);
-	Serial.println("BBBBBBBBBBBBBBBB");
 	bindActions();
 }
 void WebServer::bindActions() {

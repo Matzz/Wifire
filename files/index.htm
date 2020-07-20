@@ -20,6 +20,7 @@
 		<ul class="navbar-nav">
 			<li class="nav-item"><a class="nav-link" href="#editAp">Ap config</a></li>
 			<li class="nav-item"><a class="nav-link" href="#editStation">Station config</a></li>
+			<li class="nav-item"><a class="nav-link" href="#editGpio">GPIO config</a></li>
 			<li class="nav-item"><a class="nav-link" href="#editOta">Ota config</a></li>
 		</ul>
 	</nav>
@@ -43,12 +44,10 @@
 		<form class="form-horizontal" id="form">
 			<% for(name in inputs) { %>
 			<% var input = inputs[name] %>
-			<% var fieldFormat = getFieldFormat(name, inputs[name]) %>
-			<% var type = fieldFormat.type %>
 			<div class="form-group row">
-				<label class="col-sm-2 col-form-label" for="form_<%= name %>"><%= name %></label>
+				<label class="col-sm-2 col-form-label" for="form_<%= name %>"><%= input.label %></label>
 				<div class="col-sm-10">
-					<% if(type=="checkbox") { %>
+					<% if(input.type=="checkbox") { %>
       					<div class="form-check">
 							<input
 								type="checkbox"
@@ -56,27 +55,27 @@
 								id="form_<%= name %>"
 								name="<%= name %>"
 								value="true"
-								<%= (input ? "checked " : "") %>" />
+								<%= (input.value ? "checked " : "") %>" />
 						</div>
-					<% } else if(type=="select") { %>
+					<% } else if(input.type=="select") { %>
 						<select
-							type="<%= type %>"
+							type="<%= input.type %>"
 							class="form-control"
 							id="form_<%= name %>"
 							name="<%= name %>">
-						<% for(i in fieldFormat.values) { %>
-							<option value="<%= i %>" <%= i==input ? "selected=true" : "" %>>
-								<%= fieldFormat.values[i] %>
+						<% for(i in input.values) { %>
+							<option value="<%= i %>" <%= i==input.value ? "selected=true" : "" %>>
+								<%= input.values[i] %>
 							</option>
 						<% } %>
 						</select>
 					<% } else { %>
 						<input
-							type="<%= type %>"
+							type="<%= input.type %>"
 							class="form-control"
 							id="form_<%= name %>"
 							name="<%= name %>"
-							value="<%= input %>" />
+							value="<%= input.value %>" />
 					<% } %>
 
 				</div>
@@ -87,53 +86,39 @@
 			</div>
 		</form>
 	</script>
-	<script id="gpio_form_tpl" type="text/template">
-		<form class="form-horizontal" id="form">
-			<% for(name in inputs) { %>
-			<% var input = inputs[name] %>
-			<% var fieldFormat = getFieldFormat(name, inputs[name]) %>
-			<% var type = fieldFormat.type %>
-			<div class="form-group row">
-				<label class="col-sm-2 col-form-label" for="form_<%= name %>"><%= name %></label>
-				<div class="col-sm-10">
-					<% if(type=="checkbox") { %>
-      					<div class="form-check">
-							<input
-								type="checkbox"
-								class="form-check-input"
-								id="form_<%= name %>"
-								name="<%= name %>"
-								value="true"
-								<%= (input ? "checked " : "") %>" />
-						</div>
-					<% } else if(type=="select") { %>
-						<select
-							type="<%= type %>"
-							class="form-control"
-							id="form_<%= name %>"
-							name="<%= name %>">
-						<% for(i in fieldFormat.values) { %>
-							<option value="<%= i %>" <%= i==input ? "selected=true" : "" %>>
-								<%= fieldFormat.values[i] %>
-							</option>
-						<% } %>
-						</select>
-					<% } else { %>
-						<input
-							type="<%= type %>"
-							class="form-control"
-							id="form_<%= name %>"
-							name="<%= name %>"
-							value="<%= input %>" />
-					<% } %>
-
-				</div>
-			</div>
-			<% } %>
-			<div class="col-sm-offset-3">
-  				<button type="button" class="btn btn-default" id="form-submit">Submit</button>
-			</div>
-		</form>
+	<script id="gpio_tpl" type="text/template">
+	<form class="form-horizontal" id="form">
+	<table class="table">
+		<tr>
+			<th scope="col">Pin</th>
+			<th scope="col">Mode</th>
+			<th scope="col">Pull up (down GPIO 16)</th>
+		</tr>
+		<% for(idx in response_data['gpio']) { %>
+		<tr>
+			<% var pin = response_data['gpio'][idx] %>
+			<th><%= pin['name'] %></th>
+			<td>
+				<select name="gpio[<%= idx %>]['isInput']">
+					<option value="true" <%= pin['isInput'] ? 'selected' : ''  %>>
+						Input
+					</option>
+					<option value="false" <%= !pin['isInput'] ? 'selected' : ''  %>>
+						Output
+					</option>
+				</select>
+			</td>
+			<td>
+				<input type="checkbox" name="gpio[<%= idx %>]['pull']" <%= pin['pull'] ? 'checked' : '' %> value="1" />
+			</td>
+		</tr>
+		<% } %>
+		</tr>
+	</table>
+	<div class="col-sm-offset-3">
+			<button type="button" class="btn btn-default" id="form-submit">Submit</button>
+	</div>
+	</form>
 	</script>
 </body>
 </html>

@@ -6,19 +6,17 @@ FileConfig::FileConfig(String fileName) : fileName(fileName) {
 }
 
 void FileConfig::saveJsonObject(JsonDocument& doc) {
-	auto length = measureJson(doc)+10;
-	char *buffer = new char[length];
-	serializeJson(doc, buffer, length);
-	fileSetContent(fileName, buffer);
-	delete[] buffer;
+	String output;
+    serializeJson(doc, output);
+	fileSetContent(fileName, output);
 }
 
 void FileConfig::loadJsonObject(JsonDocument& doc) {
 	String jsonString;
 	if (fileExist(fileName)) {
 		jsonString = fileGetContent(fileName);
-
 	} else {
+		Serial.println("File " + fileName + " doesn't exist.");
 		jsonString = String("{}");
 	}
 	deserializeJson(doc, jsonString);

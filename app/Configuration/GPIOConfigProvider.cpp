@@ -7,30 +7,46 @@
 GPIOConfigProvider::GPIOConfigProvider(String fileName) :
 			FileConfig(fileName) { }
 
+
+
+GPIOConfig GPIOConfigProvider::jsonToConfig(JsonObject& doc) {
+	GPIOConfig cfg;
+	JsonArray gpioArr = doc["gpio"].as<JsonArray>();
+	int gpioArrSize = gpioArr.size();
+	for(int i=0; i<=PIN_MAX; i++) {
+		if(i<gpioArrSize) {
+			auto gpioObj = gpioArr[i].as<JsonObject>();
+			cfg.gpio[i] = {gpioObj["name"].as<String>(), gpioObj["isInput"].as<bool>(), gpioObj["pull"].as<bool>()};
+		} else {
+			cfg.gpio[i] = {"GPIO_"+String(i), true, false};
+		}
+	}
+	return cfg;
+
+
+}
+
+void GPIOConfigProvider::configToJson(GPIOConfig& config, JsonObject& doc) {
+	JsonArray gpioArr = doc.createNestedArray("gpio");
+	for(int i=0; i<=PIN_MAX; i++) {
+		JsonObject pinObj = gpioArr.createNestedObject();
+		pinObj["name"] = config.gpio[i].name;
+		pinObj["isInput"] = config.gpio[i].isInput;
+		pinObj["pull"] = config.gpio[i].pull;
+	}
+}
+
 GPIOConfig GPIOConfigProvider::load() {
 	Serial.println("Loading GPIO config.");
 	StaticJsonDocument<JSON_MAX_SIZE> doc;
 	loadJsonObject(doc);
-	GPIOConfig cfg;
-	Serial.println("Dec");
-	JsonArray modesArr = doc["modes"].as<JsonArray>();
-	JsonArray pullUpsArr = doc["pullUps"].as<JsonArray>();
-	JsonArray namesArr = doc["names"].as<JsonArray>();
-	Serial.println("Dec end");
-	int modesArrSize = modesArr.size();
-	int pullUpsArrSize = pullUpsArr.size();
-	int namesArrSize = namesArr.size();
-	for(int i=0; i<PIN_MAX; i++) {
-		cfg.modes[i] = i<modesArrSize ? modesArr[i] : INPUT;
-		cfg.pullUps[i] = i<pullUpsArrSize ? modesArr[i] : false;
-		cfg.names[i] = i<namesArrSize ? namesArr[i].as<String>() : "GPIO_"+String(i);
-
-	}
-	Serial.println("END");
-	return cfg;
+	JsonObject obj = doc.as<JsonObject>();
+	return jsonToConfig(obj);
 }
 
-void GPIOConfigProvider::save(GPIOConfig cfg) {
+void GPIOConfigProvider::save(GPIOConfig config) {
 	StaticJsonDocument<JSON_MAX_SIZE> doc;
+	JsonObject obj = doc.to<JsonObject>();
+	configToJson(config, obj);
 	saveJsonObject(doc);
 }
