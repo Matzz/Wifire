@@ -2,7 +2,7 @@
 #include "Injector.h"
 
 void SpiffsManager::setup() {
-	Injector di = Injector::getInstance();
+	Injector &di = Injector::getInstance();
 	int slot = rboot_get_current_rom();
 
 	Serial.println();

@@ -13,7 +13,7 @@ void SerialHandler::setup() {
 void SerialHandler::callback(Stream& stream, char arrivedChar,
 		unsigned short availableCharsCount) {
 
-	auto injector = Injector::getInstance();
+	Injector &injector = Injector::getInstance();
 
 	if (arrivedChar == '\n') {
 		char str[availableCharsCount];

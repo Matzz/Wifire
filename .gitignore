@@ -55,3 +55,6 @@ local.properties
 .worksheet
 cert
 include
+
+# Visual studio
+.vscode

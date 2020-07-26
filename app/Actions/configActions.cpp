@@ -126,7 +126,8 @@ String gpioFieldName(int idx, String field) {
 }
 
 void gpioSetConfigAction(HttpRequest &request, HttpResponse &response) {
-	auto provider = Injector::getInstance().getGPIOConfigProvider();
+	Injector &di = Injector::getInstance();
+	auto provider = di.getGPIOConfigProvider();
 
 	auto config = provider.load();
 	for(int i=0; i<=PIN_MAX; i++) {
@@ -138,6 +139,7 @@ void gpioSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	Serial.println("GPIO config saved.");
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();
+	di.getGPIOStateManager().update();
 	json["status"] = "successful";
 	response.sendNamedStream(stream);
 }

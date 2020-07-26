@@ -3,12 +3,13 @@
 ## Uncomment and change examples:
 
 ## Add your source directories here separated by space
-COMPONENT_SRCDIRS := app app/Actions app/Configuration app/Services
+COMPONENT_SRCDIRS := app app/Actions app/Configuration app/Services app/Utils
 # COMPONENT_SRCFILES :=
 # COMPONENT_INCDIRS := include
 
 ## If you require any Arduino Libraries list them here
 ARDUINO_LIBRARIES := ArduinoJson6
+ARDUINO_LIBRARIES += MultipartParser
 
 ## List the names of any additional Components required for this project
 # COMPONENT_DEPENDS :=

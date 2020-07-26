@@ -5,6 +5,7 @@
 #include "../Actions/infoAction.h"
 #include "../Actions/staticAction.h"
 #include "../Actions/configActions.h"
+#include "../Actions/gpioSwitchAction.h"
 
 
 WebServer::WebServer(int port) :
@@ -24,5 +25,6 @@ void WebServer::bindActions() {
 	server.paths.set("/config/ota/set", otaSetConfigAction);
 	server.paths.set("/config/gpio/get", gpioGetConfigAction);
 	server.paths.set("/config/gpio/set", gpioSetConfigAction);
+	server.paths.set("/gpio/on", gpioSwitchAction);
 	server.paths.setDefault(staticAction);
 }

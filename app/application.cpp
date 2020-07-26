@@ -5,9 +5,10 @@
 
 
 void onReady() {
-	Injector di = Injector::getInstance();
+	Injector &di = Injector::getInstance();
 	di.getWiFiManager().startNetwork();
 	di.getWebServer().start();
+	di.getGPIOStateManager().update();;
 	//di.getFtpServer().start();
 }
 

@@ -9,21 +9,13 @@
 #include "LazyFtpServer.h"
 #include "WiFiManager.h"
 #include "WebServer.h"
+#include "GPIOStateManager.h"
 
 class Injector {
 private:
-	Injector();
-
-	void operator=(Injector const&);
-
-	OtaConfigProvider* otaConfigProvider;
-	WiFiStationConfigProvider* wiFiStationConfigProvider;
-	WiFiApConfigProvider* wiFiApConfigProvider;
-	GPIOConfigProvider* gpioConfigProvider;
-	OtaUpdater* otaUpdater;
-	WiFiManager* wiFiManager;
-	WebServer* webServer;
-	LazyFtpServer* ftpServer;
+	Injector()  { };
+	Injector(Injector const&);             // copy constructor is private
+	Injector& operator=(Injector const&);  // assignment operator is private
 
 public:
 	static Injector& getInstance();
@@ -45,4 +37,5 @@ public:
 	WiFiManager& getWiFiManager();
 	WebServer& getWebServer();
 	LazyFtpServer& getFtpServer();
+	GPIOStateManager& getGPIOStateManager();
 };
