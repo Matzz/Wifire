@@ -7,7 +7,7 @@ OtaConfigProvider::OtaConfigProvider(String fileName) :
 			FileConfig(fileName) { }
 
 OtaConfig OtaConfigProvider::load() {
-	Serial.println("Loading OTA config.");
+	debug_i("Loading OTA config.");
 	StaticJsonDocument<JSON_MAX_SIZE> doc;
 	loadJsonObject(doc);
 	OtaConfig cfg;

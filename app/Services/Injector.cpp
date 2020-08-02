@@ -41,7 +41,7 @@ WiFiManager& Injector::getWiFiManager() {
 }
 
 WebServer& Injector::getWebServer() {
-	static auto webServer = WebServer();
+	static auto webServer = WebServer(80);
 	return webServer;
 }
 
@@ -51,6 +51,7 @@ LazyFtpServer& Injector::getFtpServer() {
 }
 
 GPIOStateManager& Injector::getGPIOStateManager() {
-	static auto gpioStateManager = GPIOStateManager(getGPIOConfigProvider());
+	auto configProvider = getGPIOConfigProvider();
+	static auto gpioStateManager = GPIOStateManager(configProvider);
 	return gpioStateManager;
 }

@@ -65,13 +65,15 @@ void SerialHandler::callback(Stream& stream, char arrivedChar,
 			Serial.println();
 			Serial.println("available commands:");
 			Serial.println("  help - display this message");
-			Serial.println("  connect - connect to wifi");
 			Serial.println("  restart - restart the esp8266");
 			Serial.println("  switch - switch to the other rom and reboot");
 			Serial.println("  ota - perform ota update, switch rom and reboot");
 			Serial.println("  info - show esp8266 and wifi info");
 			Serial.println("  ls - list files in spiffs");
 			Serial.println("  cat - show first file in spiffs");
+			Serial.println();
+		} else if (!strcmp(str, "")) {
+			// No command
 			Serial.println();
 		} else {
 			Serial.println("unknown command");

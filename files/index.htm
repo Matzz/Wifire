@@ -97,7 +97,9 @@
 		<% for(idx in response_data['gpio']) { %>
 		<tr>
 			<% var pin = response_data['gpio'][idx] %>
-			<th><%= pin['name'] %></th>
+			<th>
+				<input type="text" name="gpio[<%= idx %>]['name']" value="<%= pin['name'] %>" />
+			</th>
 			<td>
 				<select name="gpio[<%= idx %>]['isInput']">
 					<option value="true" <%= pin['isInput'] ? 'selected' : ''  %>>

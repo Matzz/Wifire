@@ -7,10 +7,9 @@
 class GPIOStateManager : private NonCopyable {
 	protected:
 		GPIOConfigProvider& cfgProvider;
-		GPIOConfig config;
 		Timer** timers = new Timer*[PIN_MAX+1];
 		void deleteTimer(int pin);
-		int getPinByName(String name);
+		int getPinByName(GPIOConfig &config, String name);
 	public:
 		GPIOStateManager(GPIOConfigProvider &cfgProvider);
 		~GPIOStateManager();

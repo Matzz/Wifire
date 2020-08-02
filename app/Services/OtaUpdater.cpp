@@ -12,13 +12,13 @@ uint8 OtaUpdater::inactiveSlot() {
 }
 
 void OtaUpdater::callback(rBootHttpUpdate& client, bool result) {
-	Serial.println("OTA - In callback...");
+	debug_i("OTA - In callback...");
 	if (result == true) {
-		Serial.println("OTA - Firmware updated.");
+		debug_i("OTA - Firmware updated.");
 		switchSlot();
 	} else {
 		// fail
-		Serial.println("OTA - Firmware update failed!");
+		debug_e("OTA - Firmware update failed!");
 	}
 }
 
@@ -30,7 +30,7 @@ OtaUpdater::OtaUpdater(const int spiffsAddresses[2],
 
 void OtaUpdater::update() {
 	auto config = cfgProvider.load();
-	Serial.println("OTA - Updating...");
+	debug_i("OTA - Updating...");
 	rBootHttpUpdate* otaUpdater = new rBootHttpUpdate();
 	uint8 slot = activeSlot();
 
@@ -54,8 +54,8 @@ void OtaUpdater::switchSlot() {
 	uint8 newSlot = inactiveSlot();
 	Serial.printf("SOTA - wapping from rom %d to rom %d.\n", currentSlot, newSlot);
 	if (!rboot_set_current_rom(newSlot)) {
-		Serial.println("OTA - Setting slot failed!");
+		debug_e("OTA - Setting slot failed!");
 	}
-	Serial.println("OTA - Restarting...\n");
+	debug_i("OTA - Restarting...\n");
 	System.restart();
 }

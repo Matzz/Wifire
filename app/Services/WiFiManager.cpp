@@ -16,49 +16,48 @@ void WiFiManager::startNetwork() {
 	bool apStarted = false;
 
 	if(stCfg.enabled) {
-		Serial.println("Station mode enabled.");
+		debug_i("Station mode enabled.");
 		if(connectStation(stCfg)) {
-			Serial.println("Connected to station.");
+			debug_i("Connected to station.");
 			connectedToStation = true;
 		} else {
-			Serial.println("Cannot connect to station.");
+			debug_w("Cannot connect to station.");
 		}
 	} else {
-		Serial.println("Station mode disabled.");
+		debug_i("Station mode disabled.");
 	}
 	if(apCfg.enabled) {
 		if(startAccessPoint(apCfg)) {
-			Serial.println("AP created.");
+			debug_i("AP created.");
 			apStarted = true;
 		} else {
-			Serial.println("Cannot create AP.");
+			debug_w("Cannot create AP.");
 		}
 	} else {
-		Serial.println("AP mode disabled.");
-
+		debug_i("AP mode disabled.");
 	}
 }
 
 
 bool WiFiManager::startAccessPoint(WiFiApConfig& config) {
 
-	Serial.println("Starting network " + config.ssid);
+	debug_i("Starting network %s", config.ssid.c_str());
 	bool configStatus = WifiAccessPoint.config(config.ssid, config.password,
 			config.authMode, config.hidden, config.channel,
 			config.beaconInterval);
 	if (!configStatus) {
-		Serial.println("Setting AP config failed.");
+		debug_w("Setting AP config failed.");
 	}
 	WifiAccessPoint.enable(true);
 
 	IPAddress oldIp = WifiAccessPoint.getIP();
 	if (!(oldIp==config.ip)) {
-		Serial.printf("Setting new ip %s. Old ip %s\n", config.ip.toString().c_str(), oldIp.toString().c_str());
+		debug_i("Setting new ip %s. Old ip %s\n", config.ip.toString().c_str(), oldIp.toString().c_str());
 		if (!WifiAccessPoint.setIP(config.ip)) {
-			Serial.println("Setting ip failed.");
+			debug_w("Setting ip failed.");
 		}
 	} else {
-		Serial.printf("Keeping old ip %s\n", oldIp.toString().c_str());
+		debug_i("Keeping old ip %s\n", oldIp.toString().c_str());
 	}
 
 	return true;

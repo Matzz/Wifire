@@ -8,13 +8,15 @@
 #include "../Actions/gpioSwitchAction.h"
 
 
-WebServer::WebServer(int port) :
+WebServer::WebServer(const int port) :
 		port(port) {
 }
+
 void WebServer::start() {
 	server.listen(port);
 	bindActions();
 }
+
 void WebServer::bindActions() {
 	server.paths.set("/info", infoAction);
 	server.paths.set("/config/station/get", stationGetConfigAction);

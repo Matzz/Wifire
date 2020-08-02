@@ -9,7 +9,7 @@ WiFiStationConfigProvider::WiFiStationConfigProvider(String fileName) :
 }
 
 WiFiStationConfig WiFiStationConfigProvider::load() {
-	Serial.println("Loading station config.");
+	debug_i("Loading station config.");
 	StaticJsonDocument<JSON_MAX_SIZE> doc;
 	loadJsonObject(doc);
 	WiFiStationConfig cfg;

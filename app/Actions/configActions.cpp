@@ -39,7 +39,7 @@ void apSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	config.channel = request.getPostParameter("channel").toInt();
 	config.beaconInterval = request.getPostParameter("beaconInterval").toInt();
 	provider.save(config);
-	Serial.println("AP config saved.");
+	debug_i("AP config saved.");
 
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();
@@ -75,7 +75,7 @@ void stationSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	config.netmask = IPAddress(request.getPostParameter("netmask"));
 	config.gateway = IPAddress(request.getPostParameter("gateway"));
 	provider.save(config);
-	Serial.println("Station config saved.");
+	debug_i("Station config saved.");
 
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();
@@ -103,7 +103,7 @@ void otaSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	config.romUrl = request.getPostParameter("romUrl");
 	config.spiffUrl = request.getPostParameter("spiffUrl");
 	provider.save(config);
-	Serial.println("OTA config saved.");
+	debug_i("OTA config saved.");
 
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();
@@ -131,12 +131,13 @@ void gpioSetConfigAction(HttpRequest &request, HttpResponse &response) {
 
 	auto config = provider.load();
 	for(int i=0; i<=PIN_MAX; i++) {
+		config.gpio[i].name = request.getPostParameter(gpioFieldName(i, "name"));
 		config.gpio[i].isInput = getBool(request, gpioFieldName(i, "isInput"));
 		config.gpio[i].pull = getBool(request, gpioFieldName(i, "pull"));
 	}
 
 	provider.save(config);
-	Serial.println("GPIO config saved.");
+	debug_i("GPIO config saved.");
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();
 	di.getGPIOStateManager().update();

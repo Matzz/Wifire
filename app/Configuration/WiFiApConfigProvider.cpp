@@ -8,7 +8,7 @@ WiFiApConfigProvider::WiFiApConfigProvider(String fileName) :
 }
 
 WiFiApConfig WiFiApConfigProvider::load() {
-	Serial.println("Loading AP config.");
+	debug_i("Loading AP config.");
 	StaticJsonDocument<JSON_MAX_SIZE> doc;
 	loadJsonObject(doc);
 	WiFiApConfig cfg;

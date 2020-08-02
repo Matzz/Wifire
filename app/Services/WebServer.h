@@ -7,7 +7,7 @@ public:
 	HttpServer server;
 	int port;
 
-	WebServer(int port = 80);
+	WebServer(const int port);
 	void start();
 	void bindActions();
 };

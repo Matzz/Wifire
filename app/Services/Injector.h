@@ -13,7 +13,9 @@
 
 class Injector {
 private:
-	Injector()  { };
+	Injector()  {
+		debug_i("Creating main Wifire module");
+	};
 	Injector(Injector const&);             // copy constructor is private
 	Injector& operator=(Injector const&);  // assignment operator is private
 

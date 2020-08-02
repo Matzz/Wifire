@@ -9,6 +9,6 @@ protected:
 	String password;
 	int port;
 public:
-	LazyFtpServer(String user, String password, int port);
+	LazyFtpServer(const String user, const String password, const int port);
 	void start();
 };

@@ -8,7 +8,6 @@ GPIOStateManager::GPIOStateManager(GPIOConfigProvider &cfgProvider) : cfgProvide
 	for(auto i=0; i<=PIN_MAX; i++) {
 		timers[i] = nullptr;
 	}
-	config = cfgProvider.load();
 }
 GPIOStateManager::~GPIOStateManager() {
 	for(auto i=0; i<=PIN_MAX; i++) {
@@ -17,13 +16,13 @@ GPIOStateManager::~GPIOStateManager() {
 	delete timers;
 }
 
-int GPIOStateManager::getPinByName(String name) {
+int GPIOStateManager::getPinByName(GPIOConfig &config, String name) {
 	for(int i=0; i<=PIN_MAX; i++) {
 		if(config.gpio[i].name == name) {
 			return i;
 		}
 	}
-	Serial.println("Invalid pin name " + name);
+	debug_w("Invalid pin name %s", name.c_str());
 	return -1;
 }
 
@@ -36,18 +35,14 @@ void GPIOStateManager::deleteTimer(int pin) {
 }
 
 bool GPIOStateManager::turnOn(String pinName, unsigned int howLong) {
-	int pin = getPinByName(pinName);
+	auto config = cfgProvider.load();
+	int pin = getPinByName(config, pinName);
 	if(pin<0) {
 		return false;
 	}
-	Serial.println(pin);
-	pinMode(pin, INPUT);
-	Serial.println(isInputPin(pin) ? "Is input" : "is output");
+	debug_w("Pin %s is not configured as output pin.", pin);
 	if(isInputPin(pin) || pin > PIN_MAX) {
-		String msg = "Pin ";
-		msg += pin;
-		msg += " is not configured as output pin.";
-		Serial.println(msg);
+		debug_w("Pin %d is not configured as output pin.", pin);
 		return false;
 	} else {
 		digitalWrite(pin, 1);
@@ -70,7 +65,7 @@ bool GPIOStateManager::turnOn(String pinName, unsigned int howLong) {
 }
 
 void GPIOStateManager::update() {
-	config = cfgProvider.load();
+	auto config = cfgProvider.load();
 	for(int i=0; i<=PIN_MAX; i++) {
 		auto pin = config.gpio[i];
 		if(pin.isInput) {

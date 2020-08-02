@@ -16,7 +16,7 @@ void FileConfig::loadJsonObject(JsonDocument& doc) {
 	if (fileExist(fileName)) {
 		jsonString = fileGetContent(fileName);
 	} else {
-		Serial.println("File " + fileName + " doesn't exist.");
+		debug_i("File %s doesn't exist.", fileName.c_str());
 		jsonString = String("{}");
 	}
 	deserializeJson(doc, jsonString);
