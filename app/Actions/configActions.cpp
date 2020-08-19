@@ -8,7 +8,7 @@ bool getBool(HttpRequest &request, String name) {
 }
 
 void apGetConfigAction(HttpRequest &request, HttpResponse &response) {
-	auto provider = Injector::getInstance().getWiFiApConfigProvider();
+	auto& provider = Injector::getInstance().getWiFiApConfigProvider();
 	auto config = provider.load();
 
 	JsonObjectStream* stream = new JsonObjectStream();
@@ -27,7 +27,7 @@ void apGetConfigAction(HttpRequest &request, HttpResponse &response) {
 }
 
 void apSetConfigAction(HttpRequest &request, HttpResponse &response) {
-	auto provider = Injector::getInstance().getWiFiApConfigProvider();
+	auto& provider = Injector::getInstance().getWiFiApConfigProvider();
 	auto config = provider.load();
 
 	config.enabled = getBool(request, "enabled");
@@ -48,7 +48,7 @@ void apSetConfigAction(HttpRequest &request, HttpResponse &response) {
 }
 
 void stationGetConfigAction(HttpRequest &request, HttpResponse &response) {
-	auto provider = Injector::getInstance().getWiFiStationConfigProvider();
+	auto& provider = Injector::getInstance().getWiFiStationConfigProvider();
 	auto config = provider.load();
 
 	JsonObjectStream* stream = new JsonObjectStream();
@@ -65,7 +65,7 @@ void stationGetConfigAction(HttpRequest &request, HttpResponse &response) {
 }
 
 void stationSetConfigAction(HttpRequest &request, HttpResponse &response) {
-	auto provider = Injector::getInstance().getWiFiStationConfigProvider();
+	auto& provider = Injector::getInstance().getWiFiStationConfigProvider();
 	auto config = provider.load();
 
 	config.enabled = getBool(request, "enabled");
@@ -84,7 +84,7 @@ void stationSetConfigAction(HttpRequest &request, HttpResponse &response) {
 }
 
 void otaGetConfigAction(HttpRequest &request, HttpResponse &response) {
-	auto provider = Injector::getInstance().getOtaConfigProvider();
+	auto& provider = Injector::getInstance().getOtaConfigProvider();
 	auto config = provider.load();
 
 	JsonObjectStream* stream = new JsonObjectStream();
@@ -97,7 +97,7 @@ void otaGetConfigAction(HttpRequest &request, HttpResponse &response) {
 }
 
 void otaSetConfigAction(HttpRequest &request, HttpResponse &response) {
-	auto provider = Injector::getInstance().getOtaConfigProvider();
+	auto& provider = Injector::getInstance().getOtaConfigProvider();
 	auto config = provider.load();
 
 	config.romUrl = request.getPostParameter("romUrl");
@@ -112,7 +112,7 @@ void otaSetConfigAction(HttpRequest &request, HttpResponse &response) {
 }
 
 void gpioGetConfigAction(HttpRequest &request, HttpResponse &response) {
-	auto provider = Injector::getInstance().getGPIOConfigProvider();
+	auto& provider = Injector::getInstance().getGPIOConfigProvider();
 	auto config = provider.load();
 
 	JsonObjectStream* stream = new JsonObjectStream(JSON_MAX_SIZE);
@@ -127,7 +127,7 @@ String gpioFieldName(int idx, String field) {
 
 void gpioSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	Injector &di = Injector::getInstance();
-	auto provider = di.getGPIOConfigProvider();
+	auto& provider = di.getGPIOConfigProvider();
 
 	auto config = provider.load();
 	for(int i=0; i<=PIN_MAX; i++) {

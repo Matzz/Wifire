@@ -11,7 +11,7 @@ class GPIOStateManager : private NonCopyable {
 		void deleteTimer(int pin);
 		int getPinByName(GPIOConfig &config, String name);
 	public:
-		GPIOStateManager(GPIOConfigProvider &cfgProvider);
+		GPIOStateManager(GPIOConfigProvider& cfgProvider);
 		~GPIOStateManager();
 		void update();
 		bool turnOn(String pin, unsigned int howLong = 0);

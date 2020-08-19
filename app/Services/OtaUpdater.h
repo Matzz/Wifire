@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SmingCore.h>
+#include <Network/RbootHttpUpdater.h>
 #include "../Configuration/OtaConfigProvider.h"
 
 class OtaUpdater {
@@ -10,7 +11,7 @@ class OtaUpdater {
 
 		static uint8 activeSlot();
 		static uint8 inactiveSlot();
-		static void callback(rBootHttpUpdate& client, bool result);
+		static void callback(RbootHttpUpdater& client, bool result);
 
 	public:
 		OtaUpdater(const int spiffsAddresses[2],

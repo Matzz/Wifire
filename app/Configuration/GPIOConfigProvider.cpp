@@ -38,6 +38,7 @@ void GPIOConfigProvider::configToJson(GPIOConfig& config, JsonObject& doc) {
 
 GPIOConfig GPIOConfigProvider::load() {
 	debug_i("Loading GPIO config.");
+
 	StaticJsonDocument<JSON_MAX_SIZE> doc;
 	loadJsonObject(doc);
 	JsonObject obj = doc.as<JsonObject>();

@@ -51,7 +51,7 @@ LazyFtpServer& Injector::getFtpServer() {
 }
 
 GPIOStateManager& Injector::getGPIOStateManager() {
-	auto configProvider = getGPIOConfigProvider();
+	GPIOConfigProvider& configProvider = getGPIOConfigProvider();
 	static auto gpioStateManager = GPIOStateManager(configProvider);
 	return gpioStateManager;
 }

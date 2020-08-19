@@ -11,9 +11,9 @@ uint8 OtaUpdater::inactiveSlot() {
 	return !activeSlot();
 }
 
-void OtaUpdater::callback(rBootHttpUpdate& client, bool result) {
+void OtaUpdater::callback(RbootHttpUpdater& client, bool result) {
 	debug_i("OTA - In callback...");
-	if (result == true) {
+	if (result) {
 		debug_i("OTA - Firmware updated.");
 		switchSlot();
 	} else {
@@ -31,7 +31,7 @@ OtaUpdater::OtaUpdater(const int spiffsAddresses[2],
 void OtaUpdater::update() {
 	auto config = cfgProvider.load();
 	debug_i("OTA - Updating...");
-	rBootHttpUpdate* otaUpdater = new rBootHttpUpdate();
+	RbootHttpUpdater* otaUpdater = new RbootHttpUpdater();
 	uint8 slot = activeSlot();
 
 	// flash rom to position indicated in the rBoot config rom table

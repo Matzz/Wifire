@@ -2,29 +2,28 @@
 #include "c_types.h"
 #include <JsonObjectStream.h>
 
-FileConfig::FileConfig(String fileName) : fileName(fileName) {
-}
+FileConfig::FileConfig(String fileName) : fileName(fileName) { }
 
-void FileConfig::saveJsonObject(JsonDocument& doc) {
+void FileConfig::saveJsonObject(JsonDocument& json) {
 	String output;
-    serializeJson(doc, output);
+    serializeJson(json, output);
 	fileSetContent(fileName, output);
 }
 
-void FileConfig::loadJsonObject(JsonDocument& doc) {
+void FileConfig::loadJsonObject(JsonDocument& json) {
 	String jsonString;
-	if (fileExist(fileName)) {
-		jsonString = fileGetContent(fileName);
+	if (fileExist(this->fileName)) {
+		jsonString = fileGetContent(this->fileName);
 	} else {
-		debug_i("File %s doesn't exist.", fileName.c_str());
+		debug_i("File '%s' doesn't exist.", this->fileName.c_str());
 		jsonString = String("{}");
 	}
-	deserializeJson(doc, jsonString);
+	deserializeJson(json, jsonString);
 }
 
-IPAddress FileConfig::getIp(JsonDocument& doc, String field, IPAddress defaultIp) {
-	if(doc.containsKey(field)) {
-		String ipStr = doc[field];
+IPAddress FileConfig::getIp(JsonDocument& json, String field, IPAddress defaultIp) {
+	if(json.containsKey(field)) {
+		String ipStr = json[field];
 		return IPAddress(ipStr);
 	} else {
 		return defaultIp;

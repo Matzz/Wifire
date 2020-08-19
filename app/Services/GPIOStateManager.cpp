@@ -4,7 +4,7 @@
 #include "../Services/Injector.h"
 
 
-GPIOStateManager::GPIOStateManager(GPIOConfigProvider &cfgProvider) : cfgProvider(cfgProvider) {
+GPIOStateManager::GPIOStateManager(GPIOConfigProvider& cfgProvider) : cfgProvider(cfgProvider) {
 	for(auto i=0; i<=PIN_MAX; i++) {
 		timers[i] = nullptr;
 	}
@@ -40,9 +40,8 @@ bool GPIOStateManager::turnOn(String pinName, unsigned int howLong) {
 	if(pin<0) {
 		return false;
 	}
-	debug_w("Pin %s is not configured as output pin.", pin);
 	if(isInputPin(pin) || pin > PIN_MAX) {
-		debug_w("Pin %d is not configured as output pin.", pin);
+		debug_w("Pin %s (%d) is not configured as output pin.", pinName.c_str(), pin);
 		return false;
 	} else {
 		digitalWrite(pin, 1);
