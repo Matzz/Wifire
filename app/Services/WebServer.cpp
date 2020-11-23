@@ -17,16 +17,28 @@ void WebServer::start() {
 	bindActions();
 }
 
+void WebServer::authWrapper(String path, const HttpPathDelegate& callback) {
+	auto wrapper = [callback](HttpRequest &request, HttpResponse &response) {
+		if(false) {
+			response.headers[HTTP_HEADER_LOCATION] = "/";
+		} else {
+			callback(request, response);
+		}
+		
+	};
+	server.paths.set(path, wrapper);
+}
+
 void WebServer::bindActions() {
-	server.paths.set("/info", infoAction);
-	server.paths.set("/config/station/get", stationGetConfigAction);
-	server.paths.set("/config/station/set", stationSetConfigAction);
-	server.paths.set("/config/ap/get", apGetConfigAction);
-	server.paths.set("/config/ap/set", apSetConfigAction);
-	server.paths.set("/config/ota/get", otaGetConfigAction);
-	server.paths.set("/config/ota/set", otaSetConfigAction);
-	server.paths.set("/config/gpio/get", gpioGetConfigAction);
-	server.paths.set("/config/gpio/set", gpioSetConfigAction);
-	server.paths.set("/gpio/on", gpioSwitchAction);
+	authWrapper("/info", infoAction);
+	authWrapper("/config/station/get", stationGetConfigAction);
+	authWrapper("/config/station/set", stationSetConfigAction);
+	authWrapper("/config/ap/get", apGetConfigAction);
+	authWrapper("/config/ap/set", apSetConfigAction);
+	authWrapper("/config/ota/get", otaGetConfigAction);
+	authWrapper("/config/ota/set", otaSetConfigAction);
+	authWrapper("/config/gpio/get", gpioGetConfigAction);
+	authWrapper("/config/gpio/set", gpioSetConfigAction);
+	authWrapper("/gpio/on", gpioSwitchAction);
 	server.paths.setDefault(staticAction);
 }

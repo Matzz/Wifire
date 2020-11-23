@@ -28,6 +28,11 @@ GPIOConfigProvider& Injector::getGPIOConfigProvider() {
 	return gpioConfigProvider;
 }
 
+AuthConfigProvider& Injector::getAuthConfigProvider() {
+	static auto authConfigProvider = AuthConfigProvider();
+	return authConfigProvider;
+}
+
 OtaUpdater& Injector::getOtaUpdater() {
 	static auto otaUpdater = OtaUpdater(spiffsAddresses, getOtaConfigProvider());
 	return otaUpdater;

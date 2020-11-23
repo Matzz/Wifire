@@ -8,7 +8,7 @@ void staticAction(HttpRequest &request, HttpResponse &response)
 		file = file.substring(1);
 
 	if (file[0] == '.' || file.startsWith("config")) {
-		response.forbidden();
+		response.code = HTTP_STATUS_FORBIDDEN;
 		return;
 	}
 

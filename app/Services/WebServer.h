@@ -10,4 +10,7 @@ public:
 	WebServer(const int port);
 	void start();
 	void bindActions();
+
+private:
+	void authWrapper(String path, const HttpPathDelegate& callback);
 };
