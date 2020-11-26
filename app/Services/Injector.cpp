@@ -28,9 +28,9 @@ GPIOConfigProvider& Injector::getGPIOConfigProvider() {
 	return gpioConfigProvider;
 }
 
-AuthConfigProvider& Injector::getAuthConfigProvider() {
-	static auto authConfigProvider = AuthConfigProvider();
-	return authConfigProvider;
+UsersConfigProvider& Injector::getUsersConfigProvider() {
+	static auto usersConfigProvider = UsersConfigProvider();
+	return usersConfigProvider;
 }
 
 OtaUpdater& Injector::getOtaUpdater() {

@@ -6,6 +6,7 @@
 #include "../Actions/staticAction.h"
 #include "../Actions/configActions.h"
 #include "../Actions/gpioSwitchAction.h"
+#include "../Actions/usersAction.h"
 
 
 WebServer::WebServer(const int port) :
@@ -39,6 +40,7 @@ void WebServer::bindActions() {
 	authWrapper("/config/ota/set", otaSetConfigAction);
 	authWrapper("/config/gpio/get", gpioGetConfigAction);
 	authWrapper("/config/gpio/set", gpioSetConfigAction);
+	authWrapper("/config/users/list", getUsersListAction);
 	authWrapper("/gpio/on", gpioSwitchAction);
 	server.paths.setDefault(staticAction);
 }

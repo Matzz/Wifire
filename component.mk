@@ -12,7 +12,7 @@ ARDUINO_LIBRARIES := ArduinoJson6
 ARDUINO_LIBRARIES += MultipartParser
 
 ## List the names of any additional Components required for this project
-# COMPONENT_DEPENDS :=
+COMPONENT_DEPENDS := malloc_count
 
 ## Set paths for any GIT submodules your application uses
 # COMPONENT_SUBMODULES :=

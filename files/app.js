@@ -120,6 +120,13 @@ function editGpioController(name) {
 	return editConfig("gpio", "gpio");
 }
 
+function usersListController(name) {
+	$.getJSON("/config/users/list").success(function(data) {
+		var template = compileTemplate("users_list");
+		$container.html(template({ 'data': data }))
+	})
+}
+
 
 function dispatch(name) {
 	if(name=="") {

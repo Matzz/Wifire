@@ -3,11 +3,29 @@
 #include <SmingCore.h>
 #include <WHashMap.h>
 #include <esp_spi_flash.h>
+#ifdef ENABLE_MALLOC_COUNT
+#include <malloc_count.h>
+#endif
 
 HashMap<String, String>* InfoProvider::getInfo(bool showPassword)  {
 	auto map = new HashMap<String, String>;
 	(*map)["sdk"] = system_get_sdk_version();
-	(*map)["heap"] = String(system_get_free_heap_size(), 10);
+	auto heep_free = system_get_free_heap_size();
+	(*map)["heep_current_free_memory"] = String(heep_free, 10);
+
+
+#ifdef ENABLE_MALLOC_COUNT
+	auto heep_current = MallocCount::getCurrent();
+	auto heep_size = heep_current+heep_free;
+	float heep_perc = heep_current;
+	heep_perc = heep_perc/heep_size*100;
+	(*map)["heep_current_memory_allocated"] = heep_current;
+	(*map)["heep_usage_percentage"] = heep_perc;
+	(*map)["heep_peak_memory_allocated"] = MallocCount::getPeak();
+	(*map)["heep_number_of_allocations_called"] = MallocCount::getAllocCount();
+	(*map)["heep_cumulative_memory_allocated"] = MallocCount::getTotal();
+#endif
+
 	(*map)["cpu frequency"] = String(system_get_cpu_freq(), 10);
 	(*map)["chip id"] = String(system_get_chip_id(), 10);
 (*map)["flash id"] = String(spi_flash_get_id(), 10);

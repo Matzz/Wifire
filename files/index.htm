@@ -22,6 +22,7 @@
 			<li class="nav-item"><a class="nav-link" href="#editStation">Station config</a></li>
 			<li class="nav-item"><a class="nav-link" href="#editGpio">GPIO config</a></li>
 			<li class="nav-item"><a class="nav-link" href="#editOta">Ota config</a></li>
+			<li class="nav-item"><a class="nav-link" href="#usersList">Users</a></li>
 		</ul>
 	</nav>
 	<div class="container" id="content"></div>
@@ -121,6 +122,25 @@
 			<button type="button" class="btn btn-default" id="form-submit">Submit</button>
 	</div>
 	</form>
+	</script>
+	<script id="users_list_tpl" type="text/template">
+		<table class="table">
+			<tr>
+				<th>Login</th>
+				<th>Enabled</th>
+				<th>Roles</th>
+				<th>Actions</th>
+			</tr>
+			<% for(var i in data['users']) { %>
+				<% var user = rows[i] %>
+				<tr>
+					<td><%= user['login'] %></td>
+					<td><%= user['enabled'] %></td>
+					<td><%= user['roles'].join(", ") %></td>
+					<td>Edit / Delete</td>
+				</tr>
+			<% } %>
+		</table>
 	</script>
 </body>
 </html>

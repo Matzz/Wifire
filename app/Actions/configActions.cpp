@@ -1,11 +1,7 @@
 #include <JsonObjectStream.h>
 #include "configActions.h"
 #include "../Services/Injector.h"
-
-bool getBool(HttpRequest &request, String name) {
-	String val = request.getPostParameter(name);
-	return val=="true" || val == "1";
-}
+#include "utils.h"
 
 void apGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	auto& provider = Injector::getInstance().getWiFiApConfigProvider();
