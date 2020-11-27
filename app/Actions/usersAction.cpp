@@ -1,7 +1,6 @@
 #include <JsonObjectStream.h>
 #include "../Services/Injector.h"
 #include "usersAction.h"
-#include "utils.h"
 
 void getUsersListAction(HttpRequest &request, HttpResponse &response) {
 	auto& provider = Injector::getInstance().getUsersConfigProvider();

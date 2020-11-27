@@ -132,7 +132,7 @@
 				<th>Actions</th>
 			</tr>
 			<% for(var i in data['users']) { %>
-				<% var user = rows[i] %>
+				<% var user = data['users'][i] %>
 				<tr>
 					<td><%= user['login'] %></td>
 					<td><%= user['enabled'] %></td>

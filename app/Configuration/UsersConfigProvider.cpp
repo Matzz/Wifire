@@ -2,6 +2,7 @@
 
 #include <SmingCore.h>
 #include "FileConfig.h"
+#include "../Utils/utils.h"
 
 #define MAX_USERS 100
 #define MAX_ROLES 10
@@ -41,6 +42,7 @@ UsersConfig UsersConfigProvider::jsonToConfig(JsonObject& doc) {
         }
         cfg.users.addElement(user);
 	}
+    cfg.addAdminIfDoesntExist();
 	return cfg;
 }
 
@@ -65,7 +67,8 @@ UsersConfig UsersConfigProvider::load() {
 	StaticJsonDocument<JSON_MAX_SIZE> doc;
 	loadJsonObject(doc);
 	JsonObject obj = doc.as<JsonObject>();
-	return jsonToConfig(obj);
+	auto config = jsonToConfig(obj);
+    return config;
 }
 
 void UsersConfigProvider::save(UsersConfig config) {
@@ -73,4 +76,43 @@ void UsersConfigProvider::save(UsersConfig config) {
 	JsonObject obj = doc.to<JsonObject>();
 	configToJson(config, obj);
 	saveJsonObject(doc);
+}
+
+String UsersConfig::adminLogin = "admin";
+
+void UsersConfig::addAdminIfDoesntExist() {
+    if(!hasAdmin()) {
+        auto admin = UsersConfig::newUser(
+            UsersConfig::adminLogin,
+            UsersConfig::adminLogin);
+        admin.roles.addElement(UsersConfig::adminLogin);
+        users.addElement(admin);
+    }
+}
+
+bool UsersConfig::hasAdmin() {
+    bool found = false;
+    auto size = users.size();
+    for(int i=0; i<size && !found; i++) {
+        if(users[i].login == UsersConfig::adminLogin) {
+            found = true;
+        }
+    }
+    return found;
+}
+
+
+UserConfig UsersConfig::newUser(String login, String password) {
+    auto salt = mkSalt();
+    auto cfg = UserConfig();
+    cfg.login = login;
+    cfg.enabled = true;
+    cfg.hash = getHash(salt + password);
+    cfg.salt = salt;
+    return cfg;
+}
+
+String UsersConfig::mkSalt() {
+    auto base = String(system_get_chip_id(), 10) + String(os_get_nanoseconds(), 10);
+    return getHash(base);
 }
