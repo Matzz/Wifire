@@ -43,6 +43,9 @@
 	</script>
 	<script id="dynamic_form_tpl" type="text/template">
 		<form class="form-horizontal" id="form">
+			<% if(title) { %>
+				<h2><%= title %></h2>
+			<% } %>
 			<% for(name in inputs) { %>
 			<% var input = inputs[name] %>
 			<div class="form-group row">
@@ -78,26 +81,30 @@
 							name="<%= name %>"
 							value="<%= input.value %>" />
 					<% } %>
-
 				</div>
 			</div>
 			<% } %>
 			<div class="col-sm-offset-3">
-  				<button type="button" class="btn btn-default" id="form-submit">Submit</button>
+  				<button type="button" class="btn btn-primary" id="form_submit">Submit</button>
 			</div>
 		</form>
 	</script>
 	<script id="gpio_tpl" type="text/template">
 	<form class="form-horizontal" id="form">
+	<h2>Edit GPIO configuration</h2>
 	<table class="table">
 		<tr>
-			<th scope="col">Pin</th>
+			<th scope="col">Pin number</th>
+			<th scope="col">Pin name</th>
 			<th scope="col">Mode</th>
 			<th scope="col">Pull up (down GPIO 16)</th>
 		</tr>
 		<% for(idx in response_data['gpio']) { %>
 		<tr>
 			<% var pin = response_data['gpio'][idx] %>
+			<th>
+				<%= idx %>
+			</th>
 			<th>
 				<input type="text" name="gpio[<%= idx %>]['name']" value="<%= pin['name'] %>" />
 			</th>
@@ -119,28 +126,102 @@
 		</tr>
 	</table>
 	<div class="col-sm-offset-3">
-			<button type="button" class="btn btn-default" id="form-submit">Submit</button>
+			<button type="button" class="btn btn-primary" id="form-submit">Submit</button>
 	</div>
 	</form>
 	</script>
 	<script id="users_list_tpl" type="text/template">
-		<table class="table">
-			<tr>
-				<th>Login</th>
-				<th>Enabled</th>
-				<th>Roles</th>
-				<th>Actions</th>
-			</tr>
-			<% for(var i in data['users']) { %>
-				<% var user = data['users'][i] %>
+		<div id="user_list_container">
+			<table class="table">
 				<tr>
-					<td><%= user['login'] %></td>
-					<td><%= user['enabled'] %></td>
-					<td><%= user['roles'].join(", ") %></td>
-					<td>Edit / Delete</td>
+					<th>Enabled</th>
+					<th>Login</th>
+					<th>Roles</th>
+					<th>Actions</th>
 				</tr>
-			<% } %>
-		</table>
+				<% for(var i in data['users']) { %>
+					<% var user = data['users'][i] %>
+					<% var rolesStr = user['roles'].join(", ") %>
+					<tr>
+						<td><%= user['enabled'] %></td>
+						<td><%= user['login'] %></td>
+						<td><%= rolesStr %></td>
+						<td>
+							<a onClick="editUser(<%= user['enabled'] %>, '<%= user['login'] %>', '<%= rolesStr %>')">Edit</a>
+							/
+							<a onClick="deleteUser('<%= user['login'] %>')">Delete</a>
+						</td>
+					</tr>
+				<% } %>
+			</table>
+			<div class="row">
+				<div class="col-sm-12">
+					<button type="button" class="btn btn-primary" onClick="newUser()">New user</button>
+				</div>
+			</div>
+		</div>
+		<div id="user_form_container">
+			<form class="form-horizontal" id="form">
+				<h2 id="user_form_title"></h2>
+				<div class="form-group row">
+					<label class="col-sm-2 col-form-label" for="form_enabled">Enabled</label>
+					<div class="col-sm-10">
+						<div class="form-check">
+							<input
+								type="checkbox"
+								class="form-check-input"
+								id="form_enabled"
+								name="enabled"
+								value="true"
+							/>
+						</div>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-sm-2 col-form-label" for="form_login">Login</label>
+					<div class="col-sm-10">
+						<input
+							type="text"
+							class="form-text-control"
+							id="form_login"
+							name="login"
+						/>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-sm-2 col-form-label" for="form_roles">Roles</label>
+					<div class="col-sm-10">
+						<input
+							type="text"
+							class="form-text-control"
+							id="form_roles"
+							name="roles"
+						/>
+						<small class="form-text text-muted">Please provide coma separated list.</small>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-sm-2 col-form-label" for="form_password">Password</label>
+					<div class="col-sm-10">
+						<input
+							type="text"
+							class="form-text-control"
+							id="form_password"
+							name="password"
+						/>
+						<small class="form-text text-muted">Please provide only if you would like to change user password.</small>
+					</div>
+				</div>
+				<div class="row">
+					<div class="offset-2 col-sm-1">
+						<button type="button" class="btn btn-primary" id="user_form_submit">Submit</button>
+					</div>
+					<div class="col-sm-1">
+						<button type="button" class="btn" id="user_form_cancel" onClick="userFormVisible(false)">Cancel</button>
+					</div>
+				</div>
+			</form>
+		</div>
 	</script>
 </body>
 </html>

@@ -64,20 +64,23 @@ function editConfig(type, form_template, custom_field_mapping) {
 
 	$.getJSON(formUrl, function(response_data) {
 		inputs = getFieldsFormat(response_data, custom_field_mapping)
-		$container.html(compileTemplate(form_template)({ inputs: inputs, response_data: response_data }));
-		$('#form-submit').click(function() {
-	        $.ajax({
+		$container.html(compileTemplate(form_template)({
+			 title: response_data['title'] ? response_data['title'] : "Edit " + type + " configuration",
+			 inputs: inputs,
+			 response_data: response_data
+			}));
+		$('#form_submit').click(function() {
+	        $.post({
 	            url: saveUrl,
-	            type: 'post',
 	            dataType: 'json',
 	            data: $('#form').serialize(),
-	        }).success(function(data) {
+	        }).done(function(data) {
 	        	alert("Ok")
-	        }).fail(function() {
-	        	alert("Error");
+			}).fail(function(jqXHR, textStatus, errorThrown) {
+				alert("Error: "+errorThrown);
 	        	console.log("Error: ", arguments)
 	        })
-		})
+		});
 	});
 }
 
@@ -120,13 +123,109 @@ function editGpioController(name) {
 	return editConfig("gpio", "gpio");
 }
 
+// --- Users configuration
+
+function userFormVisible(isVisible) {
+	$('#user_form_title').text("");
+	$form_container = $('#user_form_container');
+	$list_container = $('#user_list_container');
+	isVisible ? $form_container.show() : $form_container.hide();
+	!isVisible ? $list_container.show() : $list_container.hide();
+	if(isVisible) {
+		// Reset form so we could reuse it in other actions
+		$('#form_enabled').prop('checked', true);
+		$('#form_login').prop('value', "")
+						.prop('disabled', false);
+		$('#form_roles').prop('value', "");
+		$('#form_password').prop('value', "");
+		$('#user_form_submit').off('click');
+		userFormSubmitEnabled(true);
+	}
+}
+
+function userFormSubmitEnabled(isEnabled) {
+	$('#user_form_submit').prop('disabled', !isEnabled);
+}
+
 function usersListController(name) {
 	$.getJSON("/config/users/list").success(function(data) {
 		var template = compileTemplate("users_list");
-		$container.html(template({ 'data': data }))
+		$container.html(template({ 'data': data }));
+		userFormVisible(false);
 	})
 }
 
+function newUser() {
+	userFormVisible(true);
+	$('#user_form_title').text("New user");
+	$('#user_form_submit').click(function() {
+		userFormSubmitEnabled(false);
+		console.log($('#form').serialize());
+		$.post({
+			url: "/config/user/new",
+			dataType: 'json',
+			data: $('#form').serialize(),
+		}).done(function(data) {
+			alert("User added.");
+			userFormVisible(false);
+		 	loadPage('usersList');
+		}).fail(function(jqXHR, textStatus, errorThrown) {
+			alert("Error: "+errorThrown);
+			userFormSubmitEnabled(true);
+			console.log("Error: ", arguments)
+		})
+	});
+}
+
+function editUser(isEnabled, login, roles) {
+	userFormVisible(true);
+	$('#user_form_title').text("Edit user");
+	$('#form_enabled').prop('checked', isEnabled);
+	$('#form_login').prop('value', login)
+	                .prop('disabled', true);
+	$('#form_roles').prop('value', roles);
+	$('#user_form_submit').click(function() {
+		userFormSubmitEnabled(false);
+		console.log($('#form').serialize());
+		$.post({
+			url: "/config/user/edit",
+			dataType: 'json',
+			data: $('#form').serialize(),
+		}).done(function(data) {
+			alert("User " + login + " modified.");
+			userFormVisible(false);
+		 	loadPage('usersList');
+		}).fail(function(jqXHR, textStatus, errorThrown) {
+			alert("Error: "+errorThrown);
+			userFormSubmitEnabled(true);
+			console.log("Error: ", arguments)
+		})
+	});
+}
+
+function deleteUser(login) {
+	if(confirm("Are you sure you want to delete user "+login)) {
+		$.post({
+			url: "/config/user/delete",
+			dataType: 'json',
+			data: {'login': login},
+		}).done(function(data) {
+			alert("User " + login + " deleted.");
+			userFormVisible(false);
+			loadPage('usersList');
+		}).fail(function(jqXHR, textStatus, errorThrown) {
+			alert("Error: "+errorThrown);
+			console.log("Error: ", arguments)
+		})
+	}
+}
+
+// --- END Users configuration
+
+function loadPage(name) {
+	window.location.hash='#' + name;
+
+}
 
 function dispatch(name) {
 	if(name=="") {
