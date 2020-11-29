@@ -14,12 +14,15 @@ public:
 
 class UsersConfig {
 public:
-	Vector<UserConfig> users;
-	bool hasAdmin();
-	void addAdminIfDoesntExist();
-
 	static String adminLogin;
-	static UserConfig newUser(String login, String password);
+	
+	Vector<UserConfig> users;
+	void addAdminIfDoesntExist();
+	int findUser(String login);
+	bool removeUser(String login);
+	bool newUser(String login, bool enabled, String password, Vector<String> roles);
+	bool editUser(String login, bool enabled, String password, Vector<String> roles);
+
 
 private:
 	static String mkSalt();

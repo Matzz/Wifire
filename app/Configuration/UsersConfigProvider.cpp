@@ -78,41 +78,67 @@ void UsersConfigProvider::save(UsersConfig config) {
 	saveJsonObject(doc);
 }
 
+
+// --- Users Config
+
 String UsersConfig::adminLogin = "admin";
 
 void UsersConfig::addAdminIfDoesntExist() {
-    if(!hasAdmin()) {
-        auto admin = UsersConfig::newUser(
-            UsersConfig::adminLogin,
-            UsersConfig::adminLogin);
-        admin.roles.addElement(UsersConfig::adminLogin);
-        users.addElement(admin);
-    }
+    Vector<String> roles = Vector<String>();
+    roles.addElement(UsersConfig::adminLogin);
+    newUser(UsersConfig::adminLogin, true, UsersConfig::adminLogin, roles);
 }
 
-bool UsersConfig::hasAdmin() {
-    bool found = false;
-    auto size = users.size();
-    for(int i=0; i<size && !found; i++) {
-        if(users[i].login == UsersConfig::adminLogin) {
-            found = true;
+int UsersConfig::findUser(String login) {
+    for(int i=0; i<users.size(); i++) {
+        if(users[i].login==login) {
+            return i;
         }
     }
-    return found;
+    return -1;
 }
 
+bool UsersConfig::removeUser(String login) {
+    int idx = findUser(login);
+    if(idx>=0) {
+        users.remove(idx);
+        return true;
+    }
+    return false;
+}
 
-UserConfig UsersConfig::newUser(String login, String password) {
-    auto salt = mkSalt();
-    auto cfg = UserConfig();
-    cfg.login = login;
-    cfg.enabled = true;
-    cfg.hash = getHash(salt + password);
-    cfg.salt = salt;
-    return cfg;
+bool UsersConfig::newUser(String login, bool enabled, String password, Vector<String> roles) {
+    if(findUser(login) == -1) {
+        auto salt = mkSalt();
+        auto cfg = UserConfig();
+        cfg.login = login;
+        cfg.enabled = enabled;
+        cfg.hash = getHash(salt + password);
+        cfg.salt = salt;
+        cfg.roles = roles;
+        users.addElement(cfg);
+        return true;
+    }
+    return false;
+}
+
+bool UsersConfig::editUser(String login, bool enabled, String password, Vector<String> roles) {
+    int idx = findUser(login);
+    if(idx >= 0) {
+        auto cfg = users[idx];
+        cfg.enabled = enabled;
+        if(!password.empty) {
+            cfg.hash = getHash(cfg.salt + password);
+        }
+        cfg.roles = roles;
+        return true;
+    }
+    return false;
 }
 
 String UsersConfig::mkSalt() {
     auto base = String(system_get_chip_id(), 10) + String(os_get_nanoseconds(), 10);
     return getHash(base);
 }
+
+// --- END Users Config

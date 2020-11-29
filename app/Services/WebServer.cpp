@@ -40,7 +40,7 @@ void WebServer::bindActions() {
 	authWrapper("/config/ota/set", otaSetConfigAction);
 	authWrapper("/config/gpio/get", gpioGetConfigAction);
 	authWrapper("/config/gpio/set", gpioSetConfigAction);
-	authWrapper("/config/users/list", getUsersListAction);
+	authWrapper("/config/users/list", userListAction);
 	authWrapper("/gpio/on", gpioSwitchAction);
 	server.paths.setDefault(staticAction);
 }
