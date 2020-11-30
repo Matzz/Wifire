@@ -41,6 +41,9 @@ void WebServer::bindActions() {
 	authWrapper("/config/gpio/get", gpioGetConfigAction);
 	authWrapper("/config/gpio/set", gpioSetConfigAction);
 	authWrapper("/config/users/list", userListAction);
+	authWrapper("/config/users/add", userAddAction);
+	authWrapper("/config/users/edit", userEditAction);
+	authWrapper("/config/users/remove", userRemoveAction);
 	authWrapper("/gpio/on", gpioSwitchAction);
 	server.paths.setDefault(staticAction);
 }

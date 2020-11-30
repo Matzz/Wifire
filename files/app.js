@@ -7,6 +7,12 @@ function camelCaseToSentence(camelCase) {
 	return finalResult;
 }
 
+function handleFormFailure(jqXHR, textStatus, errorThrown) {
+	var msg = jqXHR.responseJSON['message'] || errorThrown;
+	alert("Error: "+msg);
+	console.log("Error: ", arguments);
+}
+
 function getFieldsFormat(inputs, custom_formats) {
 	all = {}
 	for(name in inputs) {
@@ -76,10 +82,7 @@ function editConfig(type, form_template, custom_field_mapping) {
 	            data: $('#form').serialize(),
 	        }).done(function(data) {
 	        	alert("Ok")
-			}).fail(function(jqXHR, textStatus, errorThrown) {
-				alert("Error: "+errorThrown);
-	        	console.log("Error: ", arguments)
-	        })
+			}).fail(handleFormFailure)
 		});
 	});
 }
@@ -135,7 +138,7 @@ function userFormVisible(isVisible) {
 		// Reset form so we could reuse it in other actions
 		$('#form_enabled').prop('checked', true);
 		$('#form_login').prop('value', "")
-						.prop('disabled', false);
+						.prop('readonly', false);
 		$('#form_roles').prop('value', "");
 		$('#form_password').prop('value', "");
 		$('#user_form_submit').off('click');
@@ -144,7 +147,7 @@ function userFormVisible(isVisible) {
 }
 
 function userFormSubmitEnabled(isEnabled) {
-	$('#user_form_submit').prop('disabled', !isEnabled);
+	$('#user_form_submit').prop('readonly', !isEnabled);
 }
 
 function usersListController(name) {
@@ -155,14 +158,14 @@ function usersListController(name) {
 	})
 }
 
-function newUser() {
+function addUser() {
 	userFormVisible(true);
 	$('#user_form_title').text("New user");
 	$('#user_form_submit').click(function() {
 		userFormSubmitEnabled(false);
 		console.log($('#form').serialize());
 		$.post({
-			url: "/config/user/new",
+			url: "/config/users/add",
 			dataType: 'json',
 			data: $('#form').serialize(),
 		}).done(function(data) {
@@ -182,13 +185,13 @@ function editUser(isEnabled, login, roles) {
 	$('#user_form_title').text("Edit user");
 	$('#form_enabled').prop('checked', isEnabled);
 	$('#form_login').prop('value', login)
-	                .prop('disabled', true);
+	                .prop('readonly', true);
 	$('#form_roles').prop('value', roles);
 	$('#user_form_submit').click(function() {
 		userFormSubmitEnabled(false);
 		console.log($('#form').serialize());
 		$.post({
-			url: "/config/user/edit",
+			url: "/config/users/edit",
 			dataType: 'json',
 			data: $('#form').serialize(),
 		}).done(function(data) {
@@ -203,28 +206,33 @@ function editUser(isEnabled, login, roles) {
 	});
 }
 
-function deleteUser(login) {
-	if(confirm("Are you sure you want to delete user "+login)) {
+function removeUser(login) {
+	if(confirm("Are you sure you want to remove user "+login)) {
 		$.post({
-			url: "/config/user/delete",
+			url: "/config/users/remove",
 			dataType: 'json',
 			data: {'login': login},
 		}).done(function(data) {
 			alert("User " + login + " deleted.");
 			userFormVisible(false);
 			loadPage('usersList');
-		}).fail(function(jqXHR, textStatus, errorThrown) {
-			alert("Error: "+errorThrown);
-			console.log("Error: ", arguments)
-		})
+		}).fail(handleFormFailure)
 	}
 }
 
 // --- END Users configuration
 
-function loadPage(name) {
-	window.location.hash='#' + name;
+function getCurrentPage() {
+	return window.location.hash.substring(1);
+}
 
+function loadPage(newPage) {
+	var currentPage = getCurrentPage();
+	if(currentPage == newPage) {
+		window.location.reload();
+	} else {
+		window.location.hash='#' + newPage;
+	}
 }
 
 function dispatch(name) {
@@ -246,8 +254,8 @@ function dispatch(name) {
 }
 
 function urlChanged() {
-	var action = window.location.hash.substring(1);
-	dispatch(action);
+	var currentPage = getCurrentPage();
+	dispatch(currentPage);
 }
 
 

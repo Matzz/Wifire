@@ -149,14 +149,14 @@
 						<td>
 							<a onClick="editUser(<%= user['enabled'] %>, '<%= user['login'] %>', '<%= rolesStr %>')">Edit</a>
 							/
-							<a onClick="deleteUser('<%= user['login'] %>')">Delete</a>
+							<a onClick="removeUser('<%= user['login'] %>')">Remove</a>
 						</td>
 					</tr>
 				<% } %>
 			</table>
 			<div class="row">
 				<div class="col-sm-12">
-					<button type="button" class="btn btn-primary" onClick="newUser()">New user</button>
+					<button type="button" class="btn btn-primary" onClick="addUser()">New user</button>
 				</div>
 			</div>
 		</div>
