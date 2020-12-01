@@ -3,7 +3,15 @@
 ## Uncomment and change examples:
 
 ## Add your source directories here separated by space
-COMPONENT_SRCDIRS := app app/Actions app/Configuration app/Services app/Utils
+COMPONENT_SRCDIRS := \
+app \
+app/Actions \
+app/Configuration \
+app/Configuration/Networking \
+app/Configuration/Users \
+app/Services \
+app/Services/Networking \
+app/Utils
 # COMPONENT_SRCFILES :=
 # COMPONENT_INCDIRS := include
 

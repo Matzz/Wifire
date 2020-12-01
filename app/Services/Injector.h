@@ -3,12 +3,12 @@
 #include <SmingCore.h>
 #include "OtaUpdater.h"
 #include "../Configuration/OtaConfigProvider.h"
-#include "../Configuration/WiFiApConfigProvider.h"
-#include "../Configuration/WiFiStationConfigProvider.h"
 #include "../Configuration/GPIOConfigProvider.h"
-#include "../Configuration/UsersConfigProvider.h"
+#include "../Configuration/Networking/WiFiApConfigProvider.h"
+#include "../Configuration/Networking/WiFiStationConfigProvider.h"
+#include "../Configuration/Users/UsersConfigProvider.h"
 #include "LazyFtpServer.h"
-#include "WiFiManager.h"
+#include "Networking/WiFiManager.h"
 #include "WebServer.h"
 #include "GPIOStateManager.h"
 

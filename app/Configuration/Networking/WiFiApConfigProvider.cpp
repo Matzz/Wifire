@@ -1,7 +1,6 @@
 #include "WiFiApConfigProvider.h"
 
 #include <SmingCore.h>
-#include "FileConfig.h"
 
 WiFiApConfigProvider::WiFiApConfigProvider(String fileName) :
 		FileConfig(fileName) {

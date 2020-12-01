@@ -1,8 +1,7 @@
 #include "UsersConfigProvider.h"
 
 #include <SmingCore.h>
-#include "FileConfig.h"
-#include "../Utils/utils.h"
+#include "../../Utils/utils.h"
 
 #define MAX_USERS 100
 #define MAX_ROLES 10

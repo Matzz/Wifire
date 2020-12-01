@@ -1,7 +1,8 @@
 #include <JsonObjectStream.h>
-#include "../Services/Injector.h"
 #include "usersAction.h"
+#include "../Services/Injector.h"
 #include "../Utils/utils.h"
+#include "../Configuration/Users/UsersConfig.h"
 
 void userListAction(HttpRequest &request, HttpResponse &response) {
 	JsonObjectStream* stream = new JsonObjectStream();

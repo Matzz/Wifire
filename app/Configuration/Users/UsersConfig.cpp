@@ -1,8 +1,7 @@
 #include "UsersConfig.h"
 
 #include <SmingCore.h>
-#include "FileConfig.h"
-#include "../Utils/utils.h"
+#include "../../Utils/utils.h"
 
 UserConfig::UserConfig(bool enabled, String login, String salt, String hash, const Vector<String> &roles) {
     this->enabled = enabled;

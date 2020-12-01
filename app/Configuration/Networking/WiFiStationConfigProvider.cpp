@@ -1,7 +1,6 @@
 #include "WiFiStationConfigProvider.h"
 
 #include <SmingCore.h>
-#include "FileConfig.h"
 
 
 WiFiStationConfigProvider::WiFiStationConfigProvider(String fileName) :

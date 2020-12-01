@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SmingCore.h>
-#include "FileConfig.h"
+#include "../FileConfig.h"
 
 class WiFiStationConfig {
 public:

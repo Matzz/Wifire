@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Configuration/WiFiStationConfigProvider.h"
-#include "../Configuration/WiFiApConfigProvider.h"
+#include "../../Configuration/Networking/WiFiStationConfigProvider.h"
+#include "../../Configuration/Networking/WiFiApConfigProvider.h"
 
 class WiFiManager {
 public:

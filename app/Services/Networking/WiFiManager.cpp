@@ -1,5 +1,5 @@
-#include "WiFiManager.h"
 #include <SmingCore.h>
+#include "WiFiManager.h"
 
 
 WiFiManager::WiFiManager(WiFiStationConfigProvider& stationConfigProvider,

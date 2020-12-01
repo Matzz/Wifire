@@ -1,7 +1,7 @@
 #include <JsonObjectStream.h>
 #include "configActions.h"
 #include "../Services/Injector.h"
-#include "../Services/AvaiableNetworksProvider.h"
+#include "../Services/Networking/AvaiableNetworksProvider.h"
 #include "../Utils/utils.h"
 
 void apGetConfigAction(HttpRequest &request, HttpResponse &response) {
