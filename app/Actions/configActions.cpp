@@ -1,6 +1,7 @@
 #include <JsonObjectStream.h>
 #include "configActions.h"
 #include "../Services/Injector.h"
+#include "../Services/AvaiableNetworksProvider.h"
 #include "../Utils/utils.h"
 
 void apGetConfigAction(HttpRequest &request, HttpResponse &response) {
@@ -76,6 +77,65 @@ void stationSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();
 	json["status"] = "successful";
+	response.sendNamedStream(stream);
+}
+
+void stationRefreshNetworks(HttpRequest &request, HttpResponse &response) {
+	JsonObjectStream* stream = new JsonObjectStream();
+	JsonObject json = stream->getRoot();
+	if(AvaiableNetworksProvider::isScanning()) {
+			response.code = HttpStatus::ALREADY_REPORTED;
+			json["message"] = "No networks. Scanning again.";
+	} else {
+			json["message"] = "Scanning started.";
+	}
+	AvaiableNetworksProvider::startScan();
+	response.sendNamedStream(stream);
+}
+
+void stationGetNetworks(HttpRequest &request, HttpResponse &response) {
+	JsonObjectStream* stream = new JsonObjectStream();
+	JsonObject json = stream->getRoot();
+	if(!AvaiableNetworksProvider::isScanning()) {
+		if(AvaiableNetworksProvider::networks.isEmpty()) {
+			AvaiableNetworksProvider::startScan();
+			response.code = HttpStatus::NO_CONTENT;
+			json["message"] = "No networks. Scanning again.";
+		} else {
+			JsonArray networksJson = json.createNestedArray("networks");
+			BssList networks = AvaiableNetworksProvider::networks;
+			for(int i=0; i<networks.size(); i++) {
+				BssInfo network = networks[i];
+				JsonObject networkJson = networksJson.createNestedObject();
+				networkJson["ssid"] = network.ssid;
+				networkJson["bssid"] = network.bssid;
+				networkJson["authorization"] = network.authorization;
+				networkJson["channel"] = network.channel;
+				networkJson["channel"] = network.channel;
+				networkJson["rssi"] = network.rssi;
+				networkJson["hidden"] = network.hidden;
+			}
+		}
+	} else {
+		json["message"] = "Scanning in progress.";
+	}
+	response.sendNamedStream(stream);
+}
+
+void stationListNetworks(HttpRequest &request, HttpResponse &response) {
+	auto& provider = Injector::getInstance().getWiFiStationConfigProvider();
+	auto config = provider.load();
+
+	JsonObjectStream* stream = new JsonObjectStream();
+	JsonObject json = stream->getRoot();
+
+	json["enabled"] = config.enabled;
+	json["ssid"] = config.ssid;
+	json["password"] = config.password;
+	json["ip"] = config.ip.toString();
+	json["netmask"] = config.netmask.toString();
+	json["gateway"] = config.gateway.toString();
+
 	response.sendNamedStream(stream);
 }
 

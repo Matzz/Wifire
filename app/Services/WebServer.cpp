@@ -34,6 +34,8 @@ void WebServer::bindActions() {
 	authWrapper("/info", infoAction);
 	authWrapper("/config/station/get", stationGetConfigAction);
 	authWrapper("/config/station/set", stationSetConfigAction);
+	authWrapper("/config/networks/refresh", stationRefreshNetworks);
+	authWrapper("/config/networks/get", stationGetNetworks);
 	authWrapper("/config/ap/get", apGetConfigAction);
 	authWrapper("/config/ap/set", apSetConfigAction);
 	authWrapper("/config/ota/get", otaGetConfigAction);

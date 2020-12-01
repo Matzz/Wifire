@@ -7,4 +7,7 @@ public:
 	static BssList networks;
 	static void startScan();
 	static void networkScanCompleted(bool succeeded, BssList list);
+	static bool isScanning() { return scanning; }
+private:
+	static bool scanning;
 };
