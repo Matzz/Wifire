@@ -6,7 +6,6 @@ WiFiManager::WiFiManager(WiFiStationConfigProvider& stationConfigProvider,
 		WiFiApConfigProvider& apConfigProvider) :
 		stationConfigProvider(stationConfigProvider), apConfigProvider(
 				apConfigProvider) {
-
 }
 
 void WiFiManager::startNetwork() {

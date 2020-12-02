@@ -3,6 +3,10 @@
 #include <SmingCore.h>
 #include "../../Utils/utils.h"
 
+
+UserConfig::UserConfig(): enabled(false), login(""), salt(""), hash(""), roles(Vector<String>(1, 1)) {
+    
+}
 UserConfig::UserConfig(bool enabled, String login, String salt, String hash, const Vector<String> &roles) {
     this->enabled = enabled;
     this->login = login;
@@ -18,6 +22,10 @@ UserConfig::UserConfig(bool enabled, String login, String password, const Vector
     this->salt = salt;
     this->hash = getHash(salt + password);
     this->roles = roles;
+}
+
+bool UserConfig::checkPassword(String password) {
+    return getHash(salt + password) == hash;
 }
 
 String UsersConfig::adminLogin = "admin";
@@ -60,8 +68,13 @@ bool UsersConfig::removeUser(String login) {
     return false;
 }
 
-const Vector<UserConfig> UsersConfig::getUsersList() {
-    return users;
+const Option<UserConfig> UsersConfig::getUser(String login) {
+    int idx = findUser(login);
+    if(idx > -1) {
+        return Some<UserConfig>(users[idx]);
+    } else {
+        return None<UserConfig>();
+    }
 }
 
 bool UsersConfig::addAdminIfDoesntExist() {
