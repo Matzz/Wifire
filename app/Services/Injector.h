@@ -7,6 +7,7 @@
 #include "../Configuration/Networking/WiFiApConfigProvider.h"
 #include "../Configuration/Networking/WiFiStationConfigProvider.h"
 #include "../Configuration/Users/UsersConfigProvider.h"
+#include "../Services/UserSessionManager.h"
 #include "LazyFtpServer.h"
 #include "Networking/WiFiManager.h"
 #include "WebServer.h"
@@ -37,6 +38,7 @@ public:
 	WiFiApConfigProvider& getWiFiApConfigProvider();
 	GPIOConfigProvider& getGPIOConfigProvider();
 	UsersConfigProvider& getUsersConfigProvider();
+	UserSessionManager& getUserSessionManager();
 	OtaUpdater& getOtaUpdater();
 	WiFiManager& getWiFiManager();
 	WebServer& getWebServer();

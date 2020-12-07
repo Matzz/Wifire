@@ -2,8 +2,11 @@
 
 #include <SmingCore.h>
 #include <Crypto/Sha1.h>
+#include <JsonObjectStream.h>
 
 bool getBool(HttpRequest& request, String name);
 String getString(HttpRequest& request, String name, String defaultVal = "");
+
+void returnFailure(HttpResponse &response, JsonObject &json, String msg);
 
 String getHash(String base);

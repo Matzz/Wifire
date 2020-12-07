@@ -8,7 +8,10 @@ function camelCaseToSentence(camelCase) {
 }
 
 function handleFormFailure(jqXHR, textStatus, errorThrown) {
-	var msg = jqXHR.responseJSON['message'] || errorThrown;
+	var msg = errorThrown;
+	if('responseJSON' in jqXHR && 'message' in jqXHR) {
+		msg = jqXHR.responseJSON['message'];
+	}
 	alert("Error: "+msg);
 	console.log("Error: ", arguments);
 }
@@ -78,10 +81,9 @@ function editConfig(type, form_template, custom_field_mapping) {
 		$('#form_submit').click(function() {
 	        $.post({
 	            url: saveUrl,
-	            dataType: 'json',
 	            data: $('#form').serialize(),
 	        }).done(function(data) {
-	        	alert("Ok")
+	        	alert("Ok");
 			}).fail(handleFormFailure)
 		});
 	});
@@ -166,17 +168,12 @@ function addUser() {
 		console.log($('#form').serialize());
 		$.post({
 			url: "/config/users/add",
-			dataType: 'json',
 			data: $('#form').serialize(),
 		}).done(function(data) {
 			alert("User added.");
 			userFormVisible(false);
 		 	loadPage('usersList');
-		}).fail(function(jqXHR, textStatus, errorThrown) {
-			alert("Error: "+errorThrown);
-			userFormSubmitEnabled(true);
-			console.log("Error: ", arguments)
-		})
+		}).fail(handleFormFailure)
 	});
 }
 
@@ -192,7 +189,6 @@ function editUser(isEnabled, login, roles) {
 		console.log($('#form').serialize());
 		$.post({
 			url: "/config/users/edit",
-			dataType: 'json',
 			data: $('#form').serialize(),
 		}).done(function(data) {
 			alert("User " + login + " modified.");
@@ -210,7 +206,6 @@ function removeUser(login) {
 	if(confirm("Are you sure you want to remove user "+login)) {
 		$.post({
 			url: "/config/users/remove",
-			dataType: 'json',
 			data: {'login': login},
 		}).done(function(data) {
 			alert("User " + login + " deleted.");

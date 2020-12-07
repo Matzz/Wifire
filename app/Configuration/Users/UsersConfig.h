@@ -1,8 +1,6 @@
 #pragma once
 
 #include <SmingCore.h>
-#include "optional"
-#include "../../Utils/Option.h"
 
 class UserConfig {
 public:
@@ -16,7 +14,7 @@ public:
     UserConfig(bool enabled, String login, String salt, String hash, const Vector<String> &roles);
     UserConfig(bool enabled, String login, String password, const Vector<String> &roles);
 
-	bool checkPassword(String password);
+	bool checkPassword(String password) const;
 
 private:
 	static String mkSalt();
@@ -29,12 +27,12 @@ public:
     bool addUser(UserConfig &user);
 	bool editUser(bool enabled, String login, String password, const Vector<String> &roles);
 	bool removeUser(String login);
-	const Vector<UserConfig> getUsersList() { return users; }
-	const Option<UserConfig> getUser(String login);
+	Vector<UserConfig> const getUsersList() { return users; } const
+	UserConfig* getUser(String login) const;
 	bool addAdminIfDoesntExist();
 
 private:
-	int findUser(String login);
+	int findUser(String login) const;
 
 private:
 	Vector<UserConfig> users;

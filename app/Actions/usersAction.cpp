@@ -34,20 +34,7 @@ Vector<String> parseRoles(HttpRequest &request) {
 	return roles;
 }
 
-void ok(HttpResponse &response, JsonObject &json) {
-	response.code = HttpStatus::OK;
-	json["status"] = "failed";
-}
-
-void fail(HttpResponse &response, JsonObject &json, String msg) {
-		response.code = HttpStatus::BAD_REQUEST;
-	json["status"] = "failed";
-	json["message"] = msg;
-}
-
 void userAddAction(HttpRequest &request, HttpResponse &response) {
-	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject json = stream->getRoot();
 
 	UserConfig user(
 		getBool(request, "enabled"),
@@ -62,17 +49,16 @@ void userAddAction(HttpRequest &request, HttpResponse &response) {
 
 	if(added) {
 		provider.save(usersConfig);
-		ok(response, json);
 	} else {
-		fail(response, json, "User alredy exists.");
+		JsonObjectStream* stream = new JsonObjectStream();
+		JsonObject json = stream->getRoot();
+		returnFailure(response, json, "User alredy exists.");
+		response.sendNamedStream(stream);
 	}
 
-	response.sendNamedStream(stream);
 }
 
 void userEditAction(HttpRequest &request, HttpResponse &response) {
-	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject json = stream->getRoot();
 
 	auto& provider = Injector::getInstance().getUsersConfigProvider();
 	UsersConfig usersConfig = provider.load();
@@ -86,17 +72,15 @@ void userEditAction(HttpRequest &request, HttpResponse &response) {
 
 	if(modified) {
 		provider.save(usersConfig);
-		ok(response, json);
 	} else {
-		fail(response, json, "User doesn't exist.");
+		JsonObjectStream* stream = new JsonObjectStream();
+		JsonObject json = stream->getRoot();
+		returnFailure(response, json, "User doesn't exist.");
+		response.sendNamedStream(stream);
 	}
-
-	response.sendNamedStream(stream);
 }
 
 void userRemoveAction(HttpRequest &request, HttpResponse &response) {
-	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject json = stream->getRoot();
 
 	auto& provider = Injector::getInstance().getUsersConfigProvider();
 	UsersConfig usersConfig = provider.load();
@@ -104,10 +88,10 @@ void userRemoveAction(HttpRequest &request, HttpResponse &response) {
 
 	if(removed) {
 		provider.save(usersConfig);
-		ok(response, json);
 	} else {
-		fail(response, json, "User doesn't exist.");
+		JsonObjectStream* stream = new JsonObjectStream();
+		JsonObject json = stream->getRoot();
+		returnFailure(response, json, "User doesn't exist.");
+		response.sendNamedStream(stream);
 	}
-
-	response.sendNamedStream(stream);
 }

@@ -33,6 +33,11 @@ UsersConfigProvider& Injector::getUsersConfigProvider() {
 	return usersConfigProvider;
 }
 
+UserSessionManager& Injector::getUserSessionManager() {
+	static auto userSessionManager = UserSessionManager(getUsersConfigProvider());
+	return userSessionManager;
+}
+
 OtaUpdater& Injector::getOtaUpdater() {
 	static auto otaUpdater = OtaUpdater(spiffsAddresses, getOtaConfigProvider());
 	return otaUpdater;

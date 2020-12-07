@@ -24,7 +24,7 @@ UserConfig::UserConfig(bool enabled, String login, String password, const Vector
     this->roles = roles;
 }
 
-bool UserConfig::checkPassword(String password) {
+bool UserConfig::checkPassword(String password) const {
     return getHash(salt + password) == hash;
 }
 
@@ -68,12 +68,12 @@ bool UsersConfig::removeUser(String login) {
     return false;
 }
 
-const Option<UserConfig> UsersConfig::getUser(String login) {
+ const UserConfig* UsersConfig::getUser(String login) const {
     int idx = findUser(login);
     if(idx > -1) {
-        return Some<UserConfig>(users[idx]);
+        return &(users[idx]);
     } else {
-        return None<UserConfig>();
+        return nullptr;
     }
 }
 
@@ -84,7 +84,7 @@ bool UsersConfig::addAdminIfDoesntExist() {
     return addUser(user);
 }
 
-int UsersConfig::findUser(String login) {
+int UsersConfig::findUser(String login) const {
     for(int i=0; i<users.size(); i++) {
         if(users[i].login==login) {
             return i;

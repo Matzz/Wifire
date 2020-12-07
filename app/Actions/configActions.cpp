@@ -37,11 +37,6 @@ void apSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	config.beaconInterval = request.getPostParameter("beaconInterval").toInt();
 	provider.save(config);
 	debug_i("AP config saved.");
-
-	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject json = stream->getRoot();
-	json["status"] = "successful";
-	response.sendNamedStream(stream);
 }
 
 void stationGetConfigAction(HttpRequest &request, HttpResponse &response) {
@@ -73,11 +68,6 @@ void stationSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	config.gateway = IPAddress(request.getPostParameter("gateway"));
 	provider.save(config);
 	debug_i("Station config saved.");
-
-	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject json = stream->getRoot();
-	json["status"] = "successful";
-	response.sendNamedStream(stream);
 }
 
 void stationRefreshNetworks(HttpRequest &request, HttpResponse &response) {
@@ -160,11 +150,6 @@ void otaSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	config.spiffUrl = request.getPostParameter("spiffUrl");
 	provider.save(config);
 	debug_i("OTA config saved.");
-
-	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject json = stream->getRoot();
-	json["status"] = "successful";
-	response.sendNamedStream(stream);
 }
 
 void gpioGetConfigAction(HttpRequest &request, HttpResponse &response) {
@@ -194,9 +179,5 @@ void gpioSetConfigAction(HttpRequest &request, HttpResponse &response) {
 
 	provider.save(config);
 	debug_i("GPIO config saved.");
-	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject json = stream->getRoot();
 	di.getGPIOStateManager().update();
-	json["status"] = "successful";
-	response.sendNamedStream(stream);
 }

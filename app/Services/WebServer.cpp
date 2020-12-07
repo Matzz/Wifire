@@ -7,6 +7,7 @@
 #include "../Actions/configActions.h"
 #include "../Actions/gpioSwitchAction.h"
 #include "../Actions/usersAction.h"
+#include "../Actions/loginAction.h"
 
 
 WebServer::WebServer(const int port) :
@@ -47,5 +48,7 @@ void WebServer::bindActions() {
 	authWrapper("/config/users/edit", userEditAction);
 	authWrapper("/config/users/remove", userRemoveAction);
 	authWrapper("/gpio/on", gpioSwitchAction);
+	authWrapper("/login", signinAction);
+
 	server.paths.setDefault(staticAction);
 }
