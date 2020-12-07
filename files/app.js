@@ -9,7 +9,7 @@ function camelCaseToSentence(camelCase) {
 
 function handleFormFailure(jqXHR, textStatus, errorThrown) {
 	var msg = errorThrown;
-	if('responseJSON' in jqXHR && 'message' in jqXHR) {
+	if('responseJSON' in jqXHR && 'message' in jqXHR['responseJSON']) {
 		msg = jqXHR.responseJSON['message'];
 	}
 	alert("Error: "+msg);

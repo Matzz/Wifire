@@ -22,13 +22,14 @@ public:
 class UserSessionManager {
 public:
 	UserSessionManager(UsersConfigProvider& configProvider);
-    Either<String, Session> validateSession(String sessionId);
-    Either<String, Session> signin(String login, String password);
+    Either<String, Session> validateSession(const String& sessionId);
+    Either<String, Session> signIn(const String& login, const String& password);\
+    void signOut(const String& sessionId);
 private:
     Vector<Session> sessions;
     UsersConfigProvider& configProvider;
 
-    int getSessionByLogin(String login);
-    int getSessionById(String sessionId);
-    String mkSessionId(String login);
+    int getSessionByLogin(const String& login);
+    int getSessionById(const String& sessionId);
+    String mkSessionId(const String& login);
 };

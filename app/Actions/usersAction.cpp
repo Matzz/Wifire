@@ -52,8 +52,7 @@ void userAddAction(HttpRequest &request, HttpResponse &response) {
 	} else {
 		JsonObjectStream* stream = new JsonObjectStream();
 		JsonObject json = stream->getRoot();
-		returnFailure(response, json, "User alredy exists.");
-		response.sendNamedStream(stream);
+		returnFailure(response, "User alredy exists.");
 	}
 
 }
@@ -73,10 +72,7 @@ void userEditAction(HttpRequest &request, HttpResponse &response) {
 	if(modified) {
 		provider.save(usersConfig);
 	} else {
-		JsonObjectStream* stream = new JsonObjectStream();
-		JsonObject json = stream->getRoot();
-		returnFailure(response, json, "User doesn't exist.");
-		response.sendNamedStream(stream);
+		returnFailure(response, "User doesn't exist.");
 	}
 }
 
@@ -89,9 +85,6 @@ void userRemoveAction(HttpRequest &request, HttpResponse &response) {
 	if(removed) {
 		provider.save(usersConfig);
 	} else {
-		JsonObjectStream* stream = new JsonObjectStream();
-		JsonObject json = stream->getRoot();
-		returnFailure(response, json, "User doesn't exist.");
-		response.sendNamedStream(stream);
+		returnFailure(response, "User doesn't exist.");
 	}
 }

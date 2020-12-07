@@ -19,7 +19,7 @@ Session& Session::operator=(const Session &session) {
 UserSessionManager::UserSessionManager(UsersConfigProvider& configProvider) :
 		configProvider(configProvider) { }
 
-int UserSessionManager::getSessionByLogin(String login) {
+int UserSessionManager::getSessionByLogin(const String& login) {
     for(int i=0; i<sessions.size(); i++) {
         Session session = sessions[i];
         if(session.login==login) {
@@ -29,7 +29,7 @@ int UserSessionManager::getSessionByLogin(String login) {
     return -1;
 }
 
-int UserSessionManager::getSessionById(String sessionId) {
+int UserSessionManager::getSessionById(const String& sessionId) {
     for(int i=0; i<sessions.size(); i++) {
         Session session = sessions[i];
         if(session.sessionId==sessionId) {
@@ -39,7 +39,7 @@ int UserSessionManager::getSessionById(String sessionId) {
     return -1;
 }
 
-Either<String, Session> UserSessionManager::validateSession(String sessionId) {
+Either<String, Session> UserSessionManager::validateSession(const String& sessionId) {
     int sessionIdx = getSessionById(sessionId);
     if(sessionIdx >= 0) {
         sessions[sessionIdx].markUsed();
@@ -50,11 +50,11 @@ Either<String, Session> UserSessionManager::validateSession(String sessionId) {
 
 }
 
-Either<String, Session> UserSessionManager::signin(String login, String password) {
+Either<String, Session> UserSessionManager::signIn(const String& login, const String& password) {
     UsersConfig usersConfig = configProvider.load();
     const UserConfig* user = usersConfig.getUser(login);
     if(user != nullptr) {
-        if(user->enabled) {
+        if(!user->enabled) {
             return {left_tag_t(), std::move("This user is disabled.")};
         }
         if(!user->checkPassword(password)) {
@@ -74,7 +74,14 @@ Either<String, Session> UserSessionManager::signin(String login, String password
     }
 }
 
-String UserSessionManager::mkSessionId(String login) {
+void UserSessionManager::signOut(const String& sessionId) {
+    uint idx = getSessionById(sessionId);
+    if(idx >= 0) {
+        sessions.removeElementAt(idx);
+    }
+}
+
+String UserSessionManager::mkSessionId(const String& login) {
     auto base = String(system_get_chip_id(), 10) + String(os_get_nanoseconds(), 10) + String(login);
     return getHash(base);
 }

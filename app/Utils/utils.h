@@ -7,6 +7,6 @@
 bool getBool(HttpRequest& request, String name);
 String getString(HttpRequest& request, String name, String defaultVal = "");
 
-void returnFailure(HttpResponse &response, JsonObject &json, String msg);
+void returnFailure(HttpResponse &response, String msg);
 
 String getHash(String base);

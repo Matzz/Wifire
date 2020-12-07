@@ -5,9 +5,13 @@ bool getBool(HttpRequest& request, String name) {
 	return val=="true" || val == "1" || val == "on";
 }
 
-void returnFailure(HttpResponse &response, JsonObject &json, String msg) {
-	response.code = HttpStatus::BAD_REQUEST;
+void returnFailure(HttpResponse &response, String msg) {
+
+	JsonObjectStream* stream = new JsonObjectStream();
+	JsonObject json = stream->getRoot();
 	json["message"] = msg;
+	response.sendDataStream(stream, MIME_JSON);
+	response.code = HttpStatus::BAD_REQUEST;
 }
 
 String getString(HttpRequest& request, String name, String defaultVal) {

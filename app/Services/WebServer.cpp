@@ -3,11 +3,12 @@
 #include <SmingCore.h>
 #include "InfoProvider.h"
 #include "../Actions/infoAction.h"
+#include "../Actions/authAction.h"
 #include "../Actions/staticAction.h"
 #include "../Actions/configActions.h"
 #include "../Actions/gpioSwitchAction.h"
 #include "../Actions/usersAction.h"
-#include "../Actions/loginAction.h"
+#include "../Actions/authAction.h"
 
 
 WebServer::WebServer(const int port) :
@@ -48,7 +49,8 @@ void WebServer::bindActions() {
 	authWrapper("/config/users/edit", userEditAction);
 	authWrapper("/config/users/remove", userRemoveAction);
 	authWrapper("/gpio/on", gpioSwitchAction);
-	authWrapper("/login", signinAction);
+	authWrapper("/signin", signInAction);
+	authWrapper("/signout", signOutAction);
 
 	server.paths.setDefault(staticAction);
 }
