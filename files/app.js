@@ -128,6 +128,31 @@ function editGpioController(name) {
 	return editConfig("gpio", "gpio");
 }
 
+// -- Auth actions
+
+function signinController() {
+	$container.html(compileTemplate("signin"));
+	$('#form').submit(function(event) {
+		console.log(event);
+		$.post({
+			url: "/signin",
+			data: $(event.target).serialize(),
+		}).done(function(data) {
+			alert("You have been signed in.");
+			loadPage("info");
+		}).fail(handleFormFailure)
+		return false;
+	});
+}
+
+function signoutController() {
+	$.post({
+		url: "/signout"
+	}).done(function(data) {
+		loadPage("signin")
+	}).fail(handleFormFailure)
+}
+
 // --- Users configuration
 
 function userFormVisible(isVisible) {
@@ -146,10 +171,11 @@ function userFormVisible(isVisible) {
 		$('#user_form_submit').off('click');
 		userFormSubmitEnabled(true);
 	}
+	return isVisible;
 }
 
 function userFormSubmitEnabled(isEnabled) {
-	$('#user_form_submit').prop('readonly', !isEnabled);
+	$('#user_form_container [type=submit]').prop('disabled', !isEnabled);
 }
 
 function usersListController(name) {
@@ -163,17 +189,20 @@ function usersListController(name) {
 function addUser() {
 	userFormVisible(true);
 	$('#user_form_title').text("New user");
-	$('#user_form_submit').click(function() {
+	$('#user_form_container').submit(function(event) {
 		userFormSubmitEnabled(false);
 		console.log($('#form').serialize());
 		$.post({
 			url: "/config/users/add",
-			data: $('#form').serialize(),
+			data: $(event.target).serialize(),
 		}).done(function(data) {
 			alert("User added.");
 			userFormVisible(false);
 		 	loadPage('usersList');
-		}).fail(handleFormFailure)
+		}).fail(handleFormFailure);
+		return false;
+	}).on('reset', function(event) {
+		return userFormVisible(false);
 	});
 }
 
@@ -184,22 +213,23 @@ function editUser(isEnabled, login, roles) {
 	$('#form_login').prop('value', login)
 	                .prop('readonly', true);
 	$('#form_roles').prop('value', roles);
-	$('#user_form_submit').click(function() {
+	$('#user_form_container').submit(function(event) {
 		userFormSubmitEnabled(false);
-		console.log($('#form').serialize());
 		$.post({
 			url: "/config/users/edit",
-			data: $('#form').serialize(),
+			data: $(event.target).serialize(),
 		}).done(function(data) {
 			alert("User " + login + " modified.");
 			userFormVisible(false);
 		 	loadPage('usersList');
 		}).fail(function(jqXHR, textStatus, errorThrown) {
-			alert("Error: "+errorThrown);
+			handleFormFailure(jqXHR, textStatus, errorThrown);
 			userFormSubmitEnabled(true);
-			console.log("Error: ", arguments)
-		})
-	});
+		});
+		return false;
+	}).on('reset', function(event) {
+		return userFormVisible(false);
+	});;
 }
 
 function removeUser(login) {
