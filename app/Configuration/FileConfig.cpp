@@ -21,10 +21,10 @@ void FileConfig::loadJsonObject(JsonDocument& json) {
 	deserializeJson(json, jsonString);
 }
 
-IPAddress FileConfig::getIp(JsonDocument& json, String field, IPAddress defaultIp) {
+IpAddress FileConfig::getIp(JsonDocument& json, String field, IpAddress defaultIp) {
 	if(json.containsKey(field)) {
 		String ipStr = json[field];
-		return IPAddress(ipStr);
+		return IpAddress(ipStr);
 	} else {
 		return defaultIp;
 	}

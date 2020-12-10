@@ -31,7 +31,7 @@ bool UserConfig::checkPassword(String password) const {
 String UsersConfig::adminLogin = "admin";
 
 String UserConfig::mkSalt() {
-    auto base = String(system_get_chip_id(), 10) + String(os_get_nanoseconds(), 10);
+    auto base = String(system_get_chip_id(), 10) + String(micros(), 10);
     return getHash(base);
 }
 

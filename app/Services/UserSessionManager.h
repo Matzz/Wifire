@@ -15,7 +15,7 @@ public:
     Session& operator=(const Session &session);
     
     inline void markUsed() {
-        lastUsed = os_get_nanoseconds();
+        lastUsed = micros();
     }
 };
 

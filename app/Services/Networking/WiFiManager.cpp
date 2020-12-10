@@ -49,7 +49,7 @@ bool WiFiManager::startAccessPoint(WiFiApConfig& config) {
 	}
 	WifiAccessPoint.enable(true);
 
-	IPAddress oldIp = WifiAccessPoint.getIP();
+	IpAddress oldIp = WifiAccessPoint.getIP();
 	if (!(oldIp==config.ip)) {
 		debug_i("Setting new ip %s. Old ip %s\n", config.ip.toString().c_str(), oldIp.toString().c_str());
 		if (!WifiAccessPoint.setIP(config.ip)) {

@@ -15,7 +15,7 @@ WiFiApConfig WiFiApConfigProvider::load() {
 	cfg.enabled = getOrElse(doc, "enabled", true);
 	cfg.ssid = getOrElse(doc, "ssid", defaultSsid);
 	cfg.password = getOrElse(doc, "password", "");
-	cfg.ip = getIp(doc, "ip", IPAddress(192,168,13,10));
+	cfg.ip = getIp(doc, "ip", IpAddress(192,168,1,1));
 	cfg.authMode = (WifiAuthMode) getOrElse<int>(doc, "authMode", AUTH_OPEN);
 	cfg.hidden = getOrElse(doc, "hidden", false);
 	cfg.channel = getOrElse(doc, "channel", 7);

@@ -21,5 +21,5 @@ protected:
 		return doc.containsKey(field) ? doc[field].as<T>() : elseVal;
 	}
 
-	IPAddress getIp(JsonDocument& json, String field, IPAddress defaultIp = IPAddress());
+	IpAddress getIp(JsonDocument& json, String field, IpAddress defaultIp = IpAddress());
 };

@@ -9,7 +9,7 @@ public:
 	String ssid;
 	String password;
 	WifiAuthMode authMode;
-	IPAddress ip;
+	IpAddress ip;
 	bool hidden = false;
 	int channel = 7;
 	int beaconInterval = 200;

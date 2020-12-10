@@ -9,59 +9,59 @@ Injector& Injector::getInstance() {
 }
 
 OtaConfigProvider& Injector::getOtaConfigProvider() {
-	static auto otaConfigProvider = OtaConfigProvider();
+	static OtaConfigProvider otaConfigProvider;
 	return otaConfigProvider;
 }
 
 WiFiStationConfigProvider& Injector::getWiFiStationConfigProvider() {
-	static auto wiFiStationConfigProvider = WiFiStationConfigProvider();
+	static WiFiStationConfigProvider wiFiStationConfigProvider;
 	return wiFiStationConfigProvider;
 }
 
 WiFiApConfigProvider& Injector::getWiFiApConfigProvider() {
-	static auto wiFiApConfigProvider = WiFiApConfigProvider();
+	static WiFiApConfigProvider wiFiApConfigProvider;
 	return wiFiApConfigProvider;
 }
 
 GPIOConfigProvider& Injector::getGPIOConfigProvider() {
-	static auto gpioConfigProvider = GPIOConfigProvider();
+	static GPIOConfigProvider gpioConfigProvider;
 	return gpioConfigProvider;
 }
 
 UsersConfigProvider& Injector::getUsersConfigProvider() {
-	static auto usersConfigProvider = UsersConfigProvider();
+	static UsersConfigProvider usersConfigProvider;
 	return usersConfigProvider;
 }
 
 UserSessionManager& Injector::getUserSessionManager() {
-	static auto userSessionManager = UserSessionManager(getUsersConfigProvider());
+	static UserSessionManager userSessionManager(getUsersConfigProvider());
 	return userSessionManager;
 }
 
 OtaUpdater& Injector::getOtaUpdater() {
-	static auto otaUpdater = OtaUpdater(spiffsAddresses, getOtaConfigProvider());
+	static OtaUpdater otaUpdater(spiffsAddresses, getOtaConfigProvider());
 	return otaUpdater;
 }
 
 WiFiManager& Injector::getWiFiManager() {
-	static auto wiFiManager = WiFiManager(
+	static WiFiManager wiFiManager(
 		getWiFiStationConfigProvider(),
 		getWiFiApConfigProvider());
 	return wiFiManager;
 }
 
 WebServer& Injector::getWebServer() {
-	static auto webServer = WebServer(80);
+	static WebServer webServer(80);
 	return webServer;
 }
 
 LazyFtpServer& Injector::getFtpServer() {
-	static auto lazyFtpServer = LazyFtpServer(ftpUser, ftpPassword, ftpPort);
+	static LazyFtpServer lazyFtpServer(ftpUser, ftpPassword, ftpPort);
 	return lazyFtpServer;
 }
 
 GPIOStateManager& Injector::getGPIOStateManager() {
 	GPIOConfigProvider& configProvider = getGPIOConfigProvider();
-	static auto gpioStateManager = GPIOStateManager(configProvider);
+	static GPIOStateManager gpioStateManager(configProvider);
 	return gpioStateManager;
 }

@@ -3,7 +3,7 @@
 
 void staticAction(HttpRequest &request, HttpResponse &response)
 {
-	String file = request.getPath();
+	String file = request.uri.Path;
 	if (file[0] == '/')
 		file = file.substring(1);
 

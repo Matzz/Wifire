@@ -82,6 +82,6 @@ void UserSessionManager::signOut(const String& sessionId) {
 }
 
 String UserSessionManager::mkSessionId(const String& login) {
-    auto base = String(system_get_chip_id(), 10) + String(os_get_nanoseconds(), 10) + String(login);
+    auto base = String(system_get_chip_id(), 10) + String(micros(), 10) + String(login);
     return getHash(base);
 }

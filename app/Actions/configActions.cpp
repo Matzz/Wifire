@@ -31,7 +31,7 @@ void apSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	config.ssid = request.getPostParameter("ssid");
 	config.password = request.getPostParameter("password");
 	config.authMode = (WifiAuthMode) request.getPostParameter("authMode").toInt();
-	config.ip = IPAddress(request.getPostParameter("ip"));
+	config.ip = IpAddress(request.getPostParameter("ip"));
 	config.hidden = request.getPostParameter("hidden");
 	config.channel = request.getPostParameter("channel").toInt();
 	config.beaconInterval = request.getPostParameter("beaconInterval").toInt();
@@ -63,9 +63,9 @@ void stationSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	config.enabled = getBool(request, "enabled");
 	config.ssid = request.getPostParameter("ssid");
 	config.password = request.getPostParameter("password");
-	config.ip = IPAddress(request.getPostParameter("ip"));
-	config.netmask = IPAddress(request.getPostParameter("netmask"));
-	config.gateway = IPAddress(request.getPostParameter("gateway"));
+	config.ip = IpAddress(request.getPostParameter("ip"));
+	config.netmask = IpAddress(request.getPostParameter("netmask"));
+	config.gateway = IpAddress(request.getPostParameter("gateway"));
 	provider.save(config);
 	debug_i("Station config saved.");
 }

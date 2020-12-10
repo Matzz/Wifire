@@ -5,16 +5,18 @@
 
 
 void onReady() {
+	Serial.println("System ready callback.");
 	Injector &di = Injector::getInstance();
-	di.getWiFiManager().startNetwork();
 	di.getWebServer().start();
-	di.getGPIOStateManager().update();
+	// di.getGPIOStateManager().update();
 	//di.getFtpServer().start();
 }
 
 void init() {
 	SerialHandler::setup();
 	SpiffsManager::setup();
+	Injector &di = Injector::getInstance();
+	di.getWiFiManager().startNetwork();
 
 	System.onReady(onReady);
 }

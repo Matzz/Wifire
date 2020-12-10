@@ -8,9 +8,9 @@ public:
 	bool enabled = false;
 	String ssid;
 	String password;
-	IPAddress ip;
-	IPAddress netmask;
-	IPAddress gateway;
+	IpAddress ip;
+	IpAddress netmask;
+	IpAddress gateway;
 };
 
 class WiFiStationConfigProvider: FileConfig {

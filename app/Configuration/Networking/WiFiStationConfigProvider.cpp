@@ -15,9 +15,9 @@ WiFiStationConfig WiFiStationConfigProvider::load() {
 	cfg.enabled = getOrElse(doc, "enabled", false);
 	cfg.ssid = getOrElse(doc, "ssid", "");
 	cfg.password = getOrElse(doc, "password", "");
-	cfg.ip = getIp(doc, "ip", IPAddress(192, 168, 1, 1));
-	cfg.netmask = getIp(doc, "netmask", IPAddress(255, 255, 255, 0));
-	cfg.gateway = getIp(doc, "gateway", IPAddress(192, 168, 1, 1));
+	cfg.ip = getIp(doc, "ip", IpAddress(192, 168, 1, 1));
+	cfg.netmask = getIp(doc, "netmask", IpAddress(255, 255, 255, 0));
+	cfg.gateway = getIp(doc, "gateway", IpAddress(192, 168, 1, 1));
 	return cfg;
 }
 
