@@ -10,6 +10,7 @@ GPIOConfigProvider::GPIOConfigProvider(String fileName) :
 
 
 GPIOConfig GPIOConfigProvider::jsonToConfig(JsonObject& doc) {
+	debug_i("Loading GPIO configuration.");
 	GPIOConfig cfg;
 	JsonArray gpioArr = doc["gpio"].as<JsonArray>();
 	int gpioArrSize = gpioArr.size();

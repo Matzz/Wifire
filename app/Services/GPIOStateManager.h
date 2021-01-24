@@ -10,6 +10,7 @@ class GPIOStateManager : private NonCopyable {
 		Timer** timers = new Timer*[PIN_MAX+1];
 		void deleteTimer(int pin);
 		int getPinByName(GPIOConfig &config, String name);
+		bool isSafeToUse(unsigned int pin);
 	public:
 		GPIOStateManager(GPIOConfigProvider& cfgProvider);
 		~GPIOStateManager();

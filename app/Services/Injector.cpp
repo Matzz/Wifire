@@ -1,8 +1,5 @@
 #include "Injector.h"
 
-int atexit(void (*func)()) { return 0; }
-
-
 Injector& Injector::getInstance() {
 	static Injector injector;
 	return injector;
@@ -61,7 +58,6 @@ LazyFtpServer& Injector::getFtpServer() {
 }
 
 GPIOStateManager& Injector::getGPIOStateManager() {
-	GPIOConfigProvider& configProvider = getGPIOConfigProvider();
-	static GPIOStateManager gpioStateManager(configProvider);
+	static GPIOStateManager gpioStateManager(getGPIOConfigProvider());
 	return gpioStateManager;
 }

@@ -8,6 +8,7 @@ void SerialHandler::setup() {
 	Serial.begin(SERIAL_BAUD_RATE); // 115200 by default
 	Serial.systemDebugOutput(true); // Debug output to serial
 	Serial.onDataReceived(SerialHandler::callback);
+	Serial.println("Serial handler set.");
 }
 
 void SerialHandler::callback(Stream& stream, char arrivedChar,

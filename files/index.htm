@@ -110,6 +110,7 @@
 			<th>
 				<input type="text" name="gpio[<%= idx %>]['name']" value="<%= pin['name'] %>" />
 			</th>
+			<% if(isPinSafeToUse(idx)) { %>
 			<td>
 				<select name="gpio[<%= idx %>]['isInput']">
 					<option value="true" <%= pin['isInput'] ? 'selected' : ''  %>>
@@ -123,6 +124,9 @@
 			<td>
 				<input type="checkbox" name="gpio[<%= idx %>]['pull']" <%= pin['pull'] ? 'checked' : '' %> value="1" />
 			</td>
+			<% } else { %>
+				<td colspan="2">It is not safe to use that pin</td>
+			<% } %>
 		</tr>
 		<% } %>
 		</tr>

@@ -16,7 +16,17 @@ WebServer::WebServer(const int port) :
 }
 
 void WebServer::start() {
+
+	HttpServerSettings settings;
+	settings.maxActiveConnections = 10;
+	settings.keepAliveSeconds = 0;
+	settings.minHeapSize = -1;
+	settings.useDefaultBodyParsers = true;
+	settings.closeOnContentError = true;
+	server.configure(settings);
+
 	server.listen(port);
+	server.setTimeOut(1000);
 	bindActions();
 }
 

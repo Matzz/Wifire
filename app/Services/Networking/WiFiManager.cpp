@@ -23,6 +23,7 @@ void WiFiManager::startNetwork() {
 			debug_w("Cannot connect to station.");
 		}
 	} else {
+		WifiStation.enable(false, false);
 		debug_i("Station mode disabled.");
 	}
 	if(apCfg.enabled) {
@@ -33,6 +34,7 @@ void WiFiManager::startNetwork() {
 			debug_w("Cannot create AP.");
 		}
 	} else {
+		WifiAccessPoint.enable(false, false);
 		debug_i("AP mode disabled.");
 	}
 }
@@ -41,13 +43,13 @@ void WiFiManager::startNetwork() {
 bool WiFiManager::startAccessPoint(WiFiApConfig& config) {
 
 	debug_i("Starting network %s", config.ssid.c_str());
+	WifiAccessPoint.enable(true, false);
 	bool configStatus = WifiAccessPoint.config(config.ssid, config.password,
 			config.authMode, config.hidden, config.channel,
 			config.beaconInterval);
 	if (!configStatus) {
 		debug_w("Setting AP config failed.");
 	}
-	WifiAccessPoint.enable(true);
 
 	IpAddress oldIp = WifiAccessPoint.getIP();
 	if (!(oldIp==config.ip)) {
@@ -72,6 +74,6 @@ bool WiFiManager::connectStation(WiFiStationConfig& config) {
 	if (!status) {
 		return false;
 	}
-	WifiStation.enable(true);
+	WifiStation.enable(true, false);
 	return WifiStation.connect();
 }

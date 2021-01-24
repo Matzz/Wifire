@@ -75,7 +75,7 @@ Either<String, Session> UserSessionManager::signIn(const String& login, const St
 }
 
 void UserSessionManager::signOut(const String& sessionId) {
-    uint idx = getSessionById(sessionId);
+    int idx = getSessionById(sessionId);
     if(idx >= 0) {
         sessions.removeElementAt(idx);
     }
