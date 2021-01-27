@@ -127,7 +127,7 @@ function editOtaController(name) {
 // -0- GPIO actions
 
 function isPinSafeToUse(pin) {
-	switch(pin) {
+	switch(parseInt(pin)) {
 		case 0:
 		case 1: return false;
 		case 2:

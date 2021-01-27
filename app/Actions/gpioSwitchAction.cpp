@@ -8,14 +8,16 @@ void gpioSwitchAction(HttpRequest &request, HttpResponse &response) {
 	Injector &di = Injector::getInstance();
 	GPIOStateManager& gpioState = di.getGPIOStateManager();
 	String name = request.getQueryParameter("name");
-    bool result = gpioState.turnOn(name, 1000);
+	uint32_t howLongMs = request.getQueryParameter("time_ms", "0").toInt();
+	
+	String stateName = request.getQueryParameter("state", "on");
+	stateName.toLowerCase();
+	uint8_t state = stateName == "on" ? HIGH : LOW;
+	
+    bool result = gpioState.switchPin(name, state, howLongMs);
 
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();
-	if(result) {
-		json["status"] = "successful";
-	} else {
-		json["status"] = "failed";
-	}
+	json["status"] = result ? "successful" : "failed";
 	response.sendNamedStream(stream);
 }

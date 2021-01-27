@@ -58,7 +58,7 @@ void WebServer::bindActions() {
 	authWrapper("/config/users/add", userAddAction);
 	authWrapper("/config/users/edit", userEditAction);
 	authWrapper("/config/users/remove", userRemoveAction);
-	authWrapper("/gpio/on", gpioSwitchAction);
+	authWrapper("/gpio/switch", gpioSwitchAction);
 	authWrapper("/signin", signInAction);
 	authWrapper("/signout", signOutAction);
 

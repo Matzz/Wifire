@@ -15,5 +15,5 @@ class GPIOStateManager : private NonCopyable {
 		GPIOStateManager(GPIOConfigProvider& cfgProvider);
 		~GPIOStateManager();
 		void update();
-		bool turnOn(String pin, unsigned int howLong = 0);
+		bool switchPin(String pinName, uint8_t state, uint32_t howLongMs = 0);
 };

@@ -33,23 +33,27 @@ void GPIOStateManager::deleteTimer(int pin) {
 		timers[pin] = nullptr;
 	}
 }
-bool GPIOStateManager::turnOn(String pinName, unsigned int howLong) {
+bool GPIOStateManager::switchPin(String pinName, uint8_t state, uint32_t howLongMs) {
+	state = state == HIGH ? HIGH : LOW;
 	auto config = cfgProvider.load();
 	int pin = getPinByName(config, pinName);
 	if(pin<0) {
 		return false;
 	}
-	if(isInputPin(pin) || pin > PIN_MAX) {
-		debug_w("Pin %s (%d) is not configured as output pin.", pinName.c_str(), pin);
+	if(isInputPin(pin)) {
+		debug_w("Pin %s (%d) is not configured as output pin.", pinName, pin);
 		return false;
 	} else {
-		digitalWrite(pin, 1);
-		if(howLong>0) {
+		digitalWrite(pin, state);
+		debug_i("GPIO %s (%d) set to state %d. Requested time %d ms.", pinName, pin, state, howLongMs);
+		if(howLongMs>0) {
 			if(timers[pin] == nullptr) {
 				timers[pin] = new Timer();
 			}
-			timers[pin]->initializeMs(howLong,  [pin]() {
-				digitalWrite(pin, 0);
+			timers[pin]->initializeMs(howLongMs,  [pinName, pin, state]() {
+				uint8_t oppositeState = state == HIGH ? LOW : HIGH;
+				digitalWrite(pin, oppositeState);
+				debug_i("GPIO %s (%d) reverted to state %d.", pinName, pin, oppositeState);
 				//This doesn't work in lambda, seg fault emited. TODO - fix it
 				//deleteTimer(pin);
 			});
