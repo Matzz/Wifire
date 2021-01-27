@@ -45,7 +45,7 @@ COMPONENT_DEPENDS := malloc_count
 ## Configure flash parameters (for ESP12-E and other new boards):
 SPI_MODE = dio
 ## SPIFFS options
-SPIFF_FILES = files
+SPIFF_FILES = web/build
 RBOOT_ENABLED ?= 1
 RBOOT_BIG_FLASH ?= 1
 SPI_SIZE        ?= 4M
@@ -53,3 +53,10 @@ SPIFF_SIZE      ?= 524288
 DISABLE_SPIFFS = 0
 ENABLE_SSL=0
 DEBUG_VERBOSE_LEVEL=INFO
+
+web-pack:
+	$(Q) gulp
+	$(Q) date +'%a, %d %b %Y %H:%M:%S GMT' -u > web/build/.lastModified
+
+web-upload: web-pack spiff_update
+	$(call WriteFlash,$(SPIFF_START_OFFSET)=$(SPIFF_BIN_OUT))
