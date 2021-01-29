@@ -1,0 +1,46 @@
+		<form class="form-horizontal" id="form">
+			<% if(title) { %>
+				<h2><%= title %></h2>
+			<% } %>
+			<% for(name in inputs) { %>
+			<% var input = inputs[name] %>
+			<div class="form-group row">
+				<label class="col-sm-2 col-form-label" for="form_<%= name %>"><%= input.label %></label>
+				<div class="col-sm-10">
+					<% if(input.type=="checkbox") { %>
+      					<div class="form-check">
+							<input
+								type="checkbox"
+								class="form-check-input"
+								id="form_<%= name %>"
+								name="<%= name %>"
+								value="true"
+								<%= (input.value ? "checked " : "") %> />
+						</div>
+					<% } else if(input.type=="select") { %>
+						<select
+							type="<%= input.type %>"
+							class="form-control"
+							id="form_<%= name %>"
+							name="<%= name %>">
+						<% for(i in input.values) { %>
+							<option value="<%= i %>" <%= i==input.value ? "selected=true" : "" %>>
+								<%= input.values[i] %>
+							</option>
+						<% } %>
+						</select>
+					<% } else { %>
+						<input
+							type="<%= input.type %>"
+							class="form-control"
+							id="form_<%= name %>"
+							name="<%= name %>"
+							value="<%= input.value %>" />
+					<% } %>
+				</div>
+			</div>
+			<% } %>
+			<div class="col-sm-offset-3">
+  				<button type="button" class="btn btn-primary" id="form_submit">Submit</button>
+			</div>
+		</form>

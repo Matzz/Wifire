@@ -55,8 +55,8 @@ ENABLE_SSL=0
 DEBUG_VERBOSE_LEVEL=INFO
 
 web-pack:
-	$(Q) gulp
+	$(Q) npx gulp
 	$(Q) date +'%a, %d %b %Y %H:%M:%S GMT' -u > web/build/.lastModified
 
-web-upload: web-pack spiff_update
+web-upload: web-pack spiffs-image-update
 	$(call WriteFlash,$(SPIFF_START_OFFSET)=$(SPIFF_BIN_OUT))

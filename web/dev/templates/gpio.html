@@ -1,0 +1,43 @@
+<form class="form-horizontal" id="form">
+	<h2>Edit GPIO configuration</h2>
+	<table class="table">
+		<tr>
+			<th scope="col">Pin number</th>
+			<th scope="col">Pin name</th>
+			<th scope="col">Mode</th>
+			<th scope="col">Pull up (down GPIO 16)</th>
+		</tr>
+		<% for(idx in response_data['gpio']) { %>
+		<tr>
+			<% var pin = response_data['gpio'][idx] %>
+			<th>
+				<%= idx %>
+			</th>
+			<th>
+				<input type="text" name="gpio[<%= idx %>]['name']" value="<%= pin['name'] %>" />
+			</th>
+			<% if(isPinSafeToUse(idx)) { %>
+			<td>
+				<select name="gpio[<%= idx %>]['isInput']">
+					<option value="true" <%= pin['isInput'] ? 'selected' : ''  %>>
+						Input
+					</option>
+					<option value="false" <%= !pin['isInput'] ? 'selected' : ''  %>>
+						Output
+					</option>
+				</select>
+			</td>
+			<td>
+				<input type="checkbox" name="gpio[<%= idx %>]['pull']" <%= pin['pull'] ? 'checked' : '' %> value="1" />
+			</td>
+			<% } else { %>
+				<td colspan="2">It is not safe to use that pin</td>
+			<% } %>
+		</tr>
+		<% } %>
+		</tr>
+	</table>
+	<div class="col-sm-offset-3">
+			<button type="button" class="btn btn-primary" id="form_submit">Submit</button>
+	</div>
+	</form>

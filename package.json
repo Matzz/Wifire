@@ -18,5 +18,10 @@
     "gulp-useref": "^3.1.2",
     "yargs": "^16.2.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "gulp-underscore-template": "^1.0.0"
+  },
+  "scripts": {
+    "gulp": "gulp"
+  }
 }
