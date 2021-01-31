@@ -35,68 +35,72 @@ const useref = require('gulp-useref');
 const gulpif = require('gulp-if');
 const inline = require('gulp-inline');
 const concat = require('gulp-concat');
-const template = require('./underscore-support');
+const compile_utemplates = require('./underscore-support');
 
+const inputPath = 'web/dev/';
+const templatesPath = 'web/dev/templates/'
+const outputPath = 'web/build/';
 
 /* Clean destination folder */
 gulp.task('clean', function() {
-    return del(['data/*']);
+    return del([outputPath + '*']);
 })
  
 /* Copy static files */
-gulp.task('files', function() {
+gulp.task('copy_static', function() {
     return gulp.src([
             'web/dev/*.{jpg,jpeg,png,ico,gif}',
         ])
         .pipe(gulp.dest('web/build'));
 });
 
-gulp.task('combine_templates', function() {
-    return gulp.src('web/dev/templates/*.html')
-        .pipe(htmlmin({
-            collapseWhitespace: true,
-            conservativeCollapse: true
-        }))
-        .pipe(template())
-        .pipe(concat('templates.js'))
-        .pipe(gulp.dest('web/build'))
-})
+/* Compile and merge underscore templates */
+gulp.task('build_templates', function() {
+    return gulp.src(templatesPath + '*.html')
+            .pipe(htmlmin({
+                collapseWhitespace: true,
+                conservativeCollapse: true
+            }))
+            .pipe(compile_utemplates())
+            .pipe(concat('templates.js'))
+            .pipe(gulp.dest(outputPath));
+});
 
-/* Process HTML, CSS, JS  --- INLINE --- */
+/* Minify HTML, CSS, JS */
+gulp.task('minify', function() {
+    return gulp.src(inputPath + '*.html')
+        .pipe(useref())
+        .pipe(gulpif('*.css', cleancss()))
+        .pipe(gulpif('*.js', uglify()))
+        .pipe(gulpif('*.html', htmlmin({
+            collapseWhitespace: true,
+            removeComments: true
+        })))
+        .pipe(gulp.dest(outputPath));
+});
+
+/* Inline javascript and css into html files (index.html) */
 gulp.task('inline', function() {
-    return gulp.src('web/dev/*.html')
+    return gulp.src(outputPath + '*.html')
         .pipe(inline({
-            base: 'web/dev/',
+            base: outputPath,
             js: uglify,
             css: cleancss,
             disabledTypes: ['svg', 'img']
         }))
-        .pipe(htmlmin({
-            collapseWhitespace: true,
-            removeComments: true,
-            minifyCSS: true,
-            minifyJS: true
-        }))
-        .pipe(gulp.dest('web/build/'));
-})
- 
-/* Process HTML, CSS, JS */
-gulp.task('html', function() {
-    return gulp.src('web/dev/*.html')
-        .pipe(useref())
-        .pipe(plumber())
-        .pipe(gulpif('*.css', cleancss()))
-        .pipe(gulpif('*.js', uglify()))
-        .pipe(htmlmin({
-            collapseWhitespace: true,
-            removeComments: true,
-            minifyCSS: true,
-            minifyJS: true
-        }))
-        .pipe(gulp.dest('web/build/'));
+        .pipe(gzip())
+        .pipe(gulp.dest(outputPath));
+});
+
+gulp.task('cleanup_tmp_files', function() {
+    return del([
+        outputPath + 'index.html',
+        outputPath + 'core.js',
+        outputPath + 'templates.js',
+        outputPath + 'core.css',
+    ]);
 });
  
-gulp.task('buildfs', series('clean', 'files', 'combine_templates', 'html'));
-gulp.task('buildfs2', series('clean', 'files', 'combine_templates', 'inline'));
-gulp.task('default', series('buildfs2'));
+gulp.task('buildfs', series('clean', 'copy_static', 'minify', 'build_templates', 'inline', 'cleanup_tmp_files'));
+gulp.task('default', series('buildfs'));
 

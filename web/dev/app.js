@@ -149,7 +149,7 @@ $(document).ready(handleAuthUpdate);
 function getAuthJson() {
 	var authJson = null;
 	var jsonStr = Cookies.get('auth');
-	if(jsonStr != "") {
+	if(jsonStr) {
 		try {
 			authJson = $.parseJSON(jsonStr);
 		} catch(error) {
