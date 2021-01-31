@@ -1,4 +1,3 @@
-var templateCache = {};
 var $container = $('#content');
 
 function camelCaseToSentence(camelCase) {
@@ -44,19 +43,9 @@ function getFieldsFormat(inputs, custom_formats) {
 	return all;
 }
 
-function compileTemplate(name) {
-	if(!templateCache[name]) {
-		templateCache[name] =  $('#'+name+'_tpl').map(function() {
-			var compiled = _.template($(this).text());
-			return compiled;
-		}).get(0);
-	}
-	return templateCache[name];
-}
-
 function infoController(name) {
 	$.getJSON("/info").success(function(data) {
-		var template = compileTemplate(name);
+		var template = templates[name];
 		$container.html(template({ rows: data }))
 	})
 }
@@ -73,7 +62,7 @@ function editConfig(type, form_template, custom_field_mapping) {
 
 	$.getJSON(formUrl, function(response_data) {
 		inputs = getFieldsFormat(response_data, custom_field_mapping)
-		$container.html(compileTemplate(form_template)({
+		$container.html(templates[form_template]({
 			 title: response_data['title'] ? response_data['title'] : "Edit " + type + " configuration",
 			 inputs: inputs,
 			 response_data: response_data
@@ -155,8 +144,45 @@ function editGpioController(name) {
 
 // --- Auth actions
 
+$(document).ready(handleAuthUpdate);
+
+function getAuthJson() {
+	var authJson = null;
+	var jsonStr = Cookies.get('auth');
+	if(jsonStr != "") {
+		try {
+			authJson = $.parseJSON(jsonStr);
+		} catch(error) {
+			console.error("Invalid auth json", jsonStr, error);
+		}
+	}
+	return authJson;
+}
+
+function handleAuthUpdate() {
+	var auth = getAuthJson();
+	var $userName = $('.user_name').text("").hide();
+	var $roles = $("[class*=role_]");
+	$roles.hide();
+	$('.signout_action').hide();
+	$('.signin_action').show();
+	if(auth) {
+		$('.signout_action').show();
+		$('.signin_action').hide();
+		$userName.text(auth.login).show();
+		if(auth.roles.includes("admin")) {
+			$roles.show();
+		}
+		else if(auth.roles.length>0) {
+			var cssStartsWith = '[class=role_';
+			selector = auth.roles.join('],'+cssStartsWith+']');
+			$(selector).show();
+		}
+	}
+}
+
 function signinController() {
-	$container.html(compileTemplate("signin"));
+	$container.html(templates["signin"]);
 	$('#form').submit(function(event) {
 		console.log(event);
 		$.post({
@@ -164,8 +190,9 @@ function signinController() {
 			data: $(event.target).serialize(),
 		}).done(function(data) {
 			alert("You have been signed in.");
+			handleAuthUpdate();
 			loadPage("info");
-		}).fail(handleFormFailure)
+		}).fail(handleFormFailure);
 		return false;
 	});
 }
@@ -174,7 +201,9 @@ function signoutController() {
 	$.post({
 		url: "/signout"
 	}).done(function(data) {
-		loadPage("signin")
+		Cookies.set('auth', null)
+		handleAuthUpdate();
+		loadPage("signin");
 	}).fail(handleFormFailure)
 }
 
@@ -207,7 +236,7 @@ function userFormSubmitEnabled(isEnabled) {
 
 function usersListController(name) {
 	$.getJSON("/config/users/list").success(function(data) {
-		var template = compileTemplate("users_list");
+		var template = templates["users_list"];
 		$container.html(template({ 'data': data }));
 		userFormVisible(false);
 	})
@@ -296,7 +325,7 @@ function dispatch(name) {
 	if(!_.isUndefined(controller)) {
 		controller(name);
 	} else {
-		var template = compileTemplate(name);
+		var template = templates[name];
 		if(!_.isUndefined(template)) {
 			$container.html(template());
 		} else {

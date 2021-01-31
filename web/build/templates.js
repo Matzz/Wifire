@@ -1,4 +1,4 @@
-exports['dynamic_form']=function(obj){
+window.templates = window.templates || []; window.templates['dynamic_form']=function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+=' <form class="form-horizontal" id="form"> ';
@@ -59,7 +59,7 @@ __p+=' <div class="col-sm-offset-3"> <button type="button" class="btn btn-primar
 }
 return __p;
 };
-exports['gpio']=function(obj){
+window.templates = window.templates || []; window.templates['gpio']=function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<form class="form-horizontal" id="form"> <h2>Edit GPIO configuration</h2> <table class="table"> <tr> <th scope="col">Pin number</th> <th scope="col">Pin name</th> <th scope="col">Mode</th> <th scope="col">Pull up (down GPIO 16)</th> </tr> ';
@@ -94,7 +94,7 @@ __p+=' </table> <div class="col-sm-offset-3"> <button type="button" class="btn b
 }
 return __p;
 };
-exports['info']=function(obj){
+window.templates = window.templates || []; window.templates['info']=function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<table class="table"> ';
@@ -109,14 +109,14 @@ __p+=' </table>';
 }
 return __p;
 };
-exports['signin']=function(obj){
+window.templates = window.templates || []; window.templates['signin']=function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<form class="form-horizontal" id="form"> <h2>Sign in</h2> <div class="form-group row"> <label class="col-sm-2 col-form-label" for="form_login">Login</label> <div class="col-sm-10"> <input type="text" class="form-text-control" id="form_login" name="login"> </div> </div> <div class="form-group row"> <label class="col-sm-2 col-form-label" for="form_password">Password</label> <div class="col-sm-10"> <input type="text" class="form-text-control" id="form_password" name="password"> </div> </div> <div class="row"> <div class="offset-2 col-sm-1"> <button type="submit" class="btn btn-primary">Submit</button> </div> </div> </form>';
 }
 return __p;
 };
-exports['users_list']=function(obj){
+window.templates = window.templates || []; window.templates['users_list']=function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<div id="user_list_container"> <table class="table"> <tr> <th>Enabled</th> <th>Login</th> <th>Roles</th> <th>Actions</th> </tr> ';

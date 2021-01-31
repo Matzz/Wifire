@@ -13,7 +13,7 @@ void staticAction(HttpRequest &request, HttpResponse &response)
 	}
 
 	if(file.length()==0) {
-		file = "index.htm";
+		file = "index.html";
 	}
 
 	response.setCache(86400, true);

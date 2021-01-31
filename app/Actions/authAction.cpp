@@ -14,6 +14,7 @@ void signInAction(HttpRequest &request, HttpResponse &response) {
 
     String login = getString(request, "login");
     String password = getString(request, "password");
+    debug_i("L: %s, P: %s", login, password);
     Either<String, Session> sessionOrErr = sessionManager.signIn(login, password);
     auto session = sessionOrErr.get_if_right();
     if(session != nullptr) {
@@ -24,8 +25,11 @@ void signInAction(HttpRequest &request, HttpResponse &response) {
         for(int j=0; j<session->roles.size(); j++) {
 		    rolesArr.add(session->roles[j]);
         }
-        response.setCookie(sessionIdField, session->sessionId);
-        response.sendDataStream(stream, MIME_JSON);
+        String authJson = stream->readString(2048);
+
+        response.setCookie("auth", authJson);
+        response.setContentType(MIME_JSON);
+        response.sendString(authJson);
 
     } else {
 		  returnFailure(response, *sessionOrErr.get_if_left());

@@ -35,7 +35,8 @@ const useref = require('gulp-useref');
 const gulpif = require('gulp-if');
 const inline = require('gulp-inline');
 const concat = require('gulp-concat');
-const template = require('gulp-underscore-template');
+const template = require('./underscore-support');
+
 
 /* Clean destination folder */
 gulp.task('clean', function() {

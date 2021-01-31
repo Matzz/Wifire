@@ -17,26 +17,27 @@
 <body>
 	<!-- Fixed navbar -->
 	<nav class="main-navbar navbar navbar-expand-lg navbar-dark bg-primary">
-		<a class="navbar-brand" href="#">Wifire</a>
+		<a class="navbar-brand" href="#">Wifire <span class="user_name"></span></a>
 
 		<ul class="navbar-nav">
-			<li class="nav-item" id="signin_menu_item"><a class="nav-link" href="#signin">Sign in</a></li>
-			<li class="nav-item" id="signout_menu_item"><a class="nav-link" href="#signout">Sign out</a></li>
-			<li class="nav-item"><a class="nav-link" href="#editAp">Ap config</a></li>
-			<li class="nav-item"><a class="nav-link" href="#editStation">Station config</a></li>
-			<li class="nav-item"><a class="nav-link" href="#editGpio">GPIO config</a></li>
-			<li class="nav-item"><a class="nav-link" href="#editOta">Ota config</a></li>
-			<li class="nav-item"><a class="nav-link" href="#usersList">Users</a></li>
+			<li class="nav-item signin_action"><a class="nav-link" href="#signin">Sign in</a></li>
+			<li class="nav-item signout_action"><a class="nav-link" href="#signout">Sign out</a></li>
+			<li class="nav-item"><a class="nav-link role_edit_ap" href="#editAp">Ap config</a></li>
+			<li class="nav-item"><a class="nav-link role_edit_station" href="#editStation">Station config</a></li>
+			<li class="nav-item"><a class="nav-link role_gpio" href="#editGpio">GPIO config</a></li>
+			<li class="nav-item"><a class="nav-link role_edit_ota" href="#editOta">Ota config</a></li>
+			<li class="nav-item"><a class="nav-link role_edit_users" href="#usersList">Users</a></li>
 		</ul>
 	</nav>
 	<div class="container" id="content"></div>
 
+	<script src="templates.js"></script>
 	<!-- build:js core.js -->
 	<script src="jquery.min.js"></script>
+	<script src="js.cookie.min.js"></script>
 	<script src="bootstrap.min.js"></script>
 	<script src="underscore.js"></script>
 	<script src="app.js"></script>
 	<!-- endbuild -->
-	<script src="template.js"></script>
 </body>
 </html>

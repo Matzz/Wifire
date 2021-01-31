@@ -36,8 +36,8 @@ UsersConfig UsersConfigProvider::jsonToConfig(JsonObject& doc) {
         UserConfig user(
             userObj["enabled"].as<bool>(),
             userObj["login"].as<String>(),
-            userObj["hash"].as<String>(),
             userObj["salt"].as<String>(),
+            userObj["hash"].as<String>(),
             roles
         );
 

@@ -16,8 +16,4 @@ void gpioSwitchAction(HttpRequest &request, HttpResponse &response) {
 	
     bool result = gpioState.switchPin(name, state, howLongMs);
 
-	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject json = stream->getRoot();
-	json["status"] = result ? "successful" : "failed";
-	response.sendNamedStream(stream);
 }

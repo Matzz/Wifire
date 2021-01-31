@@ -23,8 +23,6 @@ GPIOConfig GPIOConfigProvider::jsonToConfig(JsonObject& doc) {
 		}
 	}
 	return cfg;
-
-
 }
 
 void GPIOConfigProvider::configToJson(GPIOConfig& config, JsonObject& doc) {

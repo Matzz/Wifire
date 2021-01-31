@@ -27,3 +27,17 @@ String getHash(String base) {
 		auto hash = Crypto::Sha1().calculate(base);
 		return Crypto::toString(hash);
 }
+
+void addCookie(HttpResponse& response, const String& name, const String& value)
+{
+
+	String newCookie = name;
+	newCookie += '=';
+	newCookie += value;
+
+    if(response.headers.contains(HTTP_HEADER_SET_COOKIE)) {
+        response.headers[HTTP_HEADER_SET_COOKIE] += "; "+newCookie;
+    } else {
+        response.headers[HTTP_HEADER_SET_COOKIE] = newCookie;
+    }
+}

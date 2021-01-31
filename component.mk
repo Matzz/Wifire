@@ -59,4 +59,3 @@ web-pack:
 	$(Q) date +'%a, %d %b %Y %H:%M:%S GMT' -u > web/build/.lastModified
 
 web-upload: web-pack spiffs-image-update
-	$(call WriteFlash,$(SPIFF_START_OFFSET)=$(SPIFF_BIN_OUT))
