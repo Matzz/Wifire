@@ -1,7 +1,6 @@
 #include "UserSessionManager.h"
 #include "../Utils/utils.h"
 
-
 Session::Session():
     login(""), sessionId(""), roles(Vector<String>(1, 1)), lastUsed(0) { }
 
@@ -14,6 +13,14 @@ Session& Session::operator=(const Session &session) {
         roles = session.roles;
         lastUsed = session.lastUsed;
         return *this;
+}
+
+void UserSessionManager::setSessionCookie(HttpResponse& response, const String cookie) {
+        response.setCookie("auth", cookie + "; Path=/");
+}
+
+void UserSessionManager::clearSessionCookie(HttpResponse& response) {
+        response.setCookie("auth", "; Path=/");
 }
 
 UserSessionManager::UserSessionManager(UsersConfigProvider& configProvider) :
@@ -76,6 +83,13 @@ Either<String, Session> UserSessionManager::signIn(const String& login, const St
 
 void UserSessionManager::signOut(const String& sessionId) {
     int idx = getSessionById(sessionId);
+    if(idx >= 0) {
+        sessions.removeElementAt(idx);
+    }
+}
+
+void UserSessionManager::signOutByLogin(const String& login) {
+    int idx = getSessionByLogin(login);
     if(idx >= 0) {
         sessions.removeElementAt(idx);
     }

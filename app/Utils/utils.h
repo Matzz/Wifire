@@ -11,4 +11,4 @@ void returnFailure(HttpResponse &response, String msg);
 
 String getHash(String base);
 
-void addCookie(HttpResponse& response, const String& name, const String& value);
+const String getSessionId(HttpRequest& request);

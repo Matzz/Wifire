@@ -6,6 +6,7 @@
 
 class Session {
 public:
+
     String login;
     String sessionId;
 	Vector<String> roles;
@@ -21,10 +22,15 @@ public:
 
 class UserSessionManager {
 public:
+    static void setSessionCookie(HttpResponse& response, String cookie);
+    static void clearSessionCookie(HttpResponse& response);
+    
 	UserSessionManager(UsersConfigProvider& configProvider);
     Either<String, Session> validateSession(const String& sessionId);
-    Either<String, Session> signIn(const String& login, const String& password);\
+    Either<String, Session> signIn(const String& login, const String& password);
     void signOut(const String& sessionId);
+    void signOutByLogin(const String& login);
+
 private:
     Vector<Session> sessions;
     UsersConfigProvider& configProvider;

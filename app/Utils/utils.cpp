@@ -28,16 +28,34 @@ String getHash(String base) {
 		return Crypto::toString(hash);
 }
 
-void addCookie(HttpResponse& response, const String& name, const String& value)
-{
+const String getCookie(HttpRequest& request, String name) {
+	String cookiesStr = request.getHeader("Cookie");
+	int startPos = cookiesStr.indexOf("auth");
+	if(startPos < 0) {
+		return String::empty;
+	}
+	startPos += 5; // "auth="
+	int endPos = cookiesStr.indexOf(";", startPos);
+	if(endPos < 0) {
+		endPos = cookiesStr.length();
+	}
+	return cookiesStr.substring(startPos, endPos);
+}
 
-	String newCookie = name;
-	newCookie += '=';
-	newCookie += value;
-
-    if(response.headers.contains(HTTP_HEADER_SET_COOKIE)) {
-        response.headers[HTTP_HEADER_SET_COOKIE] += "; "+newCookie;
+const String getSessionId(HttpRequest& request) {
+    String cookieStr = getCookie(request, "auth");
+    if(cookieStr != String::empty) {
+        StaticJsonDocument<512> doc;
+        DeserializationError err = deserializeJson(doc, cookieStr);
+        if(err) {
+			return String::empty;
+        } else if(doc.containsKey("sessionId")) {
+			String sId = doc["sessionId"];
+            return sId;
+        } else {
+			return String::empty;
+        }
     } else {
-        response.headers[HTTP_HEADER_SET_COOKIE] = newCookie;
-    }
+		return String::empty;
+	}
 }

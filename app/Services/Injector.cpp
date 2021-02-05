@@ -48,7 +48,7 @@ WiFiManager& Injector::getWiFiManager() {
 }
 
 WebServer& Injector::getWebServer() {
-	static WebServer webServer(80);
+	static WebServer webServer(80, getUserSessionManager());
 	return webServer;
 }
 

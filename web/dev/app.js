@@ -6,6 +6,25 @@ function camelCaseToSentence(camelCase) {
 	return finalResult;
 }
 
+function handleGetFailure(jqXHR, textStatus, errorThrown) {
+	console.log(jqXHR);
+	if(jqXHR.status==403) {
+		alert("You don't have access rights to see that page.");
+		handleAuthUpdate();
+	} else {
+		var msg = errorThrown;
+		if('responseJSON' in jqXHR && 'message' in jqXHR['responseJSON']) {
+			msg = jqXHR.responseJSON['message'];
+		}
+		alert("Error: "+msg);
+		console.log("Error: ", arguments);
+	}
+}
+
+function getJSON(url) {
+	return $.getJSON(url).fail(handleGetFailure);
+}
+
 function handleFormFailure(jqXHR, textStatus, errorThrown) {
 	var msg = errorThrown;
 	if('responseJSON' in jqXHR && 'message' in jqXHR['responseJSON']) {
@@ -44,10 +63,10 @@ function getFieldsFormat(inputs, custom_formats) {
 }
 
 function infoController(name) {
-	$.getJSON("/info").success(function(data) {
+	getJSON("/info").success(function(data) {
 		var template = templates[name];
 		$container.html(template({ rows: data }))
-	})
+	});
 }
 
 function editConfig(type, form_template, custom_field_mapping) {
@@ -60,7 +79,7 @@ function editConfig(type, form_template, custom_field_mapping) {
 	var formUrl = "/config/"+type+"/get";
 	var saveUrl = "/config/"+type+"/set";
 
-	$.getJSON(formUrl, function(response_data) {
+	getJSON(formUrl).success(function(response_data) {
 		inputs = getFieldsFormat(response_data, custom_field_mapping)
 		$container.html(templates[form_template]({
 			 title: response_data['title'] ? response_data['title'] : "Edit " + type + " configuration",
@@ -174,8 +193,7 @@ function handleAuthUpdate() {
 			$roles.show();
 		}
 		else if(auth.roles.length>0) {
-			var cssStartsWith = '[class=role_';
-			selector = auth.roles.join('],'+cssStartsWith+']');
+			var selector = ".role_" + auth.roles.join(', .role_');
 			$(selector).show();
 		}
 	}
@@ -191,7 +209,7 @@ function signinController() {
 		}).done(function(data) {
 			alert("You have been signed in.");
 			handleAuthUpdate();
-			loadPage("info");
+			loadPage("start");
 		}).fail(handleFormFailure);
 		return false;
 	});
@@ -235,11 +253,11 @@ function userFormSubmitEnabled(isEnabled) {
 }
 
 function usersListController(name) {
-	$.getJSON("/config/users/list").success(function(data) {
+	getJSON("/config/users/list").success(function(data) {
 		var template = templates["users_list"];
 		$container.html(template({ 'data': data }));
 		userFormVisible(false);
-	})
+	});
 }
 
 function addUser() {
@@ -318,7 +336,7 @@ function loadPage(newPage) {
 
 function dispatch(name) {
 	if(name=="") {
-		name = "info";
+		name = "start";
 	}
 
 	var controller = window[name+"Controller"];

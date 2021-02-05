@@ -1,16 +1,18 @@
 #pragma once
 
 #include <SmingCore.h>
+#include "UserSessionManager.h"
 
 class WebServer {
 public:
-	HttpServer server;
-	int port;
 
-	WebServer(const int port);
+	WebServer(const int port, UserSessionManager& sessionManager);
 	void start();
 	void bindActions();
 
 private:
-	void authWrapper(String path, const HttpPathDelegate& callback);
+	HttpServer server;
+	int port;
+	UserSessionManager& sessionManager;
+	void authWrapper(const String& path, const String& requiredRole, const HttpPathDelegate& callback);
 };

@@ -31,6 +31,10 @@ Vector<String> parseRoles(HttpRequest &request) {
 	String rolesString = getString(request, "roles");
 	Vector<String> roles;
 	splitString(rolesString, ',', roles);
+	for(int j=0; j<roles.size(); j++) {
+		roles[j].trim();
+	}
+	// TODO drop empty roles;
 	return roles;
 }
 
@@ -48,6 +52,8 @@ void userAddAction(HttpRequest &request, HttpResponse &response) {
 	bool added = usersConfig.addUser(user);
 
 	if(added) {
+		auto& sessionManager = Injector::getInstance().getUserSessionManager();
+		sessionManager.signOutByLogin(user.login);
 		provider.save(usersConfig);
 	} else {
 		JsonObjectStream* stream = new JsonObjectStream();
@@ -61,15 +67,18 @@ void userEditAction(HttpRequest &request, HttpResponse &response) {
 
 	auto& provider = Injector::getInstance().getUsersConfigProvider();
 	UsersConfig usersConfig = provider.load();
+	String login = getString(request, "login");
 
 	bool modified = usersConfig.editUser(
 		getBool(request, "enabled"),
-		getString(request, "login"),
+		login,
 		getString(request, "password"),
 		parseRoles(request)
 	);
 
 	if(modified) {
+		auto& sessionManager = Injector::getInstance().getUserSessionManager();
+		sessionManager.signOutByLogin(login);
 		provider.save(usersConfig);
 	} else {
 		returnFailure(response, "User doesn't exist.");
