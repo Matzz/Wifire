@@ -20,6 +20,7 @@ void apGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	json["channel"] = config.channel;
 	json["beaconInterval"] = config.beaconInterval;
 
+	response.setContentType(MIME_JSON);
 	response.sendNamedStream(stream);
 }
 
@@ -53,6 +54,7 @@ void stationGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	json["netmask"] = config.netmask.toString();
 	json["gateway"] = config.gateway.toString();
 
+	response.setContentType(MIME_JSON);
 	response.sendNamedStream(stream);
 }
 
@@ -80,6 +82,7 @@ void stationRefreshNetworks(HttpRequest &request, HttpResponse &response) {
 			json["message"] = "Scanning started.";
 	}
 	AvaiableNetworksProvider::startScan();
+	response.setContentType(MIME_JSON);
 	response.sendNamedStream(stream);
 }
 
@@ -109,6 +112,7 @@ void stationGetNetworks(HttpRequest &request, HttpResponse &response) {
 	} else {
 		json["message"] = "Scanning in progress.";
 	}
+	response.setContentType(MIME_JSON);
 	response.sendNamedStream(stream);
 }
 
@@ -126,6 +130,7 @@ void stationListNetworks(HttpRequest &request, HttpResponse &response) {
 	json["netmask"] = config.netmask.toString();
 	json["gateway"] = config.gateway.toString();
 
+	response.setContentType(MIME_JSON);
 	response.sendNamedStream(stream);
 }
 
@@ -139,6 +144,7 @@ void otaGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	json["romUrl"] = config.romUrl;
 	json["spiffUrl"] = config.spiffUrl;
 
+	response.setContentType(MIME_JSON);
 	response.sendNamedStream(stream);
 }
 
@@ -159,6 +165,8 @@ void gpioGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	JsonObjectStream* stream = new JsonObjectStream(JSON_MAX_SIZE);
 	JsonObject json = stream->getRoot();
 	GPIOConfigProvider::configToJson(config, json);
+
+	response.setContentType(MIME_JSON);
 	response.sendNamedStream(stream);
 }
 
@@ -171,7 +179,7 @@ void gpioSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	auto& provider = di.getGPIOConfigProvider();
 
 	auto config = provider.load();
-	for(int i=0; i<=PIN_MAX; i++) {
+	for(int i=0; i<=GPIOConfig::max_pin; i++) {
 		config.gpio[i].name = request.getPostParameter(gpioFieldName(i, "name"));
 		config.gpio[i].isInput = getBool(request, gpioFieldName(i, "isInput"));
 		config.gpio[i].pull = getBool(request, gpioFieldName(i, "pull"));

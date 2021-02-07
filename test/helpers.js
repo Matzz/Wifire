@@ -19,7 +19,6 @@ function doLogin({agent = getAgent(), login, password}) {
         .post('signin')
         .type('form')
         .send({
-            '_method': 'post',
             'login': login,
             'password': password
             })
@@ -56,10 +55,7 @@ function doDeleteUser({agent, login}) {
     var result = agent
     .post("config/users/remove")
     .type('form')
-    .send({
-        '_method': 'post',
-        'login': login
-        })
+    .send({ 'login': login })
     .then(res => {
         res.agent = agent;
         return res;
@@ -82,7 +78,6 @@ function doAddUser({agent, login, password, roles = "", enabled = true}) {
         .post("config/users/add")
         .type('form')
         .send({
-            '_method': 'post',
             'enabled': enabled,
             'login': login,
             'password': password,

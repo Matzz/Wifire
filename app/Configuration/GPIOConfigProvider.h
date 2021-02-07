@@ -3,8 +3,6 @@
 #include <SmingCore.h>
 #include "FileConfig.h"
 
-#define PIN_MAX 16
-
 struct PinConfig {
 public:
 	String name;
@@ -14,7 +12,10 @@ public:
 
 class GPIOConfig {
 public:
-	PinConfig gpio[PIN_MAX+1];
+	static const unsigned int max_pin = 16;
+	static const unsigned int safe_pins[];
+	static bool isSafeToUse(unsigned int pin);
+	PinConfig gpio[max_pin+1];
 };
 
 class GPIOConfigProvider: FileConfig {
