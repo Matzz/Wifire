@@ -2,8 +2,8 @@
 #include "WiFiManager.h"
 
 
-WiFiManager::WiFiManager(WiFiStationConfigProvider& stationConfigProvider,
-		WiFiApConfigProvider& apConfigProvider) :
+WiFiManager::WiFiManager(ConfigProvider<WiFiStationConfig>& stationConfigProvider,
+		ConfigProvider<WiFiApConfig>& apConfigProvider) :
 		stationConfigProvider(stationConfigProvider), apConfigProvider(
 				apConfigProvider) {
 }

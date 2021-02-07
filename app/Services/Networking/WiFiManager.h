@@ -1,18 +1,19 @@
 #pragma once
 
-#include "../../Configuration/Networking/WiFiStationConfigProvider.h"
-#include "../../Configuration/Networking/WiFiApConfigProvider.h"
+#include "../../Configuration/Networking/WiFiStationConfig.h"
+#include "../../Configuration/Networking/WiFiApConfig.h"
+#include "../../Configuration/ConfigProvider.h"
 
 class WiFiManager {
 public:
-	WiFiManager(WiFiStationConfigProvider& stationConfigProvider,
-			WiFiApConfigProvider& apConfigProvider);
+	WiFiManager(ConfigProvider<WiFiStationConfig>& stationConfigProvider,
+			ConfigProvider<WiFiApConfig>& apConfigProvider);
 
 	void startNetwork();
 
 protected:
-	WiFiStationConfigProvider& stationConfigProvider;
-	WiFiApConfigProvider& apConfigProvider;
+	ConfigProvider<WiFiStationConfig>& stationConfigProvider;
+	ConfigProvider<WiFiApConfig>& apConfigProvider;
 
 	bool startAccessPoint(WiFiApConfig& config);
 

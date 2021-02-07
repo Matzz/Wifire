@@ -23,7 +23,7 @@ void UserSessionManager::clearSessionCookie(HttpResponse& response) {
         response.setCookie("auth", "; Path=/");
 }
 
-UserSessionManager::UserSessionManager(UsersConfigProvider& configProvider) :
+UserSessionManager::UserSessionManager(ConfigProvider<UsersConfig>& configProvider) :
 		configProvider(configProvider) { }
 
 int UserSessionManager::getSessionByLogin(const String& login) {

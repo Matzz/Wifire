@@ -5,28 +5,32 @@ Injector& Injector::getInstance() {
 	return injector;
 }
 
-OtaConfigProvider& Injector::getOtaConfigProvider() {
-	static OtaConfigProvider otaConfigProvider;
+ConfigProvider<OtaConfig>& Injector::getOtaConfigProvider() {
+	static ConfigProvider<OtaConfig> otaConfigProvider("config/ota.json", Codec<OtaConfig>::getInstance());
 	return otaConfigProvider;
 }
 
-WiFiStationConfigProvider& Injector::getWiFiStationConfigProvider() {
-	static WiFiStationConfigProvider wiFiStationConfigProvider;
+ConfigProvider<WiFiStationConfig>& Injector::getWiFiStationConfigProvider() {
+	static ConfigProvider<WiFiStationConfig> wiFiStationConfigProvider(
+		"config/wifi_station.json",
+		Codec<WiFiStationConfig>::getInstance());
 	return wiFiStationConfigProvider;
 }
 
-WiFiApConfigProvider& Injector::getWiFiApConfigProvider() {
-	static WiFiApConfigProvider wiFiApConfigProvider;
+ConfigProvider<WiFiApConfig>& Injector::getWiFiApConfigProvider() {
+	static ConfigProvider<WiFiApConfig> wiFiApConfigProvider(
+		"config/wifi_ap.json",
+		Codec<WiFiApConfig>::getInstance());
 	return wiFiApConfigProvider;
 }
 
-GPIOConfigProvider& Injector::getGPIOConfigProvider() {
-	static GPIOConfigProvider gpioConfigProvider;
+ConfigProvider<GPIOConfig>& Injector::getGPIOConfigProvider() {
+	static ConfigProvider<GPIOConfig> gpioConfigProvider("config/gpio.json", Codec<GPIOConfig>::getInstance());
 	return gpioConfigProvider;
 }
 
-UsersConfigProvider& Injector::getUsersConfigProvider() {
-	static UsersConfigProvider usersConfigProvider;
+ConfigProvider<UsersConfig>& Injector::getUsersConfigProvider() {
+	static ConfigProvider<UsersConfig> usersConfigProvider("config/users.json", Codec<UsersConfig>::getInstance());
 	return usersConfigProvider;
 }
 

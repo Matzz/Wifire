@@ -2,12 +2,13 @@
 
 #include <SmingCore.h>
 #include <Network/RbootHttpUpdater.h>
-#include "../Configuration/OtaConfigProvider.h"
+#include "../Configuration/ConfigProvider.h"
+#include "../Configuration/OtaConfig.h"
 
 class OtaUpdater {
 	protected:
 		int spiffsAddresses[2];
-		OtaConfigProvider& cfgProvider;
+		ConfigProvider<OtaConfig>& cfgProvider;
 
 		static uint8 activeSlot();
 		static uint8 inactiveSlot();
@@ -15,7 +16,7 @@ class OtaUpdater {
 
 	public:
 		OtaUpdater(const int spiffsAddresses[2],
-					OtaConfigProvider &cfgProvider);
+					ConfigProvider<OtaConfig> &cfgProvider);
 		void update();
 		static void switchSlot();
 };

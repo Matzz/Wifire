@@ -2,11 +2,12 @@
 
 #include <SmingCore.h>
 #include "OtaUpdater.h"
-#include "../Configuration/OtaConfigProvider.h"
-#include "../Configuration/GPIOConfigProvider.h"
-#include "../Configuration/Networking/WiFiApConfigProvider.h"
-#include "../Configuration/Networking/WiFiStationConfigProvider.h"
-#include "../Configuration/Users/UsersConfigProvider.h"
+#include "../Configuration/ConfigProvider.h"
+#include "../Configuration/OtaConfig.h"
+#include "../Configuration/GPIOConfig.h"
+#include "../Configuration/Networking/WiFiApConfig.h"
+#include "../Configuration/Networking/WiFiStationConfig.h"
+#include "../Configuration/Users/UsersConfig.h"
 #include "../Services/UserSessionManager.h"
 #include "LazyFtpServer.h"
 #include "Networking/WiFiManager.h"
@@ -33,11 +34,11 @@ public:
 	const String ftpUser = "wifire";
 	const String ftpPassword = "wifirer";
 
-	OtaConfigProvider& getOtaConfigProvider();
-	WiFiStationConfigProvider& getWiFiStationConfigProvider();
-	WiFiApConfigProvider& getWiFiApConfigProvider();
-	GPIOConfigProvider& getGPIOConfigProvider();
-	UsersConfigProvider& getUsersConfigProvider();
+	ConfigProvider<OtaConfig>& getOtaConfigProvider();
+	ConfigProvider<WiFiStationConfig>& getWiFiStationConfigProvider();
+	ConfigProvider<WiFiApConfig>& getWiFiApConfigProvider();
+	ConfigProvider<GPIOConfig>& getGPIOConfigProvider();
+	ConfigProvider<UsersConfig>& getUsersConfigProvider();
 	UserSessionManager& getUserSessionManager();
 	OtaUpdater& getOtaUpdater();
 	WiFiManager& getWiFiManager();

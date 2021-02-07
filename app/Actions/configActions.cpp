@@ -2,6 +2,7 @@
 #include "configActions.h"
 #include "../Services/Injector.h"
 #include "../Services/Networking/AvaiableNetworksProvider.h"
+#include "../Configuration/GPIOConfig.h"
 #include "../Utils/utils.h"
 
 void apGetConfigAction(HttpRequest &request, HttpResponse &response) {
@@ -160,11 +161,11 @@ void otaSetConfigAction(HttpRequest &request, HttpResponse &response) {
 
 void gpioGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	auto& provider = Injector::getInstance().getGPIOConfigProvider();
-	auto config = provider.load();
+	GPIOConfig config = provider.load();
 
 	JsonObjectStream* stream = new JsonObjectStream(JSON_MAX_SIZE);
 	JsonObject json = stream->getRoot();
-	GPIOConfigProvider::configToJson(config, json);
+	Codec<GPIOConfig>::getInstance().encode(json, config);
 
 	response.setContentType(MIME_JSON);
 	response.sendNamedStream(stream);

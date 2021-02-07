@@ -1,0 +1,50 @@
+#pragma once
+
+#include <SmingCore.h>
+#include "../Codec.h"
+
+class WiFiApConfig {
+public:
+	bool enabled = true;
+	String ssid;
+	String password;
+	WifiAuthMode authMode;
+	IpAddress ip;
+	bool hidden = false;
+	int channel = 7;
+	int beaconInterval = 200;
+};
+
+
+template<> class Codec<WiFiApConfig> {
+	public:
+        static Codec<WiFiApConfig>& getInstance() {
+            static Codec<WiFiApConfig> instance;
+            return instance;
+        }
+
+	void encode(JsonObject& json, WiFiApConfig obj) {
+		json["enabled"] = obj.enabled;
+		json["ssid"] = obj.ssid;
+		json["password"] = obj.password;
+		json["authMode"] = (int) obj.authMode;
+		json["ip"] = obj.ip.toString();
+		json["hidden"] = obj.hidden;
+		json["channel"] = obj.channel;
+		json["beaconInterval"] = obj.beaconInterval;
+	}
+
+	WiFiApConfig decode(JsonObject& json) {
+		WiFiApConfig obj;
+		String defaultSsid = "Wifire_" + String(system_get_chip_id(), 10);
+		obj.enabled = CodecHelpers::getOrElse(json, "enabled", true);
+		obj.ssid = CodecHelpers::getOrElse(json, "ssid", defaultSsid);
+		obj.password = CodecHelpers::getOrElse(json, "password", "");
+		obj.ip = CodecHelpers::getIp(json, "ip", IpAddress(192,168,1,1));
+		obj.authMode = (WifiAuthMode) CodecHelpers::getOrElse<int>(json, "authMode", AUTH_OPEN);
+		obj.hidden = CodecHelpers::getOrElse(json, "hidden", false);
+		obj.channel = CodecHelpers::getOrElse(json, "channel", 7);
+		obj.beaconInterval = CodecHelpers::getOrElse(json, "beaconInterval", 200);
+		return obj;
+	}
+};

@@ -1,7 +1,6 @@
 #include "OtaUpdater.h"
 
 #include <SmingCore.h>
-#include "../Configuration/OtaConfigProvider.h"
 
 uint8 OtaUpdater::activeSlot() {
 	return rboot_get_current_rom();
@@ -23,7 +22,7 @@ void OtaUpdater::callback(RbootHttpUpdater& client, bool result) {
 }
 
 OtaUpdater::OtaUpdater(const int spiffsAddresses[2],
-		OtaConfigProvider &cfgProvider) :
+		ConfigProvider<OtaConfig> &cfgProvider) :
 		spiffsAddresses { spiffsAddresses[0], spiffsAddresses[1] }, cfgProvider(
 				cfgProvider) {
 }

@@ -22,29 +22,22 @@ void WebServer::start() {
 }
 
 bool hasAccess(const String& requiredRole, HttpRequest &request, HttpResponse &response, UserSessionManager& sessionManager) {
-	debug_i("Requested role: %s", requiredRole.c_str());
 	if(requiredRole == String::empty) {
 		return true;
-	debug_i("Getting session");
 	}
 	String sessionId = getSessionId(request);
 	if(sessionId == String::empty) {
-		debug_i("Session id is empty");
 		return false;
 	}
 	auto sessionOrErr = sessionManager.validateSession(sessionId);
 	auto session = sessionOrErr.get_if_right();
 	if(session == nullptr) {
-		debug_i("Removing session.");
     	UserSessionManager::clearSessionCookie(response);
 		return false;
 	}
-	debug_i("Session %s.", session->login);
 	if(session->login == "admin") {
-		debug_i("Admin, return true.");
 		return true;
 	}
-		debug_i("Calling contains.");
 	return session->roles.contains(requiredRole);
 }
 

@@ -8,8 +8,8 @@ void userListAction(HttpRequest &request, HttpResponse &response) {
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject doc = stream->getRoot();
 
-	auto& provider = Injector::getInstance().getUsersConfigProvider();
-	auto config = provider.load();
+	ConfigProvider<UsersConfig>& provider = Injector::getInstance().getUsersConfigProvider();
+	UsersConfig config = provider.load();
 
 	JsonArray usersArr = doc.createNestedArray("users");
 	auto users = config.getUsersList();

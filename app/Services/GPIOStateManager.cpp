@@ -1,10 +1,8 @@
 #include <SmingCore.h>
 #include "GPIOStateManager.h"
-#include "../Configuration/GPIOConfigProvider.h"
-#include "../Services/Injector.h"
 
 
-GPIOStateManager::GPIOStateManager(GPIOConfigProvider& cfgProvider) : cfgProvider(cfgProvider) {
+GPIOStateManager::GPIOStateManager(ConfigProvider<GPIOConfig>& cfgProvider) : cfgProvider(cfgProvider) {
 	for(auto i=0; i<=GPIOConfig::max_pin; i++) {
 		timers[i] = nullptr;
 	}

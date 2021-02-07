@@ -1,7 +1,8 @@
 #pragma once
 
 #include <SmingCore.h>
-#include "../Configuration/Users/UsersConfigProvider.h"
+#include "../Configuration/Users/UsersConfig.h"
+#include "../Configuration/ConfigProvider.h"
 #include "../Utils/Either.h"
 
 class Session {
@@ -25,7 +26,7 @@ public:
     static void setSessionCookie(HttpResponse& response, String cookie);
     static void clearSessionCookie(HttpResponse& response);
     
-	UserSessionManager(UsersConfigProvider& configProvider);
+	UserSessionManager(ConfigProvider<UsersConfig>& configProvider);
     Either<String, Session> validateSession(const String& sessionId);
     Either<String, Session> signIn(const String& login, const String& password);
     void signOut(const String& sessionId);
@@ -33,7 +34,7 @@ public:
 
 private:
     Vector<Session> sessions;
-    UsersConfigProvider& configProvider;
+    ConfigProvider<UsersConfig>& configProvider;
 
     int getSessionByLogin(const String& login);
     int getSessionById(const String& sessionId);
