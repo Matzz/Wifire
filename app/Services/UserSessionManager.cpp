@@ -52,7 +52,7 @@ Either<String, Session> UserSessionManager::validateSession(const String& sessio
         sessions[sessionIdx].markUsed();
         return {right_tag_t(), std::move(sessions[sessionIdx])};
     } else {
-        return {left_tag_t(), std::move("Session expired")};
+        return {left_tag_t(), std::move(F("Session expired"))};
     }
 
 }
@@ -62,7 +62,7 @@ Either<String, Session> UserSessionManager::signIn(const String& login, const St
     const UserConfig* user = usersConfig.getUser(login);
     if(user != nullptr) {
         if(!user->enabled) {
-            return {left_tag_t(), std::move("This user is disabled.")};
+            return {left_tag_t(), std::move(F("This user is disabled."))};
         }
         if(!user->checkPassword(password)) {
             return {left_tag_t(), std::move("Invalid password.")};

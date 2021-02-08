@@ -21,33 +21,37 @@ void WebServer::start() {
 	bindActions();
 }
 
-bool hasAccess(const String& requiredRole, HttpRequest &request, HttpResponse &response, UserSessionManager& sessionManager) {
+String getAccessErrors(const String& requiredRole, HttpRequest &request, HttpResponse &response, UserSessionManager& sessionManager) {
 	if(requiredRole == String::empty) {
-		return true;
+		return String::empty;
 	}
 	String sessionId = getSessionId(request);
 	if(sessionId == String::empty) {
-		return false;
+		return F("You must signin to see this page.");
 	}
 	auto sessionOrErr = sessionManager.validateSession(sessionId);
 	auto session = sessionOrErr.get_if_right();
 	if(session == nullptr) {
     	UserSessionManager::clearSessionCookie(response);
-		return false;
+		String* err = sessionOrErr.get_if_left();
+		return *err;
 	}
 	if(session->login == "admin") {
-		return true;
+		return String::empty;
 	}
-	return session->roles.contains(requiredRole);
+	if(!session->roles.contains(requiredRole)) {
+		return F("You don't have required permissions to see this page.");
+	}
+	return String::empty;
 }
 
 void WebServer::authWrapper(const String& path, const String& requiredRole, const HttpPathDelegate& callback) {
 	auto wrapper = [this, path, callback, requiredRole](HttpRequest &request, HttpResponse &response) {
-		bool accessGranted = hasAccess(requiredRole, request, response, sessionManager);
-		if(!accessGranted) {
+		String maybeError = getAccessErrors(requiredRole, request, response, sessionManager);
+		if(maybeError != String::empty) {
+			returnFailure(response, maybeError);
 			response.headers[HTTP_HEADER_LOCATION] = "/";
 			response.code = HttpStatus::FORBIDDEN;
-			response.sendString("{\"status\": \"access_refused\"}");
 		} else {
 			callback(request, response);
 		}
