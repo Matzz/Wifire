@@ -34,7 +34,7 @@ template<> class Codec<WiFiApConfig> {
 		json["beaconInterval"] = obj.beaconInterval;
 	}
 
-	WiFiApConfig decode(JsonObject& json) {
+	Either<String, WiFiApConfig> decode(JsonObject& json) {
 		WiFiApConfig obj;
 		String defaultSsid = "Wifire_" + String(system_get_chip_id(), 10);
 		obj.enabled = CodecHelpers::getOrElse(json, "enabled", true);

@@ -36,7 +36,7 @@ template<> class Codec<GPIOConfig> {
 		}
 	}
 
-	GPIOConfig decode(JsonObject& json) {
+	Either<String, GPIOConfig> decode(JsonObject& json) {
 		GPIOConfig cfg;
 		JsonArray gpioArr = json["gpio"].as<JsonArray>();
 		int gpioArrSize = gpioArr.size();

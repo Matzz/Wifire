@@ -9,8 +9,12 @@ void userListAction(HttpRequest &request, HttpResponse &response) {
 	JsonObject doc = stream->getRoot();
 
 	ConfigProvider<UsersConfig>& provider = Injector::getInstance().getUsersConfigProvider();
-	UsersConfig config = provider.load();
-
+	auto configOrError = provider.load();
+	if(configOrError.is_left()) {
+		return returnFailure(response, F("Invalid json. Please save configration again."));
+	}
+	UsersConfig config = *configOrError.get_if_right();
+	
 	JsonArray usersArr = doc.createNestedArray("users");
 	auto users = config.getUsersList();
 	for(int i=0; i<users.size(); i++) {
@@ -48,13 +52,17 @@ void userAddAction(HttpRequest &request, HttpResponse &response) {
 	);
 
 	auto& provider = Injector::getInstance().getUsersConfigProvider();
-	UsersConfig usersConfig = provider.load();
-	bool added = usersConfig.addUser(user);
+	auto configOrError = provider.load();
+	if(configOrError.is_left()) {
+		return returnFailure(response, F("Invalid json. Please save configration again."));
+	}
+	UsersConfig config = *configOrError.get_if_right();
+	bool added = config.addUser(user);
 
 	if(added) {
 		auto& sessionManager = Injector::getInstance().getUserSessionManager();
 		sessionManager.signOutByLogin(user.login);
-		provider.save(usersConfig);
+		provider.save(config);
 	} else {
 		JsonObjectStream* stream = new JsonObjectStream();
 		JsonObject json = stream->getRoot();
@@ -66,10 +74,14 @@ void userAddAction(HttpRequest &request, HttpResponse &response) {
 void userEditAction(HttpRequest &request, HttpResponse &response) {
 
 	auto& provider = Injector::getInstance().getUsersConfigProvider();
-	UsersConfig usersConfig = provider.load();
+	auto configOrError = provider.load();
+	if(configOrError.is_left()) {
+		return returnFailure(response, F("Invalid json. Please save configration again."));
+	}
+	UsersConfig config = *configOrError.get_if_right();
 	String login = getString(request, "login");
 
-	bool modified = usersConfig.editUser(
+	bool modified = config.editUser(
 		getBool(request, "enabled"),
 		login,
 		getString(request, "password"),
@@ -79,7 +91,7 @@ void userEditAction(HttpRequest &request, HttpResponse &response) {
 	if(modified) {
 		auto& sessionManager = Injector::getInstance().getUserSessionManager();
 		sessionManager.signOutByLogin(login);
-		provider.save(usersConfig);
+		provider.save(config);
 	} else {
 		returnFailure(response, "User doesn't exist.");
 	}
@@ -88,11 +100,15 @@ void userEditAction(HttpRequest &request, HttpResponse &response) {
 void userRemoveAction(HttpRequest &request, HttpResponse &response) {
 
 	auto& provider = Injector::getInstance().getUsersConfigProvider();
-	UsersConfig usersConfig = provider.load();
-	bool removed = usersConfig.removeUser(getString(request, "login"));
+	auto configOrError = provider.load();
+	if(configOrError.is_left()) {
+		return returnFailure(response, F("Invalid json. Please save configration again."));
+	}
+	UsersConfig config = *configOrError.get_if_right();
+	bool removed = config.removeUser(getString(request, "login"));
 
 	if(removed) {
-		provider.save(usersConfig);
+		provider.save(config);
 	} else {
 		returnFailure(response, "User doesn't exist.");
 	}

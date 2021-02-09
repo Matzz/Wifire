@@ -28,7 +28,12 @@ OtaUpdater::OtaUpdater(const int spiffsAddresses[2],
 }
 
 void OtaUpdater::update() {
-	auto config = cfgProvider.load();
+	auto configOrError = cfgProvider.load();
+	if(configOrError.is_left()) {
+		return;
+	}
+	auto config = *configOrError.get_if_right();
+
 	debug_i("OTA - Updating...");
 	RbootHttpUpdater* otaUpdater = new RbootHttpUpdater();
 	uint8 slot = activeSlot();

@@ -21,7 +21,7 @@ template<> class Codec<OtaConfig> {
 		json["spiffUrl"] = obj.spiffUrl.c_str();
 	}
 
-	OtaConfig decode(JsonObject& json) {
+	Either<String, OtaConfig> decode(JsonObject& json) {
 		OtaConfig cfg;
 		cfg.romUrl = CodecHelpers::getOrElse(json, "romUrl", String::empty);
 		cfg.spiffUrl = CodecHelpers::getOrElse(json, "spiffUrl", String::empty);

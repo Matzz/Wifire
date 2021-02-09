@@ -4,6 +4,7 @@
 #include <JsonObjectStream.h>
 #include <ArduinoJson.h>
 #include "../Utils/NonCopyable.h"
+#include "../Utils/Either.h"
 #include "Codec.h"
 #define JSON_MAX_SIZE 2048
 
@@ -22,7 +23,7 @@ public:
 		fileSetContent(fileName, output);
 	}
 	
-	T load() {
+	Either<String, T> load() {
 		String jsonString;
 		debug_i("Loading config: %s", this->fileName.c_str());
 		if (fileExist(this->fileName)) {

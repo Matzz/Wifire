@@ -6,7 +6,6 @@ bool getBool(HttpRequest& request, String name) {
 }
 
 void returnFailure(HttpResponse &response, String msg) {
-
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();
 	json["message"] = msg;

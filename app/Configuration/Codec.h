@@ -1,5 +1,6 @@
 #pragma once
 #include <ArduinoJson.h>
+#include "../Utils/Either.h"
 
 template<typename T>
 class Codec {
@@ -24,7 +25,7 @@ class CodecHelpers {
 	}
 	
     template<typename T>
-    static T decodeDoc(Codec<T> codec, JsonDocument& doc) {
+    static Either<String, T> decodeDoc(Codec<T> codec, JsonDocument& doc) {
 		JsonObject json = doc.as<JsonObject>();
 		return codec.decode(json);
 	}

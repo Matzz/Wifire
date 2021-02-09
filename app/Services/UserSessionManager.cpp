@@ -58,8 +58,14 @@ Either<String, Session> UserSessionManager::validateSession(const String& sessio
 }
 
 Either<String, Session> UserSessionManager::signIn(const String& login, const String& password) {
-    UsersConfig usersConfig = configProvider.load();
+
+	auto configOrError = configProvider.load();
+	if(configOrError.is_left()) {
+		return {left_tag_t(), *configOrError.get_if_left()};
+	}
+	auto usersConfig = *configOrError.get_if_right();
     const UserConfig* user = usersConfig.getUser(login);
+
     if(user != nullptr) {
         if(!user->enabled) {
             return {left_tag_t(), std::move(F("This user is disabled."))};

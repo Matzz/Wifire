@@ -29,7 +29,7 @@ template<> class Codec<WiFiStationConfig> {
 		json["gateway"] = obj.gateway.toString();
 	}
 
-	WiFiStationConfig decode(JsonObject& json) {
+	Either<String, WiFiStationConfig> decode(JsonObject& json) {
 		WiFiStationConfig obj;
 		obj.enabled = CodecHelpers::getOrElse(json, "enabled", false);
 		obj.ssid = CodecHelpers::getOrElse(json, "ssid", "");

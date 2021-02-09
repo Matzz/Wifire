@@ -9,8 +9,21 @@ WiFiManager::WiFiManager(ConfigProvider<WiFiStationConfig>& stationConfigProvide
 }
 
 void WiFiManager::startNetwork() {
-	WiFiStationConfig stCfg = stationConfigProvider.load();
-	WiFiApConfig apCfg = apConfigProvider.load();
+	auto stCfgOrError = stationConfigProvider.load();
+	if(stCfgOrError.is_left()) {
+		debug_w("Station config error: %s", stCfgOrError.get_if_left()->c_str());
+		return;
+	}
+	auto stCfg = *stCfgOrError.get_if_right();
+
+	auto apCfgOrError = apConfigProvider.load();
+	if(apCfgOrError.is_left()) {
+		debug_w("Access point config error: %s", apCfgOrError.get_if_left()->c_str());
+		return;
+	}
+	auto apCfg = *apCfgOrError.get_if_right();
+	
+
 	bool connectedToStation = false;
 	bool apStarted = false;
 

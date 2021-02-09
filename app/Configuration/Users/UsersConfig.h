@@ -66,7 +66,7 @@ template<> class Codec<UsersConfig> {
 		}
 	}
 
-	UsersConfig decode(JsonObject& json) {
+	Either<String, UsersConfig> decode(JsonObject& json) {
 		UsersConfig cfg;
 		JsonArray usersArr = json["users"].as<JsonArray>();
 		int usersArrSize = usersArr.size();
@@ -103,6 +103,6 @@ template<> class Codec<UsersConfig> {
 
 		cfg.addAdminIfDoesntExist();
 		
-		return cfg;
+		return {right_tag_t(), std::move(cfg)};
 	}
 };

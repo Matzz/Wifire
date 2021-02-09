@@ -7,7 +7,11 @@
 
 void apGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	auto& provider = Injector::getInstance().getWiFiApConfigProvider();
-	auto config = provider.load();
+	auto configOrError = provider.load();
+	if(configOrError.is_left()) {
+		return returnFailure(response, F("Invalid json. Please save configration again."));
+	}
+	auto config = *configOrError.get_if_right();
 
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();
@@ -27,7 +31,7 @@ void apGetConfigAction(HttpRequest &request, HttpResponse &response) {
 
 void apSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	auto& provider = Injector::getInstance().getWiFiApConfigProvider();
-	auto config = provider.load();
+	WiFiApConfig config;
 
 	config.enabled = getBool(request, "enabled");
 	config.ssid = request.getPostParameter("ssid");
@@ -43,7 +47,11 @@ void apSetConfigAction(HttpRequest &request, HttpResponse &response) {
 
 void stationGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	auto& provider = Injector::getInstance().getWiFiStationConfigProvider();
-	auto config = provider.load();
+	auto configOrError = provider.load();
+	if(configOrError.is_left()) {
+		return returnFailure(response, F("Invalid json. Please save configration again."));
+	}
+	auto config = *configOrError.get_if_right();
 
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();
@@ -61,7 +69,7 @@ void stationGetConfigAction(HttpRequest &request, HttpResponse &response) {
 
 void stationSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	auto& provider = Injector::getInstance().getWiFiStationConfigProvider();
-	auto config = provider.load();
+	WiFiStationConfig config;
 
 	config.enabled = getBool(request, "enabled");
 	config.ssid = request.getPostParameter("ssid");
@@ -119,8 +127,12 @@ void stationGetNetworks(HttpRequest &request, HttpResponse &response) {
 
 void stationListNetworks(HttpRequest &request, HttpResponse &response) {
 	auto& provider = Injector::getInstance().getWiFiStationConfigProvider();
-	auto config = provider.load();
-
+	auto configOrError = provider.load();
+	if(configOrError.is_left()) {
+		return returnFailure(response, F("Invalid json. Please save configration again."));
+	}
+	auto config = *configOrError.get_if_right();
+	
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();
 
@@ -137,7 +149,11 @@ void stationListNetworks(HttpRequest &request, HttpResponse &response) {
 
 void otaGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	auto& provider = Injector::getInstance().getOtaConfigProvider();
-	auto config = provider.load();
+	auto configOrError = provider.load();
+	if(configOrError.is_left()) {
+		return returnFailure(response, F("Invalid json. Please save configration again."));
+	}
+	auto config = *configOrError.get_if_right();
 
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();
@@ -151,8 +167,7 @@ void otaGetConfigAction(HttpRequest &request, HttpResponse &response) {
 
 void otaSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	auto& provider = Injector::getInstance().getOtaConfigProvider();
-	auto config = provider.load();
-
+	OtaConfig config;
 	config.romUrl = request.getPostParameter("romUrl");
 	config.spiffUrl = request.getPostParameter("spiffUrl");
 	provider.save(config);
@@ -161,7 +176,12 @@ void otaSetConfigAction(HttpRequest &request, HttpResponse &response) {
 
 void gpioGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	auto& provider = Injector::getInstance().getGPIOConfigProvider();
-	GPIOConfig config = provider.load();
+
+	auto configOrError = provider.load();
+	if(configOrError.is_left()) {
+		return returnFailure(response, F("Invalid json. Please save configration again."));
+	}
+	GPIOConfig config = *configOrError.get_if_right();
 
 	JsonObjectStream* stream = new JsonObjectStream(JSON_MAX_SIZE);
 	JsonObject json = stream->getRoot();
@@ -179,7 +199,7 @@ void gpioSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	Injector &di = Injector::getInstance();
 	auto& provider = di.getGPIOConfigProvider();
 
-	auto config = provider.load();
+	GPIOConfig config;
 	for(int i=0; i<=GPIOConfig::max_pin; i++) {
 		config.gpio[i].name = request.getPostParameter(gpioFieldName(i, "name"));
 		config.gpio[i].isInput = getBool(request, gpioFieldName(i, "isInput"));
