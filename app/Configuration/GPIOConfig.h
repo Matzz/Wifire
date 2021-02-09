@@ -25,29 +25,30 @@ template<> class Codec<GPIOConfig> {
             return instance;
         }
 
-	void encode(JsonObject& json, GPIOConfig obj) {
-		JsonArray gpioArr = json.createNestedArray("gpio");
+	void encode(JsonObject& json, GPIOConfig cfg) {
+		JsonObject gpioObj = json.createNestedObject("gpio");
 		for(int i=0; i<=GPIOConfig::max_pin; i++) {
-			JsonObject pinObj = gpioArr.createNestedObject();
-			pinObj["name"] = obj.gpio[i].name;
+			String key = String(i);
+			JsonObject pinObj = gpioObj.createNestedObject(key);
+			pinObj["name"] = cfg.gpio[i].name;
 			bool isSafe = GPIOConfig::isSafeToUse(i);
-			pinObj["isInput"] = isSafe ? obj.gpio[i].isInput : false;
-			pinObj["pull"] = isSafe ? obj.gpio[i].pull : false;
+			pinObj["isInput"] = isSafe ? cfg.gpio[i].isInput : false;
+			pinObj["pull"] = isSafe ? cfg.gpio[i].pull : false;
 		}
 	}
 
 	Either<String, GPIOConfig> decode(JsonObject& json) {
 		GPIOConfig cfg;
-		JsonArray gpioArr = json["gpio"].as<JsonArray>();
-		int gpioArrSize = gpioArr.size();
-		for(int i=0; i<=GPIOConfig::max_pin; i++) {
-			if(i<gpioArrSize) {
-				auto gpioObj = gpioArr[i].as<JsonObject>();
-				cfg.gpio[i] = {gpioObj["name"].as<String>(), gpioObj["isInput"].as<bool>(), gpioObj["pull"].as<bool>()};
+		JsonObject gpioObj = json["gpio"].as<JsonObject>();
+		for(unsigned int i=0; i<=GPIOConfig::max_pin; i++) {
+			String key = String(i);
+			if(gpioObj.containsKey(key)) {
+				auto pinObj = gpioObj[key].as<JsonObject>();
+				cfg.gpio[i] = {pinObj["name"].as<String>(), pinObj["isInput"].as<bool>(), pinObj["pull"].as<bool>()};
 			} else {
 				cfg.gpio[i] = {"GPIO_"+String(i), true, false};
 			}
 		}
-		return cfg;
+		return {right_tag_t(), cfg};
 	}
 };

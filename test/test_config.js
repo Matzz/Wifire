@@ -7,7 +7,9 @@ const {
     doDeleteUser,
     doSucessfulDeleteUser,
     doAddUser,
-    doSucessfulAddUser
+    doSucessfulAddUser,
+    doEditUser,
+    doSucessfulEditUser
 } = require('./helpers');
 const { isHost } = require('./config');
 const expect = chai.expect
@@ -22,7 +24,6 @@ describe('config actions', function() {
                 var expectedSpiffUrl = 'defg' + rnd;
                 return agent
                     .post("config/ota/set")
-                    .type('form')
                     .send({
                         'romUrl': expectedRomUrl,
                         'spiffUrl': expectedSpiffUrl
@@ -48,14 +49,15 @@ describe('config actions', function() {
                 var rnd = Math.random();
                 var safePins = [2,3,4,5,13,14,15,16];
                 var expectedGPIO = {};
+                expectedGPIO['gpio'] = {};
                 for(var i=0; i<=16; i++) {
-                    expectedGPIO["gpio["+i+"]['name']"] = "GPIO_"+i+"_"+rnd;
-                    expectedGPIO["gpio["+i+"]['isInput']"] = "true";
-                    expectedGPIO["gpio["+i+"]['pull']"] = "true";
+                    expectedGPIO["gpio"][i] = {};
+                    expectedGPIO["gpio"][i]["name"] = "GPIO_"+i+"_"+rnd
+                    expectedGPIO["gpio"][i]["isInput"] = true;
+                    expectedGPIO["gpio"][i]["pull"] = true;
                 }
                 return agent
                     .post("config/gpio/set")
-                    .type('form')
                     .send(expectedGPIO)
                     .then(editRes => {
                         expect(editRes).to.have.status(200);
@@ -71,7 +73,6 @@ describe('config actions', function() {
                             expect(body[i].isInput).to.be.eql(isSafe ? true : false);
                             expect(body[i].pull).to.be.eql(isSafe ? true : false);
                         }
-                        return;;
                     })
             });
     });
@@ -93,7 +94,6 @@ describe('config actions', function() {
                     var expectedSpiffUrl = 'defg' + rnd;
                     return agent
                         .post("config/station/set")
-                        .type('form')
                         .send(expectedCfg)
                         .then(editRes => {
                             expect(editRes).to.have.status(200);
@@ -116,19 +116,16 @@ describe('config actions', function() {
                     var rnd = Math.floor(Math.random()*10)
                     var expectedCfg = {
                         enabled: true,
-                        ssid: "station_"+rnd,
-                        password: "station_pass_"+rnd,
+                        ssid: "ap_"+rnd,
+                        password: "ap_pass_"+rnd,
                         authMode: 2,
                         ip: "1.2.3."+rnd,
                         hidden: true,
                         channel: rnd,
                         beaconInterval: rnd*10
                     }
-                    var expectedRomUrl = 'abc' + rnd;
-                    var expectedSpiffUrl = 'defg' + rnd;
                     return agent
                         .post("config/ap/set")
-                        .type('form')
                         .send(expectedCfg)
                         .then(editRes => {
                             expect(editRes).to.have.status(200);

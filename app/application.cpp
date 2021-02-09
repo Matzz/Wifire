@@ -2,7 +2,7 @@
 #include "Services/Injector.h"
 #include "Services/SerialHandler.h"
 #include "Services/SpiffsManager.h"
-
+#include "Configuration/GPIOConfig.h"
 
 void onReady() {
 	debug_i("System ready callback.");

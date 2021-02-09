@@ -1,19 +1,16 @@
-#include "utils.h"
+#include "actionsHelpers.h"
 
-bool getBool(HttpRequest& request, String name) {
+#include <ArduinoJson.h>
+#include <JsonObjectStream.h>
+#include "../Configuration/Codec.h"
+
+
+bool getBool(HttpRequest& request, const String &name) {
 	String val = request.getPostParameter(name);
 	return val=="true" || val == "1" || val == "on";
 }
 
-void returnFailure(HttpResponse &response, String msg) {
-	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject json = stream->getRoot();
-	json["message"] = msg;
-	response.sendDataStream(stream, MIME_JSON);
-	response.code = HttpStatus::BAD_REQUEST;
-}
-
-String getString(HttpRequest& request, String name, String defaultVal) {
+String getString(HttpRequest& request, const String &name, const String& defaultVal) {
 	String maybeParam = request.getPostParameter(name);
 	if(maybeParam == null) {
 		return defaultVal;
@@ -22,9 +19,20 @@ String getString(HttpRequest& request, String name, String defaultVal) {
 	}
 }
 
-String getHash(String base) {
-		auto hash = Crypto::Sha1().calculate(base);
-		return Crypto::toString(hash);
+void returnOk(HttpResponse &response, String msg) {
+	JsonObjectStream* stream = new JsonObjectStream();
+	JsonObject json = stream->getRoot();
+	json["message"] = msg;
+	response.sendDataStream(stream, MIME_JSON);
+	response.code = HttpStatus::OK;
+}
+
+void returnFailure(HttpResponse &response, String msg) {
+	JsonObjectStream* stream = new JsonObjectStream();
+	JsonObject json = stream->getRoot();
+	json["message"] = msg;
+	response.sendDataStream(stream, MIME_JSON);
+	response.code = HttpStatus::BAD_REQUEST;
 }
 
 const String getCookie(HttpRequest& request, String name) {

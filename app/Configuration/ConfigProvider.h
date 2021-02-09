@@ -6,7 +6,6 @@
 #include "../Utils/NonCopyable.h"
 #include "../Utils/Either.h"
 #include "Codec.h"
-#define JSON_MAX_SIZE 2048
 
 template <typename T>
 class ConfigProvider: private NonCopyable {
@@ -16,7 +15,7 @@ protected:
 public:
 	ConfigProvider(String fileName, Codec<T> &codec) : fileName(fileName), codec(codec) { }
 	void save(T& obj) {
-		StaticJsonDocument<JSON_MAX_SIZE> doc;
+		DynamicJsonDocument doc(JSON_MAX_SIZE);
 		String output;
 		CodecHelpers::encodeDoc(codec, doc, obj);
 		serializeJson(doc, output);
@@ -24,16 +23,17 @@ public:
 	}
 	
 	Either<String, T> load() {
-		String jsonString;
-		debug_i("Loading config: %s", this->fileName.c_str());
-		if (fileExist(this->fileName)) {
-			jsonString = fileGetContent(this->fileName);
+		DynamicJsonDocument doc(JSON_MAX_SIZE);
+		debug_i("Loading config: %s", fileName.c_str());
+		if (fileExist(fileName)) {
+			if(!Json::loadFromFile(doc, fileName)) {
+				return F("Invalid json.");
+			}
 		} else {
+			// We still try to decode empty result. Maybe there are sensible defaults in the decoder.
 			debug_i("File '%s' doesn't exist.", this->fileName.c_str());
-			jsonString = String("{}");
 		}
-		StaticJsonDocument<JSON_MAX_SIZE> doc;
-		deserializeJson(doc, jsonString);
+		
 		return CodecHelpers::decodeDoc(codec, doc);
 	}
 };

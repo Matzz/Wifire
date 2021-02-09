@@ -2,6 +2,8 @@
 
 #include <SmingCore.h>
 #include "../Codec.h"
+#include "UserEditRequest.h"
+#include "UserDeleteRequest.h"
 
 #define MAX_USERS 100
 #define MAX_ROLES 10
@@ -19,7 +21,11 @@ public:
     UserConfig(bool enabled, String login, String password, const Vector<String> &roles);
 
 	bool checkPassword(String password) const;
+	inline void setPassword(const String& password) {
+    	hash = UserConfig::getHash(salt + password);
+	}
 
+	static String getHash(const String& base);
 private:
 	static String mkSalt();
 };
@@ -28,9 +34,10 @@ class UsersConfig {
 public:
 	static String adminLogin;
 	
-    bool addUser(UserConfig &user);
-	bool editUser(bool enabled, String login, String password, const Vector<String> &roles);
-	bool removeUser(String login);
+    bool addUser(UserEditRequest &userToAdd);
+	bool addUser(UserConfig &user);
+	bool editUser(UserEditRequest &userToEdit);
+	bool removeUser(UserDeleteRequest &userToDelete);
 	Vector<UserConfig> const getUsersList() { return users; } const
 	UserConfig* getUser(String login) const;
 	bool addAdminIfDoesntExist();
@@ -98,7 +105,7 @@ template<> class Codec<UsersConfig> {
 				roles
 			);
 
-        cfg.addUser(user);
+        	cfg.addUser(user);
 		}
 
 		cfg.addAdminIfDoesntExist();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SmingCore.h>
+#include "actionsHelpers.h"
 
 void apGetConfigAction(HttpRequest &request, HttpResponse &response);
 void apSetConfigAction(HttpRequest &request, HttpResponse &response);

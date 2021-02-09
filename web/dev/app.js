@@ -6,8 +6,7 @@ function camelCaseToSentence(camelCase) {
 	return finalResult;
 }
 
-function handleGetFailure(jqXHR, textStatus, errorThrown) {
-	console.log(jqXHR);
+function handleRequestFailure(jqXHR, textStatus, errorThrown) {
 	if(jqXHR.status==403) {
 		alert("You don't have access rights to see that page.");
 		handleAuthUpdate();
@@ -17,24 +16,25 @@ function handleGetFailure(jqXHR, textStatus, errorThrown) {
 			msg = jqXHR.responseJSON['message'];
 		}
 		alert("Error: "+msg);
-		console.log("Error: ", arguments);
+		console.warn("Error: ", arguments);
 	}
 }
 
 function getJSON(url) {
-	return $.getJSON(url).fail(handleGetFailure);
+	return $.getJSON(url).fail(handleRequestFailure);
 }
 
-function handleFormFailure(jqXHR, textStatus, errorThrown) {
-	var msg = errorThrown;
-	if('responseJSON' in jqXHR && 'message' in jqXHR['responseJSON']) {
-		msg = jqXHR.responseJSON['message'];
-	}
-	alert("Error: "+msg);
-	console.log("Error: ", arguments);
+function postJSON(url, data) {
+	var cfg = {
+		url: url,
+		data: JSON.stringify(data),
+		dataType: 'json',
+        contentType	: 'application/json; charset=utf-8'
+	};
+	return $.post(cfg).fail(handleRequestFailure)
 }
 
-function getFieldsFormat(inputs, custom_formats) {
+function getInputType(inputs, custom_formats) {
 	all = {}
 	for(name in inputs) {
 		var value = inputs[name];
@@ -44,7 +44,8 @@ function getFieldsFormat(inputs, custom_formats) {
 		if(name in custom_formats) {
 			input = _.defaults(custom_formats[name], input)
 		} else {
-			switch(typeof value) {
+			input["json_type"] = typeof value;
+			switch(input["json_type"]) {
 				case "boolean":
 					input_type = "checkbox";
 					break;
@@ -55,7 +56,7 @@ function getFieldsFormat(inputs, custom_formats) {
 					input_type = "text";
 					break;
 			}
-			input["type"] = input_type
+			input["html_type"] = input_type
 		}
 		all[name] = input;
 	}
@@ -80,19 +81,20 @@ function editConfig(type, form_template, custom_field_mapping) {
 	var saveUrl = "/config/"+type+"/set";
 
 	getJSON(formUrl).success(function(response_data) {
-		inputs = getFieldsFormat(response_data, custom_field_mapping)
+		inputs = getInputType(response_data, custom_field_mapping)
 		$container.html(templates[form_template]({
 			 title: response_data['title'] ? response_data['title'] : "Edit " + type + " configuration",
 			 inputs: inputs,
 			 response_data: response_data
 			}));
-		$('#form_submit').click(function() {
-	        $.post({
-	            url: saveUrl,
-	            data: $('#form').serialize(),
-	        }).done(function(data) {
-	        	alert("Ok");
-			}).fail(handleFormFailure)
+		$('#form').submit(function(event) {
+			var data = $(event.target).serializeJSON();
+			console.info("Sending ", data);
+			postJSON(saveUrl, data)
+				.done(function(data) {
+					alert("Configuration saved.");
+				});
+				event.preventDefault();
 		});
 	});
 }
@@ -104,7 +106,8 @@ function editStationController(name) {
 function editApController(name) {
 	custom_field_mapping = {
 		"authMode": {
-			type: "select", 
+			html_type: "select",
+			json_type: "string", 
 			values: {
 				0: "Open",
 				1: "WEP",
@@ -123,10 +126,12 @@ function editApController(name) {
 function editOtaController(name) {
 	custom_field_mapping = {
 			"romUrl": {
-				type: "url"
+				html_type: "url",
+				json_type: "string"
 			},
 			"spiffUrl": {
-				type: "url"
+				html_type: "url",
+				json_type: "string"
 			}
 		}
 	return editConfig("ota");
@@ -154,7 +159,7 @@ function getAuthJson() {
 		try {
 			authJson = $.parseJSON(jsonStr);
 		} catch(error) {
-			console.error("Invalid auth json", jsonStr, error);
+			console.warn("Invalid auth json", jsonStr, error);
 		}
 	}
 	return authJson;
@@ -184,16 +189,13 @@ function handleAuthUpdate() {
 function signinController() {
 	$container.html(templates["signin"]);
 	$('#form').submit(function(event) {
-		console.log(event);
-		$.post({
-			url: "/signin",
-			data: $(event.target).serialize(),
-		}).done(function(data) {
-			alert("You have been signed in.");
-			handleAuthUpdate();
-			loadPage("start");
-		}).fail(handleFormFailure);
-		return false;
+		postJSON("/signin", $(event.target).serializeJSON())
+			.done(function(data) {
+				alert("You have been signed in.");
+				handleAuthUpdate();
+				loadPage("start");
+			});
+		event.preventDefault();
 	});
 }
 
@@ -204,7 +206,7 @@ function signoutController() {
 		Cookies.set('auth', null)
 		handleAuthUpdate();
 		loadPage("signin");
-	}).fail(handleFormFailure)
+	}).fail(handleRequestFailure)
 }
 
 // --- END Auth actions
@@ -242,23 +244,37 @@ function usersListController(name) {
 	});
 }
 
+function normalizeRoles(data) {
+	if(data.roles) {
+		var rolesList = data.roles.split(",");
+		var normalizedRoles = _.map(rolesList, function(value) {
+			return value.trim();
+		}).filter(function(v) {
+			return v != "";
+		});
+		data.roles = _.uniq(normalizedRoles);
+	}
+	return data;
+}
+
 function addUser() {
 	userFormVisible(true);
 	$('#user_form_title').text("New user");
 	$('#user_form_container').submit(function(event) {
 		userFormSubmitEnabled(false);
-		console.log($('#form').serialize());
-		$.post({
-			url: "/config/users/add",
-			data: $(event.target).serialize(),
-		}).done(function(data) {
-			alert("User added.");
-			userFormVisible(false);
-		 	loadPage('usersList');
-		}).fail(handleFormFailure);
-		return false;
+		var data = normalizeRoles($(event.target).serializeJSON());
+		postJSON("/config/users/add", data)
+			.done(function(data) {
+				alert("User added.");
+				userFormVisible(false);
+				loadPage('usersList');
+			})
+			.fail(function() {
+				userFormSubmitEnabled(true);
+			});
+			event.preventDefault();
 	}).on('reset', function(event) {
-		return userFormVisible(false);
+		userFormVisible(false)
 	});
 }
 
@@ -271,33 +287,28 @@ function editUser(isEnabled, login, roles) {
 	$('#form_roles').prop('value', roles);
 	$('#user_form_container').submit(function(event) {
 		userFormSubmitEnabled(false);
-		$.post({
-			url: "/config/users/edit",
-			data: $(event.target).serialize(),
-		}).done(function(data) {
-			alert("User " + login + " modified.");
-			userFormVisible(false);
-		 	loadPage('usersList');
-		}).fail(function(jqXHR, textStatus, errorThrown) {
-			handleFormFailure(jqXHR, textStatus, errorThrown);
-			userFormSubmitEnabled(true);
-		});
-		return false;
+		var data = normalizeRoles($(event.target).serializeJSON());
+		postJSON("/config/users/edit", data)
+			.done(function(data) {
+				alert("User " + login + " modified.");
+				userFormVisible(false);
+				loadPage('usersList');
+			}).fail(function(jqXHR, textStatus, errorThrown) {
+				userFormSubmitEnabled(true);
+			});
+		event.preventDefault();
 	}).on('reset', function(event) {
-		return userFormVisible(false);
-	});;
+		userFormVisible(false);
+	});
 }
 
 function removeUser(login) {
 	if(confirm("Are you sure you want to remove user "+login)) {
-		$.post({
-			url: "/config/users/remove",
-			data: {'login': login},
-		}).done(function(data) {
-			alert("User " + login + " deleted.");
+		postJSON("/config/users/remove", {'login': login}).done(function(data) {
+			alert("User " + login + " removed.");
 			userFormVisible(false);
 			loadPage('usersList');
-		}).fail(handleFormFailure)
+		});
 	}
 }
 

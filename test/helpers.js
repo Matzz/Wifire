@@ -17,7 +17,6 @@ function doLogin({agent = getAgent(), login, password}) {
     password = isUndefined(password) ? login : password;
     var promise = agent
         .post('signin')
-        .type('form')
         .send({
             'login': login,
             'password': password
@@ -54,7 +53,6 @@ function doSucessfulLogout(agent) {
 function doDeleteUser({agent, login}) {
     var result = agent
     .post("config/users/remove")
-    .type('form')
     .send({ 'login': login })
     .then(res => {
         res.agent = agent;
@@ -71,12 +69,11 @@ function doSucessfulDeleteUser({agent, login}) {
         });
 }
 
-function doAddUser({agent, login, password, roles = "", enabled = true}) {
+function doAddUser({agent, login, password, roles = [], enabled = true}) {
     password = isUndefined(password) ? login : password;
     
     var result = agent
         .post("config/users/add")
-        .type('form')
         .send({
             'enabled': enabled,
             'login': login,
@@ -90,8 +87,34 @@ function doAddUser({agent, login, password, roles = "", enabled = true}) {
     return result;
 }
 
-function doSucessfulAddUser({agent, login, password, roles = "", enabled = true}) {
+function doSucessfulAddUser({agent, login, password, roles = [], enabled = true}) {
     return doAddUser({agent: agent, login: login, password: password, roles: roles, enabled: enabled})
+        .then(res => {
+            expect(res).to.have.status(200);
+            return res;
+        });
+}
+
+function doEditUser({agent, login, password, roles = [], enabled = true}) {
+    password = isUndefined(password) ? login : password;
+    
+    var result = agent
+        .post("config/users/edit")
+        .send({
+            'enabled': enabled,
+            'login': login,
+            'password': password,
+            'roles': roles
+            })
+        .then(res => {
+            res.agent = agent;
+            return res;
+        });
+    return result;
+}
+
+function doSucessfulEditUser({agent, login, password, roles = [], enabled = true}) {
+    return doEditUser({agent: agent, login: login, password: password, roles: roles, enabled: enabled})
         .then(res => {
             expect(res).to.have.status(200);
             return res;
@@ -106,5 +129,7 @@ module.exports = {
     doDeleteUser: doDeleteUser,
     doSucessfulDeleteUser: doSucessfulDeleteUser,
     doAddUser: doAddUser,
-    doSucessfulAddUser: doSucessfulAddUser
+    doSucessfulAddUser: doSucessfulAddUser,
+    doEditUser: doEditUser,
+    doSucessfulEditUser: doSucessfulEditUser
 }

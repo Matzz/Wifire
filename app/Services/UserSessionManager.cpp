@@ -1,5 +1,4 @@
 #include "UserSessionManager.h"
-#include "../Utils/utils.h"
 
 Session::Session():
     login(""), sessionId(""), roles(Vector<String>(1, 1)), lastUsed(0) { }
@@ -103,5 +102,5 @@ void UserSessionManager::signOutByLogin(const String& login) {
 
 String UserSessionManager::mkSessionId(const String& login) {
     auto base = String(system_get_chip_id(), 10) + String(micros(), 10) + String(login);
-    return getHash(base);
+    return UserConfig::getHash(base);
 }

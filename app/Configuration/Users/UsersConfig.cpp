@@ -1,7 +1,7 @@
 #include "UsersConfig.h"
 
 #include <SmingCore.h>
-#include "../../Utils/utils.h"
+#include <Crypto/Sha1.h>
 
 
 UserConfig::UserConfig(): enabled(false), login(""), salt(""), hash(""), roles(Vector<String>(1, 1)) {
@@ -20,20 +20,25 @@ UserConfig::UserConfig(bool enabled, String login, String password, const Vector
     this->enabled = enabled;
     this->login = login;
     this->salt = salt;
-    this->hash = getHash(salt + password);
     this->roles = roles;
+    setPassword(password);
 }
 
 bool UserConfig::checkPassword(String password) const {
-    return getHash(salt + password) == hash;
+    return UserConfig::getHash(salt + password) == hash;
 }
 
-String UsersConfig::adminLogin = "admin";
+String UserConfig::getHash(const String& base) {
+		auto hash = Crypto::Sha1().calculate(base);
+		return Crypto::toString(hash);
+}
 
 String UserConfig::mkSalt() {
     auto base = String(system_get_chip_id(), 10) + String(micros(), 10);
     return getHash(base);
 }
+
+String UsersConfig::adminLogin = "admin";
 
 bool UsersConfig::addUser(UserConfig &user) {
     if(findUser(user.login) == -1) {
@@ -42,25 +47,33 @@ bool UsersConfig::addUser(UserConfig &user) {
     return false;
 }
 
-bool UsersConfig::editUser(bool enabled, String login, String password, const Vector<String> &roles) {
-    int idx = findUser(login);
+bool UsersConfig::addUser(UserEditRequest &userToAdd) {
+    if(findUser(userToAdd.login) == -1) {
+        UserConfig user(userToAdd.enabled, userToAdd.login, userToAdd.password, userToAdd.roles);
+        return users.addElement(user);
+    }
+    return false;
+}
+
+bool UsersConfig::editUser(UserEditRequest &userToEdit) {
+    int idx = findUser(userToEdit.login);
     if(idx >= 0) {
         UserConfig &cfg = users[idx];
-        cfg.enabled = enabled;
-        if(password.length() > 0) {
-            cfg.hash = getHash(cfg.salt + password);
+        cfg.enabled = userToEdit.enabled;
+        if(userToEdit.password.length() > 0) {
+            cfg.setPassword(userToEdit.password);
         }
-        cfg.roles = roles;
+        cfg.roles = userToEdit.roles;
         return true;
     }
     return false;
 }
 
-bool UsersConfig::removeUser(String login) {
-    if(login == UsersConfig::adminLogin) {
+bool UsersConfig::removeUser(UserDeleteRequest &userToDelete) {
+    if(userToDelete.login == UsersConfig::adminLogin) {
         return false;
     }
-    int idx = findUser(login);
+    int idx = findUser(userToDelete.login);
     if(idx>=0) {
         users.remove(idx);
         return true;

@@ -42,17 +42,18 @@ void SerialHandler::callback(Stream& stream, char arrivedChar,
 			Vector<String> files = fileList();
 			int idx = -1;
 			String fileName = String(str).substring(4);
-			Serial.println("Searching for "+fileName);
-			for (unsigned int i = 0; i < files.count() && idx == -1; i++) {
-				if (files[i].equals(fileName)) {
-					idx = i;
-				}
-			}
-			if (idx >= 0) {
-				Serial.printf("dumping file %s:\r\n", files[idx].c_str());
-				Serial.println(fileGetContent(files[idx]));
+			if(fileExist(fileName)) {
+				Serial.println(fileGetContent(fileName));
 			} else {
-				Serial.println("File not found.");
+				Serial.printf("File '%s' does not exist.\r\n", fileName.c_str());
+			}
+		} else if (!strncmp(str, "rm ", 3)) {
+			String fileName = String(str).substring(3);
+			if(fileExist(fileName)) {
+				fileDelete(fileName);
+				Serial.printf("Deleted '%s'\r\n", fileName.c_str());
+			} else {
+				Serial.printf("File '%s' does not exist.\r\n", fileName.c_str());
 			}
 		} else if (!strcmp(str, "info")) {
 			auto info = InfoProvider::getInfo(true);

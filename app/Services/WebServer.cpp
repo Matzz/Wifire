@@ -9,11 +9,12 @@
 #include "../Actions/gpioSwitchAction.h"
 #include "../Actions/usersAction.h"
 #include "../Actions/authAction.h"
-#include "../Utils/utils.h"
+#include "../Actions/actionsHelpers.h"
 
 
 WebServer::WebServer(const int port, UserSessionManager& sessionManager) :
 		port(port), sessionManager(sessionManager) {
+	server.setBodyParser(MIME_JSON, bodyToStringParser); 
 }
 
 void WebServer::start() {

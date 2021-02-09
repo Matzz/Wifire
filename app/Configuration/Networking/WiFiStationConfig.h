@@ -15,10 +15,10 @@ public:
 
 template<> class Codec<WiFiStationConfig> {
 	public:
-        static Codec<WiFiStationConfig>& getInstance() {
-            static Codec<WiFiStationConfig> instance;
-            return instance;
-        }
+	static Codec<WiFiStationConfig>& getInstance() {
+		static Codec<WiFiStationConfig> instance;
+		return instance;
+	}
 
 	void encode(JsonObject& json, WiFiStationConfig obj) {
 		json["enabled"] = obj.enabled;

@@ -7,7 +7,9 @@ const {
     doDeleteUser,
     doSucessfulDeleteUser,
     doAddUser,
-    doSucessfulAddUser
+    doSucessfulAddUser,
+    doEditUser,
+    doSucessfulEditUser
 } = require('./helpers');
 const { serverConf } = require('./config');
 const expect = chai.expect
@@ -116,8 +118,14 @@ describe('user management', function() {
         var userPassword = "test2"
 
         return doSucessfulLogin({agent: adminAgent, login: "admin"})
-            .then(() => { return doSucessfulAddUser({agent: adminAgent, login: userLogin, password: userPassword,
-                 roles: "edit_ap_config,show_info"}) })
+            .then(() => {
+                return doSucessfulAddUser({
+                    agent: adminAgent,
+                    login: userLogin,
+                    password: userPassword,
+                    roles: ["edit_ap_config", "show_info"]
+                });
+            })
             .then(() => { return doSucessfulLogin({agent: userAgent, login: userLogin, password: userPassword}) })
             .then(() => {
                 return userAgent
@@ -134,6 +142,49 @@ describe('user management', function() {
                                     expect(infoRes).to.have.status(200);
                                 });
                             })
+                    })
+                
+            })
+            .finally(() => {
+                return doSucessfulLogout(userAgent)
+                    .then(() => doDeleteUser({agent: adminAgent, login: userLogin}))
+                    .then(() => doSucessfulLogout(adminAgent));
+            })
+    });
+
+    it('modify user permission and password', () => {
+        var adminAgent = getAgent();
+        var userAgent = getAgent();
+        var userLogin = "test"
+        var userPassword1 = "test1"
+        var userPassword2 = "test2"
+
+        return doSucessfulLogin({agent: adminAgent, login: "admin"})
+            .then(() => {
+                return doSucessfulAddUser({
+                    agent: adminAgent,
+                    login: userLogin,
+                    password: userPassword1,
+                    roles: []
+                });
+            })
+            .then(() => { return doSucessfulLogin({agent: userAgent, login: userLogin, password: userPassword1}) })
+            .then(() => {
+                return userAgent
+                    .get("config/ap/get")
+                    .then(stationCfgRes => {
+                        expect(stationCfgRes).to.have.status(403);
+                        return doSucessfulEditUser({agent: adminAgent, login: userLogin, password: userPassword2, roles: ["edit_ap_config"]})
+                    })
+                    .then(edutRes => {
+                        return  doSucessfulLogin({agent: userAgent, login: userLogin, password: userPassword2});
+                    })
+                    .then(loginRes => {
+                        userAgent
+                        .get("config/ap/get")
+                        .then(apCfgRes => {
+                            expect(apCfgRes).to.have.status(200);
+                        })
                     })
                 
             })

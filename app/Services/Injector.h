@@ -1,20 +1,21 @@
 #pragma once
 
 #include <SmingCore.h>
-#include "OtaUpdater.h"
+#include "../Utils/NonCopyable.h"
 #include "../Configuration/ConfigProvider.h"
 #include "../Configuration/OtaConfig.h"
 #include "../Configuration/GPIOConfig.h"
 #include "../Configuration/Networking/WiFiApConfig.h"
 #include "../Configuration/Networking/WiFiStationConfig.h"
 #include "../Configuration/Users/UsersConfig.h"
-#include "../Services/UserSessionManager.h"
+#include "UserSessionManager.h"
+#include "OtaUpdater.h"
 #include "LazyFtpServer.h"
 #include "Networking/WiFiManager.h"
 #include "WebServer.h"
 #include "GPIOStateManager.h"
 
-class Injector {
+class Injector : private NonCopyable {
 private:
 	Injector()  {
 		debug_i("Creating main Wifire module");

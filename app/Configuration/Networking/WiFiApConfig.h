@@ -11,8 +11,8 @@ public:
 	WifiAuthMode authMode;
 	IpAddress ip;
 	bool hidden = false;
-	int channel = 7;
-	int beaconInterval = 200;
+	unsigned int channel = 7;
+	unsigned int beaconInterval = 200;
 };
 
 
@@ -44,7 +44,7 @@ template<> class Codec<WiFiApConfig> {
 		obj.authMode = (WifiAuthMode) CodecHelpers::getOrElse<int>(json, "authMode", AUTH_OPEN);
 		obj.hidden = CodecHelpers::getOrElse(json, "hidden", false);
 		obj.channel = CodecHelpers::getOrElse(json, "channel", 7);
-		obj.beaconInterval = CodecHelpers::getOrElse(json, "beaconInterval", 200);
+		obj.beaconInterval = CodecHelpers::getOrElse<unsigned int>(json, "beaconInterval", 200);
 		return obj;
 	}
 };
