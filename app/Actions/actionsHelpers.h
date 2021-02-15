@@ -17,11 +17,12 @@ Either<String, T> decodeJson(HttpRequest &request) {
 	if(request.getBodyStream() == nullptr) {
 		return F("Received an empty json.");
 	}
-	DynamicJsonDocument doc(JSON_MAX_SIZE);
+
 	String body = request.getBody();
+	DynamicJsonDocument doc(JSON_MAX_SIZE);
 	auto desRes = deserializeJson(doc, body);
-	if(!Json::deserialize(doc, body)) {
-		return F("Invalid json.");
+	if(desRes != DeserializationError::Code::Ok) {
+		return String(desRes.c_str());
 	}
 	auto objOrError = CodecHelpers::decodeDoc(Codec<T>::getInstance(), doc);
 	return objOrError;
