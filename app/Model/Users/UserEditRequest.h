@@ -35,6 +35,6 @@ template<> class Codec<UserEditRequest> {
             json["password"].as<String>(),
             StringVectorCodec::decode(json,  "roles")
         );
-		return {right_tag_t(), std::move(cfg)};
+		return {RightTagT(), std::move(cfg)};
 	}
 };

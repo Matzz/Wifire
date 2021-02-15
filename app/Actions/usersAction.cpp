@@ -3,9 +3,9 @@
 #include <JsonObjectStream.h>
 #include "actionsHelpers.h"
 #include "../Services/Injector.h"
-#include "../Configuration/StringVectorCodec.h"
-#include "../Configuration/Users/UsersConfig.h"
-#include "../Configuration/Users/UserEditRequest.h"
+#include "../Model/StringVectorCodec.h"
+#include "../Model/Users/UsersConfig.h"
+#include "../Model/Users/UserEditRequest.h"
 
 void userListAction(HttpRequest &request, HttpResponse &response) {
 	JsonObjectStream* stream = new JsonObjectStream();
@@ -13,10 +13,10 @@ void userListAction(HttpRequest &request, HttpResponse &response) {
 
 	ConfigProvider<UsersConfig>& provider = Injector::getInstance().getUsersConfigProvider();
 	auto configOrError = provider.load();
-	if(configOrError.is_left()) {
+	if(configOrError.isLeft()) {
 		return returnFailure(response, F("Invalid json. Please save configration again."));
 	}
-	UsersConfig config = *configOrError.get_if_right();
+	UsersConfig config = *configOrError.getIfRight();
 	
 	JsonArray usersArr = doc.createNestedArray("users");
 	auto users = config.getUsersList();
@@ -33,19 +33,19 @@ void userListAction(HttpRequest &request, HttpResponse &response) {
 
 void userAddAction(HttpRequest &request, HttpResponse &response) {
 	Either<String, UserEditRequest> userAddOrError = decodeJson<UserEditRequest>(request);
-	if(userAddOrError.is_left()) {
-		return returnFailure(response, *userAddOrError.get_if_left());
+	if(userAddOrError.isLeft()) {
+		return returnFailure(response, *userAddOrError.getIfLeft());
 	}
-	UserEditRequest userToAdd = *userAddOrError.get_if_right();
+	UserEditRequest userToAdd = *userAddOrError.getIfRight();
 	
 	auto& provider = Injector::getInstance().getUsersConfigProvider();
 	auto configOrError = provider.load();
 
 	UsersConfig usersConfig;
-	if(configOrError.is_left()) {
+	if(configOrError.isLeft()) {
 		debug_e("Invalid users config json. Creating new empty configuration.");
 	} else {
-		usersConfig = *configOrError.get_if_right();
+		usersConfig = *configOrError.getIfRight();
 	}
 	bool added = usersConfig.addUser(userToAdd);
 
@@ -64,19 +64,19 @@ void userAddAction(HttpRequest &request, HttpResponse &response) {
 
 void userEditAction(HttpRequest &request, HttpResponse &response) {
 	Either<String, UserEditRequest> userEditOrError = decodeJson<UserEditRequest>(request);
-	if(userEditOrError.is_left()) {
-		return returnFailure(response, *userEditOrError.get_if_left());
+	if(userEditOrError.isLeft()) {
+		return returnFailure(response, *userEditOrError.getIfLeft());
 	}
-	UserEditRequest userToEdit = *userEditOrError.get_if_right();
+	UserEditRequest userToEdit = *userEditOrError.getIfRight();
 
 	auto& provider = Injector::getInstance().getUsersConfigProvider();
 	auto configOrError = provider.load();
 
 	UsersConfig usersConfig;
-	if(configOrError.is_left()) {
+	if(configOrError.isLeft()) {
 		debug_e("Invalid users config json. Creating new empty configuration.");
 	} else {
-		usersConfig = *configOrError.get_if_right();
+		usersConfig = *configOrError.getIfRight();
 	}
 
 	bool modified = usersConfig.editUser(userToEdit);
@@ -93,18 +93,18 @@ void userEditAction(HttpRequest &request, HttpResponse &response) {
 
 void userRemoveAction(HttpRequest &request, HttpResponse &response) {
 	Either<String, UserDeleteRequest> userDeleteOrError = decodeJson<UserDeleteRequest>(request);
-	if(userDeleteOrError.is_left()) {
-		return returnFailure(response, *userDeleteOrError.get_if_left());
+	if(userDeleteOrError.isLeft()) {
+		return returnFailure(response, *userDeleteOrError.getIfLeft());
 	}
-	UserDeleteRequest userToDelete = *userDeleteOrError.get_if_right();
+	UserDeleteRequest userToDelete = *userDeleteOrError.getIfRight();
 
 	auto& provider = Injector::getInstance().getUsersConfigProvider();
 	auto configOrError = provider.load();
 
-	if(configOrError.is_left()) {
+	if(configOrError.isLeft()) {
 		returnFailure(response, F("Invalid users config json."));
 	}
-	UsersConfig usersConfig = *configOrError.get_if_right();
+	UsersConfig usersConfig = *configOrError.getIfRight();
 
 	bool modified = usersConfig.removeUser(userToDelete);
 

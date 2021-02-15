@@ -2,12 +2,12 @@
 
 #include <SmingCore.h>
 #include "../Utils/NonCopyable.h"
-#include "../Configuration/ConfigProvider.h"
-#include "../Configuration/OtaConfig.h"
-#include "../Configuration/GPIOConfig.h"
-#include "../Configuration/Networking/WiFiApConfig.h"
-#include "../Configuration/Networking/WiFiStationConfig.h"
-#include "../Configuration/Users/UsersConfig.h"
+#include "../Model/OtaConfig.h"
+#include "../Model/GPIOConfig.h"
+#include "../Model/Networking/WiFiApConfig.h"
+#include "../Model/Networking/WiFiStationConfig.h"
+#include "../Model/Users/UsersConfig.h"
+#include "ConfigProvider.h"
 #include "UserSessionManager.h"
 #include "OtaUpdater.h"
 #include "LazyFtpServer.h"

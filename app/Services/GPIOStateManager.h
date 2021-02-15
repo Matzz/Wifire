@@ -1,8 +1,8 @@
 #pragma once
 #include <SmingCore.h>
 #include <Wiring/WHashMap.h>
-#include "../Configuration/GPIOConfig.h"
-#include "../Configuration/ConfigProvider.h"
+#include "ConfigProvider.h"
+#include "../Model/GPIOConfig.h"
 #include "../Utils/NonCopyable.h"
 
 class GPIOStateManager : private NonCopyable {

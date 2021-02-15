@@ -2,8 +2,8 @@
 
 #include <SmingCore.h>
 #include <Network/RbootHttpUpdater.h>
-#include "../Configuration/ConfigProvider.h"
-#include "../Configuration/OtaConfig.h"
+#include "ConfigProvider.h"
+#include "../Model/OtaConfig.h"
 
 class OtaUpdater {
 	protected:

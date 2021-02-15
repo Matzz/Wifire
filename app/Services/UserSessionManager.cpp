@@ -49,9 +49,9 @@ Either<String, Session> UserSessionManager::validateSession(const String& sessio
     int sessionIdx = getSessionById(sessionId);
     if(sessionIdx >= 0) {
         sessions[sessionIdx].markUsed();
-        return {right_tag_t(), std::move(sessions[sessionIdx])};
+        return {RightTagT(), std::move(sessions[sessionIdx])};
     } else {
-        return {left_tag_t(), std::move(F("Session expired"))};
+        return {LeftTagT(), std::move(F("Session expired"))};
     }
 
 }
@@ -59,18 +59,18 @@ Either<String, Session> UserSessionManager::validateSession(const String& sessio
 Either<String, Session> UserSessionManager::signIn(const String& login, const String& password) {
 
 	auto configOrError = configProvider.load();
-	if(configOrError.is_left()) {
-		return {left_tag_t(), *configOrError.get_if_left()};
+	if(configOrError.isLeft()) {
+		return {LeftTagT(), *configOrError.getIfLeft()};
 	}
-	auto usersConfig = *configOrError.get_if_right();
+	auto usersConfig = *configOrError.getIfRight();
     const UserConfig* user = usersConfig.getUser(login);
 
     if(user != nullptr) {
         if(!user->enabled) {
-            return {left_tag_t(), std::move(F("This user is disabled."))};
+            return {LeftTagT(), std::move(F("This user is disabled."))};
         }
         if(!user->checkPassword(password)) {
-            return {left_tag_t(), std::move("Invalid password.")};
+            return {LeftTagT(), std::move("Invalid password.")};
         }
         int sessionIdx = getSessionByLogin(login);
 
@@ -79,10 +79,10 @@ Either<String, Session> UserSessionManager::signIn(const String& login, const St
             sessionIdx = sessions.size() -1;
         }
         sessions[sessionIdx].markUsed();
-        return {right_tag_t(), std::move(sessions[sessionIdx])};
+        return {RightTagT(), std::move(sessions[sessionIdx])};
 
     } else {
-        return {left_tag_t(), std::move("User not found.")};
+        return {LeftTagT(), std::move("User not found.")};
     }
 }
 

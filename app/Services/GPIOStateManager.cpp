@@ -34,11 +34,11 @@ void GPIOStateManager::deleteTimer(int pin) {
 bool GPIOStateManager::switchPin(String pinName, uint8_t state, uint32_t howLongMs) {
 	state = state == HIGH ? HIGH : LOW;
 	auto configOrError = cfgProvider.load();
-	if(configOrError.is_left()) {
-		debug_w("Configuration error: %s", configOrError.get_if_left()->c_str());
+	if(configOrError.isLeft()) {
+		debug_w("Model error: %s", configOrError.getIfLeft()->c_str());
 		return false;
 	}
-	auto config = *configOrError.get_if_right();
+	auto config = *configOrError.getIfRight();
 
 	int pin = getPinByName(config, pinName);
 	if(pin<0) {
@@ -73,11 +73,11 @@ bool GPIOStateManager::switchPin(String pinName, uint8_t state, uint32_t howLong
 
 void GPIOStateManager::update() {
 	auto configOrError = cfgProvider.load();
-	if(configOrError.is_left()) {
-		debug_w("Configuration error: %s", configOrError.get_if_left()->c_str());
+	if(configOrError.isLeft()) {
+		debug_w("Model error: %s", configOrError.getIfLeft()->c_str());
 		return;
 	}
-	auto config = *configOrError.get_if_right();
+	auto config = *configOrError.getIfRight();
 	
 	for(int i=0; i<=GPIOConfig::max_pin; i++) {
 		PinConfig pin = config.gpio[i];

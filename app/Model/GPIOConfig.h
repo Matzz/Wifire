@@ -49,6 +49,6 @@ template<> class Codec<GPIOConfig> {
 				cfg.gpio[i] = {"GPIO_"+String(i), true, false};
 			}
 		}
-		return {right_tag_t(), cfg};
+		return {RightTagT(), cfg};
 	}
 };

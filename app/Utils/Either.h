@@ -3,8 +3,8 @@
 // you say you don't have the std namespace available
 // if you really don't have std::move or std::forward, just write them yourself
 enum class EitherSide { left, right };
-struct left_tag_t {};
-struct right_tag_t {};
+struct LeftTagT {};
+struct RightTagT {};
 
 template<class L, class R>
 class Either {
@@ -18,14 +18,14 @@ class Either {
     public:
     // "in-place" constructors: according to the tag, initialize with whatever arguments
     template<class... U>
-    Either(left_tag_t, U&&... args) : tag(EitherSide::left), left(std::forward<U>(args)...) { }
+    Either(LeftTagT, U&&... args) : tag(EitherSide::left), left(std::forward<U>(args)...) { }
     template<class... U>
-    Either(right_tag_t, U&&... args) : tag(EitherSide::right), right(std::forward<U>(args)...) { }
+    Either(RightTagT, U&&... args) : tag(EitherSide::right), right(std::forward<U>(args)...) { }
     // may want std::initializer_list "forwarding" constructors, too
 
     // initialize by type
-    Either(L x) : Either(left_tag_t(), std::move(x)) { }
-    Either(R x) : Either(right_tag_t(), std::move(x)) { }
+    Either(L x) : Either(LeftTagT(), std::move(x)) { }
+    Either(R x) : Either(RightTagT(), std::move(x)) { }
 
     // sometimes we don't know which variant member to initialize immediately
     // so we leave the union uninitialized and then placement-new into it
@@ -71,10 +71,10 @@ class Either {
         else right.~R();
     }
 
-    L *get_if_left() { return tag == EitherSide::left ? &left : nullptr; }
-    L const *get_if_left() const { return tag == EitherSide::left ? &left : nullptr; }
-    R *get_if_right() { return tag == EitherSide::right ? &right : nullptr; }
-    R const *get_if_right() const { return tag == EitherSide::right ? &right : nullptr; }
-    bool is_left() const { return bool(get_if_left()); }
-    bool is_right() const { return bool(get_if_right()); }
+    L *getIfLeft() { return tag == EitherSide::left ? &left : nullptr; }
+    L const *getIfLeft() const { return tag == EitherSide::left ? &left : nullptr; }
+    R *getIfRight() { return tag == EitherSide::right ? &right : nullptr; }
+    R const *getIfRight() const { return tag == EitherSide::right ? &right : nullptr; }
+    bool isLeft() const { return bool(getIfLeft()); }
+    bool isRight() const { return bool(getIfRight()); }
 };

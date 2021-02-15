@@ -10,18 +10,18 @@ WiFiManager::WiFiManager(ConfigProvider<WiFiStationConfig>& stationConfigProvide
 
 void WiFiManager::startNetwork() {
 	auto stCfgOrError = stationConfigProvider.load();
-	if(stCfgOrError.is_left()) {
-		debug_w("Station config error: %s", stCfgOrError.get_if_left()->c_str());
+	if(stCfgOrError.isLeft()) {
+		debug_w("Station config error: %s", stCfgOrError.getIfLeft()->c_str());
 		return;
 	}
-	auto stCfg = *stCfgOrError.get_if_right();
+	auto stCfg = *stCfgOrError.getIfRight();
 
 	auto apCfgOrError = apConfigProvider.load();
-	if(apCfgOrError.is_left()) {
-		debug_w("Access point config error: %s", apCfgOrError.get_if_left()->c_str());
+	if(apCfgOrError.isLeft()) {
+		debug_w("Access point config error: %s", apCfgOrError.getIfLeft()->c_str());
 		return;
 	}
-	auto apCfg = *apCfgOrError.get_if_right();
+	auto apCfg = *apCfgOrError.getIfRight();
 	
 
 	bool connectedToStation = false;

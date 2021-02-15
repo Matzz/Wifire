@@ -5,7 +5,7 @@
 #include <ArduinoJson.h>
 #include "../Utils/NonCopyable.h"
 #include "../Utils/Either.h"
-#include "Codec.h"
+#include "../Model/Codec.h"
 
 template <typename T>
 class ConfigProvider: private NonCopyable {

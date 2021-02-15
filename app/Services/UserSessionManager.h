@@ -1,8 +1,8 @@
 #pragma once
 
 #include <SmingCore.h>
-#include "../Configuration/Users/UsersConfig.h"
-#include "../Configuration/ConfigProvider.h"
+#include "ConfigProvider.h"
+#include "../Model/Users/UsersConfig.h"
 #include "../Utils/Either.h"
 
 class Session {

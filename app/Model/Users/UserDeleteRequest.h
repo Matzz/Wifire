@@ -21,6 +21,6 @@ public:
 	Either<String, UserDeleteRequest> decode(JsonObject& json) {
 		UserDeleteRequest cfg;
 		cfg.login = json["login"].as<String>();
-		return {right_tag_t(), std::move(cfg)};
+		return {RightTagT(), std::move(cfg)};
 	}
 };

@@ -1,6 +1,6 @@
 #include "authAction.h"
 #include "../Services/Injector.h"
-#include "../Configuration/StringVectorCodec.h"
+#include "../Model/StringVectorCodec.h"
 #include "actionsHelpers.h"
 
 
@@ -13,13 +13,13 @@ void signInAction(HttpRequest &request, HttpResponse &response) {
     }
 
 	Either<String, UserSigninRequest> configOrError = decodeJson<UserSigninRequest>(request);
-	if(configOrError.is_left()) {
-		return returnFailure(response, *configOrError.get_if_left());
+	if(configOrError.isLeft()) {
+		return returnFailure(response, *configOrError.getIfLeft());
 	}
-	UserSigninRequest* signinData = configOrError.get_if_right();
+	UserSigninRequest* signinData = configOrError.getIfRight();
 
     Either<String, Session> sessionOrErr = sessionManager.signIn(signinData->login, signinData->password);
-    auto session = sessionOrErr.get_if_right();
+    auto session = sessionOrErr.getIfRight();
     if(session != nullptr) {
 
 		DynamicJsonDocument doc(JSON_MAX_SIZE);
@@ -34,7 +34,7 @@ void signInAction(HttpRequest &request, HttpResponse &response) {
         response.sendString(authJson);
 
     } else {
-		  returnFailure(response, *sessionOrErr.get_if_left());
+		  returnFailure(response, *sessionOrErr.getIfLeft());
           return;
     }
 }

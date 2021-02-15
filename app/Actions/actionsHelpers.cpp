@@ -2,7 +2,7 @@
 
 #include <ArduinoJson.h>
 #include <JsonObjectStream.h>
-#include "../Configuration/Codec.h"
+#include "../Model/Codec.h"
 
 
 bool getBool(HttpRequest& request, const String &name) {

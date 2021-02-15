@@ -29,10 +29,10 @@ OtaUpdater::OtaUpdater(const int spiffsAddresses[2],
 
 void OtaUpdater::update() {
 	auto configOrError = cfgProvider.load();
-	if(configOrError.is_left()) {
+	if(configOrError.isLeft()) {
 		return;
 	}
-	auto config = *configOrError.get_if_right();
+	auto config = *configOrError.getIfRight();
 
 	debug_i("OTA - Updating...");
 	RbootHttpUpdater* otaUpdater = new RbootHttpUpdater();

@@ -3,11 +3,11 @@
 #include <JsonObjectStream.h>
 #include "../Services/Injector.h"
 #include "../Services/Networking/AvaiableNetworksProvider.h"
-#include "../Configuration/GPIOConfig.h"
-#include "../Configuration/OtaConfig.h"
-#include "../Configuration/Networking/WiFiApConfig.h"
-#include "../Configuration/Networking/WiFiStationConfig.h"
-#include "../Configuration/Users/UsersConfig.h"
+#include "../Model/GPIOConfig.h"
+#include "../Model/OtaConfig.h"
+#include "../Model/Networking/WiFiApConfig.h"
+#include "../Model/Networking/WiFiStationConfig.h"
+#include "../Model/Users/UsersConfig.h"
 
 void apGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	auto& provider = Injector::getInstance().getWiFiApConfigProvider();
@@ -99,10 +99,10 @@ void stationGetNetworks(HttpRequest &request, HttpResponse &response) {
 void stationListNetworks(HttpRequest &request, HttpResponse &response) {
 	auto& provider = Injector::getInstance().getWiFiStationConfigProvider();
 	auto configOrError = provider.load();
-	if(configOrError.is_left()) {
+	if(configOrError.isLeft()) {
 		return returnFailure(response, F("Invalid json. Please save configration again."));
 	}
-	auto config = *configOrError.get_if_right();
+	auto config = *configOrError.getIfRight();
 	
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();

@@ -88,6 +88,6 @@ template<> class Codec<UsersConfig> {
 
 		cfg.addAdminIfDoesntExist();
 		
-		return {right_tag_t(), std::move(cfg)};
+		return {RightTagT(), std::move(cfg)};
 	}
 };

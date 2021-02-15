@@ -1,8 +1,8 @@
 #pragma once
 #include <SmingCore.h>
 #include "../Utils/Either.h"
-#include "../Configuration/Codec.h"
-#include "../Configuration/ConfigProvider.h"
+#include "../Model/Codec.h"
+#include "../Services/ConfigProvider.h"
 
 bool getBool(HttpRequest& request, const String& name);
 String getString(HttpRequest& request, const String &name, const String& defaultVal = "");
@@ -31,10 +31,10 @@ Either<String, T> decodeJson(HttpRequest &request) {
 template<typename T>
 void handleConfigGet(HttpRequest &request, HttpResponse &response, ConfigProvider<T> &cfgProvider) {
 	auto configOrError = cfgProvider.load();
-	if(configOrError.is_left()) {
-		return returnFailure(response, *configOrError.get_if_left());
+	if(configOrError.isLeft()) {
+		return returnFailure(response, *configOrError.getIfLeft());
 	}
-	auto config = *configOrError.get_if_right();
+	auto config = *configOrError.getIfRight();
 
 	DynamicJsonDocument doc(JSON_MAX_SIZE);
 	CodecHelpers::encodeDoc<T>(Codec<T>::getInstance(), doc, config);
@@ -48,10 +48,10 @@ void handleConfigGet(HttpRequest &request, HttpResponse &response, ConfigProvide
 template<typename T>
 void handleConfigSet(HttpRequest &request, HttpResponse &response, ConfigProvider<T> &cfgProvider) {
 	Either<String, T> configOrError = decodeJson<T>(request);
-	if(configOrError.is_left()) {
-		return returnFailure(response, *configOrError.get_if_left());
+	if(configOrError.isLeft()) {
+		return returnFailure(response, *configOrError.getIfLeft());
 	}
-	T config = *configOrError.get_if_right();
+	T config = *configOrError.getIfRight();
 	
 	cfgProvider.save(config);
 	debug_i("Config saved.");

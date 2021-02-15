@@ -31,10 +31,10 @@ String getAccessErrors(const String& requiredRole, HttpRequest &request, HttpRes
 		return F("You must signin to see this page.");
 	}
 	auto sessionOrErr = sessionManager.validateSession(sessionId);
-	auto session = sessionOrErr.get_if_right();
+	auto session = sessionOrErr.getIfRight();
 	if(session == nullptr) {
     	UserSessionManager::clearSessionCookie(response);
-		String* err = sessionOrErr.get_if_left();
+		String* err = sessionOrErr.getIfLeft();
 		return *err;
 	}
 	if(session->login == "admin") {

@@ -24,6 +24,6 @@ public:
 		UserSigninRequest cfg;
 		cfg.login = json["login"].as<String>();
 		cfg.password = json["password"].as<String>();
-		return {right_tag_t(), std::move(cfg)};
+		return {RightTagT(), std::move(cfg)};
 	}
 };

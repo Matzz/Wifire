@@ -6,9 +6,9 @@
 COMPONENT_SRCDIRS := \
 app \
 app/Actions \
-app/Configuration \
-app/Configuration/Networking \
-app/Configuration/Users \
+app/Model \
+app/Model/Networking \
+app/Model/Users \
 app/Services \
 app/Services/Networking \
 app/Utils
