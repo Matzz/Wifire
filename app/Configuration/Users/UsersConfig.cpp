@@ -4,23 +4,14 @@
 #include <Crypto/Sha1.h>
 
 
-UserConfig::UserConfig(): enabled(false), login(""), salt(""), hash(""), roles(Vector<String>(1, 1)) {
-    
-}
-UserConfig::UserConfig(bool enabled, String login, String salt, String hash, const Vector<String> &roles) {
-    this->enabled = enabled;
-    this->login = login;
-    this->salt = salt;
-    this->hash = hash;
-    this->roles = roles;
-}
+UserConfig::UserConfig(): enabled(false), login(""), salt(""), hash(""), roles(Vector<String>(1, 1)) {}
 
-UserConfig::UserConfig(bool enabled, String login, String password, const Vector<String> &roles) {
-    String salt = mkSalt();
-    this->enabled = enabled;
-    this->login = login;
-    this->salt = salt;
-    this->roles = roles;
+UserConfig::UserConfig(bool enabled, String login, String salt, String hash, const Vector<String> &roles):
+    enabled(enabled), login(login), salt(salt), hash(hash), roles(roles) {}
+
+UserConfig::UserConfig(bool enabled, String login, String password, const Vector<String> &roles):
+    enabled(enabled), login(login), roles(roles) {
+    salt = mkSalt();
     setPassword(password);
 }
 

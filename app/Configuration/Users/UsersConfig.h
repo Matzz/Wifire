@@ -2,11 +2,9 @@
 
 #include <SmingCore.h>
 #include "../Codec.h"
+#include "../StringVectorCodec.h"
 #include "UserEditRequest.h"
 #include "UserDeleteRequest.h"
-
-#define MAX_USERS 100
-#define MAX_ROLES 10
 
 class UserConfig {
 public:
@@ -51,10 +49,10 @@ private:
 
 template<> class Codec<UsersConfig> {
 	public:
-        static Codec<UsersConfig>& getInstance() {
-            static Codec<UsersConfig> instance;
-            return instance;
-        }
+	static Codec<UsersConfig>& getInstance() {
+		static Codec<UsersConfig> instance;
+		return instance;
+	}
 
 	void encode(JsonObject& json, UsersConfig config) {
 		JsonArray usersArr = json.createNestedArray("users");
@@ -66,10 +64,7 @@ template<> class Codec<UsersConfig> {
 			userObj["login"] = user.login;
 			userObj["hash"] = user.hash;
 			userObj["salt"] = user.salt;
-			JsonArray rolesArr = userObj.createNestedArray("roles");
-			for(int j=0; j<user.roles.size(); j++) {
-				rolesArr.add(user.roles[j]);
-			}
+			StringVectorCodec::encode(userObj, user.roles, "roles");
 		}
 	}
 
@@ -78,31 +73,14 @@ template<> class Codec<UsersConfig> {
 		JsonArray usersArr = json["users"].as<JsonArray>();
 		int usersArrSize = usersArr.size();
 
-		if(usersArrSize>MAX_USERS) {
-			debug_e("Too many users! Loading only first %d.", MAX_USERS);
-			usersArrSize = MAX_USERS;
-		}
 		for(int i=0; i<usersArrSize; i++) {
 			JsonObject userObj = usersArr[i].as<JsonObject>();
-			JsonArray rolesArr = userObj["roles"].as<JsonArray>();
-			unsigned int rolesArrSize = rolesArr.size();
-			if(rolesArrSize>MAX_ROLES) {
-				debug_e("Too many roles! Loading only first %d.", MAX_ROLES);
-				rolesArrSize = MAX_ROLES;
-			}
-			Vector<String> roles(rolesArrSize,  10);
-			for(int j=0; j<rolesArrSize; j++) {
-				String role = rolesArr[j].as<String>();
-				if(role.length() > 0) {
-					roles.addElement(role);
-				}
-			}
 			UserConfig user(
 				userObj["enabled"].as<bool>(),
 				userObj["login"].as<String>(),
 				userObj["salt"].as<String>(),
 				userObj["hash"].as<String>(),
-				roles
+				StringVectorCodec::decode(userObj,  "roles")
 			);
 
         	cfg.addUser(user);

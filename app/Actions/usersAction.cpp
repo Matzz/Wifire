@@ -3,6 +3,7 @@
 #include <JsonObjectStream.h>
 #include "actionsHelpers.h"
 #include "../Services/Injector.h"
+#include "../Configuration/StringVectorCodec.h"
 #include "../Configuration/Users/UsersConfig.h"
 #include "../Configuration/Users/UserEditRequest.h"
 
@@ -24,10 +25,7 @@ void userListAction(HttpRequest &request, HttpResponse &response) {
 		JsonObject userObj = usersArr.createNestedObject();
 		userObj["enabled"] = user.enabled;
 		userObj["login"] = user.login;
-        JsonArray rolesArr = userObj.createNestedArray("roles");
-        for(int j=0; j<user.roles.size(); j++) {
-		    rolesArr.add(user.roles[j]);
-        }
+        StringVectorCodec::encode(userObj, user.roles, "roles");
 	}
 
 	response.sendNamedStream(stream);

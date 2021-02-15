@@ -1,5 +1,6 @@
 #include "authAction.h"
 #include "../Services/Injector.h"
+#include "../Configuration/StringVectorCodec.h"
 #include "actionsHelpers.h"
 
 
@@ -20,15 +21,14 @@ void signInAction(HttpRequest &request, HttpResponse &response) {
     Either<String, Session> sessionOrErr = sessionManager.signIn(signinData->login, signinData->password);
     auto session = sessionOrErr.get_if_right();
     if(session != nullptr) {
-        JsonObjectStream* stream = new JsonObjectStream();
-        JsonObject json = stream->getRoot();
+
+		DynamicJsonDocument doc(JSON_MAX_SIZE);
+        JsonObject json = doc.to<JsonObject>();
         json["login"] = signinData->login;
         json["sessionId"] = session->sessionId;
-        JsonArray rolesArr = json.createNestedArray("roles");
-        for(int j=0; j<session->roles.size(); j++) {
-		    rolesArr.add(session->roles[j]);
-        }
-        String authJson = stream->readString(2048);
+        StringVectorCodec::encode(json, session->roles, "roles");
+        String authJson;
+        serializeJson(json, authJson);
         UserSessionManager::setSessionCookie(response, authJson);
         response.setContentType(MIME_JSON);
         response.sendString(authJson);

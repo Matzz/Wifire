@@ -2,9 +2,7 @@
 
 #include <SmingCore.h>
 #include "../Codec.h"
-
-#define MAX_USERS 100
-#define MAX_ROLES 10
+#include "../StringVectorCodec.h"
 
 class UserEditRequest {
 public:
@@ -12,6 +10,8 @@ public:
 	String login;
 	String password;
 	Vector<String> roles;
+
+    UserEditRequest(bool enabled, String login, String password, const Vector<String> &roles);
 };
 
 template<> class Codec<UserEditRequest> {
@@ -25,35 +25,16 @@ template<> class Codec<UserEditRequest> {
         json["enabled"] = userToEdit.enabled;
         json["login"] = userToEdit.login;
         json["password"] = userToEdit.password;
-        JsonArray rolesArr = json.createNestedArray("roles");
-        for(int j=0; j<userToEdit.roles.size(); j++) {
-            rolesArr.add(userToEdit.roles[j]);
-        }
+        StringVectorCodec::encode(json, userToEdit.roles, "roles");
 	}
 
 	Either<String, UserEditRequest> decode(JsonObject& json) {
-		UserEditRequest cfg;
-        cfg.enabled = json["enabled"].as<bool>();
-        cfg.login = json["login"].as<String>();
-        cfg.password = json["password"].as<String>();
-        
-		JsonArray usersArr = json["users"].as<JsonArray>();
-		int usersArrSize = usersArr.size();
-
-        JsonArray rolesArr = json["roles"].as<JsonArray>();
-        unsigned int rolesArrSize = rolesArr.size();
-        if(rolesArrSize>MAX_ROLES) {
-            return {left_tag_t(), "Too many roles!"};
-        }
-        Vector<String> roles(rolesArrSize,  10);
-        for(int j=0; j<rolesArrSize; j++) {
-            String role = rolesArr[j].as<String>();
-            if(role.length() > 0) {
-                roles.addElement(role);
-            }
-        }
-        cfg.roles = roles;
-		
+		UserEditRequest cfg(
+            json["enabled"].as<bool>(),
+            json["login"].as<String>(),
+            json["password"].as<String>(),
+            StringVectorCodec::decode(json,  "roles")
+        );
 		return {right_tag_t(), std::move(cfg)};
 	}
 };
