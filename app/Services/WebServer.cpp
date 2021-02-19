@@ -37,7 +37,7 @@ String getAccessErrors(const String& requiredRole, HttpRequest &request, HttpRes
 		String* err = sessionOrErr.getIfLeft();
 		return *err;
 	}
-	if(session->login == "admin") {
+	if(session->roles.contains("admin") ) {
 		return String::empty;
 	}
 	if(!session->roles.contains(requiredRole)) {

@@ -28,7 +28,7 @@ const { series } = require('gulp');
 const plumber = require('gulp-plumber');
 const htmlmin = require('gulp-htmlmin');
 const cleancss = require('gulp-clean-css');
-const uglify = require('gulp-uglify');
+const uglify = require('gulp-uglify-es').default;
 const gzip = require('gulp-gzip');
 const del = require('del');
 const useref = require('gulp-useref');
@@ -40,6 +40,7 @@ const compile_utemplates = require('./underscore-support');
 const inputPath = 'web/dev/';
 const templatesPath = 'web/dev/templates/'
 const outputPath = 'web/build/';
+
 
 /* Clean destination folder */
 gulp.task('clean', function() {
@@ -71,11 +72,11 @@ gulp.task('minify', function() {
     return gulp.src(inputPath + '*.html')
         .pipe(useref())
         .pipe(gulpif('*.css', cleancss()))
-        .pipe(gulpif('*.js', uglify()))
-        .pipe(gulpif('*.html', htmlmin({
-            collapseWhitespace: true,
-            removeComments: true
-        })))
+        // .pipe(gulpif('*.js', uglify()))
+        // .pipe(gulpif('*.html', htmlmin({
+        //     collapseWhitespace: true,
+        //     removeComments: true
+        // })))
         .pipe(gulp.dest(outputPath));
 });
 

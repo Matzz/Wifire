@@ -14,16 +14,21 @@
                 <td><%= user['login'] %></td>
                 <td><%= rolesStr %></td>
                 <td>
-                    <a onClick="editUser(<%= user['enabled'] %>, '<%= user['login'] %>', '<%= rolesStr %>')">Edit</a>
+                    <a class="edit-user"
+                        data-enabled="<%= user['enabled'] %>"
+                        data-login="<%= user['login'] %>"
+                        data-roles="<%= rolesStr %>">
+                        Edit
+                    </a>
                     /
-                    <a onClick="removeUser('<%= user['login'] %>')">Remove</a>
+                    <a class="remove-user" data-login="<%= user['login'] %>"">Remove</a>
                 </td>
             </tr>
         <% } %>
     </table>
     <div class="row">
         <div class="col-sm-12">
-            <button type="button" class="btn btn-primary" onClick="addUser()">New user</button>
+            <button type="button" class="btn btn-primary add-user" class="add-user">New user</button>
         </div>
     </div>
 </div>

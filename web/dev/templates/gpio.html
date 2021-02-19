@@ -20,7 +20,7 @@
 			<th>
 				<input type="text" name="<%= fieldName(idx, 'name') %>" value="<%= pin['name'] %>" />
 			</th>
-			<% if(isPinSafeToUse(idx)) { %>
+			<% if(GPIOHandler.isPinSafeToUse(idx)) { %>
 			<td>
 				<select name="<%= fieldName(idx, 'isInput') %>:boolean">
 					<option value="true" <%= pin["isInput"] ? "selected" : ""  %>>

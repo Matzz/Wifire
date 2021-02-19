@@ -1,355 +1,454 @@
-var $container = $('#content');
-
-function camelCaseToSentence(camelCase) {
-	var result = camelCase.replace( /([A-Z])/g, " $1" ).toLowerCase();
-	var finalResult = result.charAt(0).toUpperCase() + result.slice(1);
-	return finalResult;
-}
-
-function handleRequestFailure(jqXHR, textStatus, errorThrown) {
-	if(jqXHR.status==403) {
-		alert("You don't have access rights to see that page.");
-		handleAuthUpdate();
-	} else {
-		var msg = errorThrown;
-		if('responseJSON' in jqXHR && 'message' in jqXHR['responseJSON']) {
-			msg = jqXHR.responseJSON['message'];
-		}
-		alert("Error: "+msg);
-		console.warn("Error: ", arguments);
+class ContentManager {
+	constructor($container = $('#content'), templates = window.templates, controllers = []) {
+	  this.$container = $container;
+	  this.templates = templates;
+	  this.controllers = controllers;
+	  autoBind(this);
 	}
-}
 
-function getJSON(url) {
-	return $.getJSON(url).fail(handleRequestFailure);
-}
+	static getCurrentPage() {
+		return window.location.hash.substring(1);
+	}
 
-function postJSON(url, data) {
-	var cfg = {
-		url: url,
-		data: JSON.stringify(data),
-		dataType: 'json',
-        contentType	: 'application/json; charset=utf-8'
-	};
-	return $.post(cfg).fail(handleRequestFailure)
-}
-
-function getInputType(inputs, custom_formats) {
-	all = {}
-	for(name in inputs) {
-		var value = inputs[name];
-		var input = {}
-		input["value"] = value;
-		input["label"] = camelCaseToSentence(name);
-		if(name in custom_formats) {
-			input = _.defaults(custom_formats[name], input)
+	static loadPage(newPage) {
+		var currentPage = ContentManager.getCurrentPage();
+		if(currentPage == newPage) {
+			window.location.reload();
 		} else {
-			input["json_type"] = typeof value;
-			switch(input["json_type"]) {
-				case "boolean":
-					input_type = "checkbox";
-					break;
-				case "number":
-					input_type = "number";
-					break;
-				default:
-					input_type = "text";
-					break;
-			}
-			input["html_type"] = input_type
-		}
-		all[name] = input;
-	}
-	return all;
-}
-
-function infoController(name) {
-	getJSON("/info").success(function(data) {
-		var template = templates[name];
-		$container.html(template({ rows: data }))
-	});
-}
-
-function editConfig(type, form_template, custom_field_mapping) {
-	if(!form_template) {
-		form_template = 'dynamic_form';
-	}
-	if(!custom_field_mapping) {
-		custom_field_mapping = {}
-	}
-	var formUrl = "/config/"+type+"/get";
-	var saveUrl = "/config/"+type+"/set";
-
-	getJSON(formUrl).success(function(response_data) {
-		inputs = getInputType(response_data, custom_field_mapping)
-		$container.html(templates[form_template]({
-			 title: response_data['title'] ? response_data['title'] : "Edit " + type + " configuration",
-			 inputs: inputs,
-			 response_data: response_data
-			}));
-		$('#form').submit(function(event) {
-			var data = $(event.target).serializeJSON();
-			console.info("Sending ", data);
-			postJSON(saveUrl, data)
-				.done(function(data) {
-					alert("Configuration saved.");
-				});
-				event.preventDefault();
-		});
-	});
-}
-
-function editStationController(name) {
-	return editConfig("station");
-}
-
-function editApController(name) {
-	custom_field_mapping = {
-		"authMode": {
-			html_type: "select",
-			json_type: "string", 
-			values: {
-				0: "Open",
-				1: "WEP",
-				2: "WEP PSK",
-				3: "WPA PSK",
-				4: "WPA2 PSK",
-				5: "WPA WPA2 PSK",
-				6: "WPA2 ENTERPRISE",
-				7: "MAX"
-			}
+			window.location.hash='#' + newPage;
 		}
 	}
-	return editConfig("ap", null, custom_field_mapping);
-}
 
-function editOtaController(name) {
-	custom_field_mapping = {
-			"romUrl": {
-				html_type: "url",
-				json_type: "string"
-			},
-			"spiffUrl": {
-				html_type: "url",
-				json_type: "string"
-			}
+	bindCallbacks() {
+		$(window).bind('hashchange', this.handleUrlChanged);
+		$(document).ready(this.handleUrlChanged);
+		$(document).ready(ApiHandler.handleAuthUpdate);
+	}
+
+	addController(name, fn) {
+		this.controllers[name] = fn;
+	}
+	
+	addTemplate(name, fn) {
+		this.templates[name] = fn;
+	}
+
+	dispatch(actionName) {
+		if(actionName == "") {
+			actionName = "start";
 		}
-	return editConfig("ota");
-}
-
-// -0- GPIO actions
-
-function isPinSafeToUse(pin) {
-	var safePins = [2,3,4,5,13,14,15,16];
-	return safePins.includes(parseInt(pin));
-}
-
-function editGpioController(name) {
-	return editConfig("gpio", "gpio");
-}
-
-// --- Auth actions
-
-$(document).ready(handleAuthUpdate);
-
-function getAuthJson() {
-	var authJson = null;
-	var jsonStr = Cookies.get('auth');
-	if(jsonStr) {
-		try {
-			authJson = $.parseJSON(jsonStr);
-		} catch(error) {
-			console.warn("Invalid auth json", jsonStr, error);
+	
+		var controller = this.controllers[actionName];
+		// Try to find associated controller
+		if(!_.isUndefined(controller)) {
+			controller(contentManager, actionName);
+		} else {
+			// Falback to plain template (without controller)
+			this.renderTemplate(actionName, {});
 		}
 	}
-	return authJson;
-}
 
-function handleAuthUpdate() {
-	var auth = getAuthJson();
-	var $userName = $('.user_name').text("").hide();
-	var $roles = $("[class*=role_]");
-	$roles.hide();
-	$('.signout_action').hide();
-	$('.signin_action').show();
-	if(auth) {
-		$('.signout_action').show();
-		$('.signin_action').hide();
-		$userName.text(auth.login).show();
-		if(auth.roles.includes("admin")) {
-			$roles.show();
-		}
-		else if(auth.roles.length>0) {
-			var selector = ".role_" + auth.roles.join(', .role_');
-			$(selector).show();
-		}
-	}
-}
-
-function signinController() {
-	$container.html(templates["signin"]);
-	$('#form').submit(function(event) {
-		postJSON("/signin", $(event.target).serializeJSON())
-			.done(function(data) {
-				alert("You have been signed in.");
-				handleAuthUpdate();
-				loadPage("start");
-			});
-		event.preventDefault();
-	});
-}
-
-function signoutController() {
-	$.post({
-		url: "/signout"
-	}).done(function(data) {
-		Cookies.set('auth', null)
-		handleAuthUpdate();
-		loadPage("signin");
-	}).fail(handleRequestFailure)
-}
-
-// --- END Auth actions
-
-// --- Users configuration
-
-function userFormVisible(isVisible) {
-	$('#user_form_title').text("");
-	$form_container = $('#user_form_container');
-	$list_container = $('#user_list_container');
-	isVisible ? $form_container.show() : $form_container.hide();
-	!isVisible ? $list_container.show() : $list_container.hide();
-	if(isVisible) {
-		// Reset form so we could reuse it in other actions
-		$('#form_enabled').prop('checked', true);
-		$('#form_login').prop('value', "")
-						.prop('readonly', false);
-		$('#form_roles').prop('value', "");
-		$('#form_password').prop('value', "");
-		$('#user_form_submit').off('click');
-		userFormSubmitEnabled(true);
-	}
-	return isVisible;
-}
-
-function userFormSubmitEnabled(isEnabled) {
-	$('#user_form_container [type=submit]').prop('disabled', !isEnabled);
-}
-
-function usersListController(name) {
-	getJSON("/config/users/list").success(function(data) {
-		var template = templates["users_list"];
-		$container.html(template({ 'data': data }));
-		userFormVisible(false);
-	});
-}
-
-function normalizeRoles(data) {
-	if(data.roles) {
-		var rolesList = data.roles.split(",");
-		var normalizedRoles = _.map(rolesList, function(value) {
-			return value.trim();
-		}).filter(function(v) {
-			return v != "";
-		});
-		data.roles = _.uniq(normalizedRoles);
-	}
-	return data;
-}
-
-function addUser() {
-	userFormVisible(true);
-	$('#user_form_title').text("New user");
-	$('#user_form_container').submit(function(event) {
-		userFormSubmitEnabled(false);
-		var data = normalizeRoles($(event.target).serializeJSON());
-		postJSON("/config/users/add", data)
-			.done(function(data) {
-				alert("User added.");
-				userFormVisible(false);
-				loadPage('usersList');
-			})
-			.fail(function() {
-				userFormSubmitEnabled(true);
-			});
-			event.preventDefault();
-	}).on('reset', function(event) {
-		userFormVisible(false)
-	});
-}
-
-function editUser(isEnabled, login, roles) {
-	userFormVisible(true);
-	$('#user_form_title').text("Edit user");
-	$('#form_enabled').prop('checked', isEnabled);
-	$('#form_login').prop('value', login)
-	                .prop('readonly', true);
-	$('#form_roles').prop('value', roles);
-	$('#user_form_container').submit(function(event) {
-		userFormSubmitEnabled(false);
-		var data = normalizeRoles($(event.target).serializeJSON());
-		postJSON("/config/users/edit", data)
-			.done(function(data) {
-				alert("User " + login + " modified.");
-				userFormVisible(false);
-				loadPage('usersList');
-			}).fail(function(jqXHR, textStatus, errorThrown) {
-				userFormSubmitEnabled(true);
-			});
-		event.preventDefault();
-	}).on('reset', function(event) {
-		userFormVisible(false);
-	});
-}
-
-function removeUser(login) {
-	if(confirm("Are you sure you want to remove user "+login)) {
-		postJSON("/config/users/remove", {'login': login}).done(function(data) {
-			alert("User " + login + " removed.");
-			userFormVisible(false);
-			loadPage('usersList');
-		});
-	}
-}
-
-// --- END Users configuration
-
-function getCurrentPage() {
-	return window.location.hash.substring(1);
-}
-
-function loadPage(newPage) {
-	var currentPage = getCurrentPage();
-	if(currentPage == newPage) {
-		window.location.reload();
-	} else {
-		window.location.hash='#' + newPage;
-	}
-}
-
-function dispatch(name) {
-	if(name=="") {
-		name = "start";
-	}
-
-	var controller = window[name+"Controller"];
-	if(!_.isUndefined(controller)) {
-		controller(name);
-	} else {
-		var template = templates[name];
+	renderTemplate(templateName, options = {}) {
+		var template = this.templates[templateName];
+		// Falback to plain template (without controller)
 		if(!_.isUndefined(template)) {
-			$container.html(template());
+			this.$container.html(template(options));
 		} else {
-			$container.text("Not found "+controller);
+			this.$container.text("Not found "+templateName);
+		}
+	}
+
+	handleUrlChanged() {
+		var currentPage = ContentManager.getCurrentPage();
+		this.dispatch(currentPage);
+	}
+}
+
+class FormHelpers {
+	static camelCaseToSentence(camelCase) {
+		var result = camelCase.replace( /([A-Z])/g, " $1" ).toLowerCase();
+		var finalResult = result.charAt(0).toUpperCase() + result.slice(1);
+		return finalResult;
+	}
+
+	static getInputType(inputs, custom_formats) {
+		var all = {};
+		for(name in inputs) {
+			var value = inputs[name];
+			var input = {}
+			input["value"] = value;
+			input["label"] = FormHelpers.camelCaseToSentence(name);
+			if(name in custom_formats) {
+				input = _.defaults(custom_formats[name], input)
+			} else {
+				input["json_type"] = typeof value;
+				var input_type;
+				switch(input["json_type"]) {
+					case "boolean":
+						input_type = "checkbox";
+						break;
+					case "number":
+						input_type = "number";
+						break;
+					default:
+						input_type = "text";
+						break;
+				}
+				input["html_type"] = input_type
+			}
+			all[name] = input;
+		}
+		return all;
+	}
+
+	static editConfig({contentManager, type, template = null, custom_field_mapping = null}) {
+		if(!template) {
+			template = 'dynamic_form';
+		}
+		if(!custom_field_mapping) {
+			custom_field_mapping = {}
+		}
+		var formUrl = "/config/"+type+"/get";
+		var saveUrl = "/config/"+type+"/set";
+	
+		ApiHandler.getJSON(formUrl).success(function(response_data) {
+			var inputs = FormHelpers.getInputType(response_data, custom_field_mapping)
+			contentManager.renderTemplate(template, {
+				title: response_data['title'] ? response_data['title'] : "Edit " + type + " configuration",
+				inputs: inputs,
+				response_data: response_data
+			   });
+			contentManager.$container.find('#form').submit(function(event) {
+				var data = $(event.target).serializeJSON();
+				ApiHandler.postJSON(saveUrl, data)
+					.done(function(data) {
+						alert("Configuration saved.");
+					});
+				event.preventDefault();
+			});
+		});
+	}
+}
+
+class ApiHandler {
+	
+	static getAuthJson() {
+		var authJson = null;
+		var jsonStr = Cookies.get('auth');
+		if(jsonStr) {
+			try {
+				authJson = $.parseJSON(jsonStr);
+			} catch(error) {
+				console.warn("Invalid auth json", jsonStr, error);
+			}
+		}
+		return authJson;
+	}
+
+	static handleRequestFailure(jqXHR, textStatus, errorThrown) {
+		if(jqXHR.status==403) {
+			alert("You don't have access rights to see that page.");
+			ApiHandler.handleAuthUpdate();
+			ContentManager.loadPage("");
+		} else {
+			var msg = errorThrown;
+			if('responseJSON' in jqXHR && 'message' in jqXHR['responseJSON']) {
+				msg = jqXHR.responseJSON['message'];
+			}
+			alert("Error: "+msg);
+			console.warn("Error: ", arguments);
+		}
+	}
+	
+	static getJSON(url) {
+		return $.getJSON(url).fail(ApiHandler.handleRequestFailure);
+	}
+	
+	static postJSON(url, data) {
+		var cfg = {
+			url: url,
+			data: JSON.stringify(data),
+			dataType: 'json',
+			contentType	: 'application/json; charset=utf-8'
+		};
+		return $.post(cfg).fail(ApiHandler.handleRequestFailure)
+	}
+
+	static handleAuthUpdate() {
+		var auth = ApiHandler.getAuthJson();
+		var $userName = $('.user_name').text("").hide();
+		var $roles = $("[class*=role_]");
+		$roles.hide();
+		$('.signout_action').hide();
+		$('.signin_action').show();
+		if(auth) {
+			$('.signout_action').show();
+			$('.signin_action').hide();
+			$userName.text(auth.login).show();
+			if(auth.roles.includes("admin")) {
+				$roles.show();
+			}
+			else if(auth.roles.length>0) {
+				var selector = ".role_" + auth.roles.join(', .role_');
+				$(selector).show();
+			}
 		}
 	}
 }
 
-function urlChanged() {
-	var currentPage = getCurrentPage();
-	dispatch(currentPage);
+class UserEditManager {
+	constructor(contentManager) {
+		this.contentManager = contentManager;
+		this.$c = contentManager.$container;
+		this.$form_container = null;
+		autoBind(this);
+	}
+
+	hideUserForm() { this.userFormVisible(false); }
+
+	showUserForm(title, submitCallback) {
+		this.userFormVisible(true);
+		this.$form_container.unbind(['submit', 'reset']);
+		this.$form_container.submit(submitCallback);
+		this.$form_container.on('reset', this.hideUserForm);
+		this.$c.find('#user_form_title').text(title);
+	}
+
+	userFormVisible(isVisible) {
+		this.$c.find('#user_form_title').text("");
+		var $list_container = this.$c.find('#user_list_container');
+		isVisible ? this.$form_container.show() : this.$form_container.hide();
+		!isVisible ? $list_container.show() : $list_container.hide();
+		if(isVisible) {
+			// Reset form so we could reuse it in other actions
+
+			this.$c.find('#form_enabled').prop('checked', true);
+			this.$c.find('#form_login').prop('value', "")
+							.prop('readonly', false);
+			this.$c.find('#form_roles').prop('value', "");
+			this.$c.find('#form_password').prop('value', "");
+			this.$c.find('#user_form_submit').off('click');
+
+			this.userFormSubmitEnabled(true);
+		}
+		return isVisible;
+	}
+
+	normalizeRoles(data) {
+		if(data.roles) {
+			var rolesList = data.roles.split(",");
+			var normalizedRoles = _.map(rolesList, function(value) {
+				return value.trim();
+			}).filter(function(v) {
+				return v != "";
+			});
+			data.roles = _.uniq(normalizedRoles);
+		}
+		return data;
+	}
+	
+	userFormSubmitEnabled(isEnabled) {
+		this.$c.find('#user_form_container [type=submit]').prop('disabled', !isEnabled);
+	}
+	
+	
+	addUserCallback(event) {
+		this.showUserForm("New user", this.addUserSubmitCallback);
+	}
+	
+	addUserSubmitCallback(event) {
+		this.userFormSubmitEnabled(false);
+		var formData = $(event.target).serializeJSON()
+		formData = this.normalizeRoles(formData);
+		ApiHandler.postJSON("/config/users/add", formData)
+			.done(_.bind(function(data) {
+				alert("User added.");
+				this.userFormVisible(false);
+				ContentManager.loadPage('usersList');
+			}, this))
+			.fail(_.bind(function() {
+				this.userFormSubmitEnabled(true);
+			}, this));
+			event.preventDefault();
+	}
+	
+	editUserCallback(event) {
+		var $target = $(event.target);
+		var isEnabled = $target.data('enabled');
+		var login = $target.data('login');
+		var roles = $target.data('roles');
+
+		this.showUserForm("Edit user", this.editUserSubmitCallback);
+		this.$c.find('#form_enabled').prop('checked', isEnabled);
+		this.$c.find('#form_login')
+			.prop('value', login)
+			.prop('readonly', true);
+		this.$c.find('#form_roles')
+			.prop('value', roles);
+	}
+
+	editUserSubmitCallback(event) {
+		this.userFormSubmitEnabled(false);
+		var formData = $(event.target).serializeJSON();
+		formData = this.normalizeRoles(formData);
+		ApiHandler.postJSON("/config/users/edit", formData)
+			.done(_.bind(function(data) {
+				alert("User " + formData.login + " modified.");
+				this.userFormVisible(false);
+				ContentManager.loadPage('usersList');
+			}, this))
+			.fail(_.bind(function(jqXHR, textStatus, errorThrown) {
+				this.userFormSubmitEnabled(true);
+			}, this));
+		event.preventDefault();
+	}
+	
+	removeUserCallback(event) {
+		var $target = $(event.target);
+		var login = $target.data('login');
+		if(confirm("Are you sure you want to remove user "+login)) {
+			ApiHandler.postJSON("/config/users/remove", {'login': login})
+				.done(_.bind(function(data) {
+					alert("User " + login + " removed.");
+					this.userFormVisible(false);
+					ContentManager.loadPage('usersList');
+				}, this));
+		}
+	}
+
+	bindController() {
+		var listHandler = function(contentManager, actionName) {
+			var loaded = _.bind(function(data) {
+				for(var i in data['users']) {
+					data['users'][i]['rolesStr'] = data['users'][i]['roles'].join(",");
+				}
+				contentManager.renderTemplate("users_list", {
+					'data': data
+				});
+				var $c = contentManager.$container;
+				this.$form_container = $c.find('#user_form_container');
+				$c.find('.edit-user').on('click', this.editUserCallback);
+				$c.find('.remove-user').on('click', this.removeUserCallback);
+				$c.find('.add-user').on('click', this.addUserCallback);
+				this.hideUserForm();
+			}, this);
+			ApiHandler.getJSON("/config/users/list").success(loaded);
+		}
+
+		this.contentManager.addController("usersList", _.bind(listHandler, this));
+		
+	}
+
+}
+
+class GPIOHandler {
+	static isPinSafeToUse(pin) {
+		var safePins = [2,3,4,5,13,14,15,16];
+		return safePins.includes(parseInt(pin));
+	}
+	static bindController(contentManager) {
+		contentManager.addController("editGpio", function(contentManager, actionName) {
+			FormHelpers.editConfig({
+				contentManager: contentManager,
+				type: "gpio",
+				template: "gpio"
+			});
+		
+		});
+	}
+}
+
+function addActions(contentManager) {
+	
+	contentManager.addController("info", function(contentManager, actionName) {
+		ApiHandler.getJSON("/info").success(function(data) {
+			var opt = { rows: data };
+			contentManager.renderTemplate(actionName, opt);
+		});
+	})
+	
+	contentManager.addController("editStation", function(contentManager, actionName) {
+		FormHelpers.editConfig({
+			contentManager: contentManager,
+			type: "station"
+		});
+	});
+	
+	
+	contentManager.addController("editAp",  function(contentManager, actionName) {
+		custom_field_mapping = {
+			"authMode": {
+				html_type: "select",
+				json_type: "string", 
+				values: {
+					0: "Open",
+					1: "WEP",
+					2: "WEP PSK",
+					3: "WPA PSK",
+					4: "WPA2 PSK",
+					5: "WPA WPA2 PSK",
+					6: "WPA2 ENTERPRISE",
+					7: "MAX"
+				}
+			}
+		}
+		FormHelpers.editConfig({
+			contentManager: contentManager,
+			type: "ap",
+			custom_field_mapping: custom_field_mapping
+		});
+	});
+	
+	contentManager.addController("editOta", function(contentManager, actionName) {
+		custom_field_mapping = {
+				"romUrl": {
+					html_type: "url",
+					json_type: "string"
+				},
+				"spiffUrl": {
+					html_type: "url",
+					json_type: "string"
+				}
+			}
+		FormHelpers.editConfig({
+			contentManager: contentManager,
+			type: "ota",
+			custom_field_mapping: custom_field_mapping
+		});
+	
+	});
+	
+	contentManager.addController("signin", function(contentManager, actionName) {
+		contentManager.renderTemplate("signin");
+		contentManager.$container.find('#form').submit(function(event) {
+			ApiHandler.postJSON("/signin", $(event.target).serializeJSON())
+				.done(function(data) {
+					alert("You have been signed in.");
+					ApiHandler.handleAuthUpdate();
+					ContentManager.loadPage("start");
+				});
+			event.preventDefault();
+		});
+	});
+	
+	contentManager.addController("signout", function(contentManager, actionName) {
+		$.post({
+			url: "/signout"
+		}).done(function(data) {
+			Cookies.set('auth', null)
+			ApiHandler.handleAuthUpdate();
+			ContentManager.loadPage("signin");
+		}).fail(ApiHandler.handleRequestFailure)
+	});
+	
 }
 
 
-$(window).bind('hashchange', urlChanged);
-$(document).ready(urlChanged);
+
+
+var contentManager = new ContentManager();
+var userEditManager = new UserEditManager(contentManager);
+userEditManager.bindController();
+GPIOHandler.bindController(contentManager);
+addActions(contentManager);
+contentManager.bindCallbacks();

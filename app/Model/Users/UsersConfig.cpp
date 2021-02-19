@@ -55,6 +55,7 @@ bool UsersConfig::editUser(UserEditRequest &userToEdit) {
             cfg.setPassword(userToEdit.password);
         }
         cfg.roles = userToEdit.roles;
+        UsersConfig::forceActiveAdmin(cfg);
         return true;
     }
     return false;
@@ -79,6 +80,17 @@ bool UsersConfig::removeUser(UserDeleteRequest &userToDelete) {
     } else {
         return nullptr;
     }
+}
+
+
+void UsersConfig::forceActiveAdmin(UserConfig& cfg) {
+    if(cfg.login == UsersConfig::adminLogin) {
+        if(!cfg.roles.contains("admin")) {
+            cfg.roles.add("admin");
+        }
+        cfg.enabled = true;
+    }
+
 }
 
 bool UsersConfig::addAdminIfDoesntExist() {

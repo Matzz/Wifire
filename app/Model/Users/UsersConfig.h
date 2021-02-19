@@ -42,6 +42,7 @@ public:
 
 private:
 	int findUser(String login) const;
+	static void forceActiveAdmin(UserConfig& cfg);
 
 private:
 	Vector<UserConfig> users;
