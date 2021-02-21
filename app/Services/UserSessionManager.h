@@ -7,7 +7,6 @@
 
 class Session {
 public:
-
     String login;
     String sessionId;
 	Vector<String> roles;

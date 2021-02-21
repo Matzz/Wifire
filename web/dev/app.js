@@ -44,15 +44,23 @@ class ContentManager {
 			controller(contentManager, actionName);
 		} else {
 			// Falback to plain template (without controller)
-			this.renderTemplate(actionName, {});
+			this.displayTemplate(actionName, {});
 		}
 	}
 
 	renderTemplate(templateName, options = {}) {
 		var template = this.templates[templateName];
-		// Falback to plain template (without controller)
 		if(!_.isUndefined(template)) {
-			this.$container.html(template(options));
+			template(options);
+		} else {
+			null
+		}
+	}
+
+	displayTemplate(templateName, options = {}) {
+		var rendered = this.renderTemplate(templateName, options);
+		if(rendered !== null) {
+			this.$container.html(rendered);
 		} else {
 			this.$container.text("Not found "+templateName);
 		}
@@ -113,7 +121,7 @@ class FormHelpers {
 	
 		ApiHandler.getJSON(formUrl).success(function(response_data) {
 			var inputs = FormHelpers.getInputType(response_data, custom_field_mapping)
-			contentManager.renderTemplate(template, {
+			contentManager.displayTemplate(template, {
 				title: response_data['title'] ? response_data['title'] : "Edit " + type + " configuration",
 				inputs: inputs,
 				response_data: response_data
@@ -208,7 +216,7 @@ class UserEditManager {
 
 	showUserForm(title, submitCallback) {
 		this.userFormVisible(true);
-		this.$form_container.unbind(['submit', 'reset']);
+		this.$form_container.off('submit reset');
 		this.$form_container.submit(submitCallback);
 		this.$form_container.on('reset', this.hideUserForm);
 		this.$c.find('#user_form_title').text(title);
@@ -222,12 +230,13 @@ class UserEditManager {
 		if(isVisible) {
 			// Reset form so we could reuse it in other actions
 
-			this.$c.find('#form_enabled').prop('checked', true);
-			this.$c.find('#form_login').prop('value', "")
-							.prop('readonly', false);
-			this.$c.find('#form_roles').prop('value', "");
-			this.$c.find('#form_password').prop('value', "");
-			this.$c.find('#user_form_submit').off('click');
+			this.$c.find('#form_enabled')
+				.prop('checked', true);
+			this.$c.find('#form_login')
+				.prop('value', "")
+				.prop('readonly', false);
+			this.$c.find('#form_roles, #form_password')
+				.prop('value', "");
 
 			this.userFormSubmitEnabled(true);
 		}
@@ -322,7 +331,7 @@ class UserEditManager {
 				for(var i in data['users']) {
 					data['users'][i]['rolesStr'] = data['users'][i]['roles'].join(",");
 				}
-				contentManager.renderTemplate("users_list", {
+				contentManager.displayTemplate("users_list", {
 					'data': data
 				});
 				var $c = contentManager.$container;
@@ -363,7 +372,7 @@ function addActions(contentManager) {
 	contentManager.addController("info", function(contentManager, actionName) {
 		ApiHandler.getJSON("/info").success(function(data) {
 			var opt = { rows: data };
-			contentManager.renderTemplate(actionName, opt);
+			contentManager.displayTemplate(actionName, opt);
 		});
 	})
 	
@@ -419,7 +428,7 @@ function addActions(contentManager) {
 	});
 	
 	contentManager.addController("signin", function(contentManager, actionName) {
-		contentManager.renderTemplate("signin");
+		contentManager.displayTemplate("signin");
 		contentManager.$container.find('#form').submit(function(event) {
 			ApiHandler.postJSON("/signin", $(event.target).serializeJSON())
 				.done(function(data) {

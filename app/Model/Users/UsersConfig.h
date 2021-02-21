@@ -6,6 +6,7 @@
 #include "UserEditRequest.h"
 #include "UserDeleteRequest.h"
 
+
 class UserConfig {
 public:
     bool enabled;
@@ -30,12 +31,21 @@ private:
 
 class UsersConfig {
 public:
+	enum ModificationResult {
+			ok,
+			notEnoughMemory,
+			userAlreadyExist,
+			userDoesntExist,
+			cannotRemoveAdmin
+	};
+
 	static String adminLogin;
+	static String resultToMessage(ModificationResult result);
 	
-    bool addUser(UserEditRequest &userToAdd);
-	bool addUser(UserConfig &user);
-	bool editUser(UserEditRequest &userToEdit);
-	bool removeUser(UserDeleteRequest &userToDelete);
+    ModificationResult addUser(UserEditRequest &userToAdd);
+	ModificationResult addUser(UserConfig &user);
+	ModificationResult editUser(UserEditRequest &userToEdit);
+	ModificationResult removeUser(UserDeleteRequest &userToDelete);
 	Vector<UserConfig> const getUsersList() { return users; } const
 	UserConfig* getUser(String login) const;
 	bool addAdminIfDoesntExist();

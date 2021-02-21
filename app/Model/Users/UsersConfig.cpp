@@ -3,7 +3,6 @@
 #include <SmingCore.h>
 #include <Crypto/Sha1.h>
 
-
 UserConfig::UserConfig(): enabled(false), login(""), salt(""), hash(""), roles(Vector<String>(1, 1)) {}
 
 UserConfig::UserConfig(bool enabled, String login, String salt, String hash, const Vector<String> &roles):
@@ -29,24 +28,39 @@ String UserConfig::mkSalt() {
     return getHash(base);
 }
 
+// USERS:
+
 String UsersConfig::adminLogin = "admin";
 
-bool UsersConfig::addUser(UserConfig &user) {
-    if(findUser(user.login) == -1) {
-        return users.addElement(user);
-    }
-    return false;
+String UsersConfig::resultToMessage(UsersConfig::ModificationResult result) {
+    switch(result) {
+        case ModificationResult::ok: return String::empty;
+        case ModificationResult::notEnoughMemory: return F("Not enough memory.");
+        case ModificationResult::userAlreadyExist: return F("User already exists.");
+        case ModificationResult::userDoesntExist: return F("User does not exist.");
+        case ModificationResult::cannotRemoveAdmin: return F("Cannot remove admin user.");
+    };
+    return F("Unknown error.");
 }
 
-bool UsersConfig::addUser(UserEditRequest &userToAdd) {
+UsersConfig::ModificationResult UsersConfig::addUser(UserConfig &user) {
+    if(findUser(user.login) == -1) {
+        return users.addElement(user) ? ModificationResult::ok : ModificationResult::notEnoughMemory;
+    } else {
+        return ModificationResult::userAlreadyExist;
+    }
+}
+
+UsersConfig::ModificationResult UsersConfig::addUser(UserEditRequest &userToAdd) {
     if(findUser(userToAdd.login) == -1) {
         UserConfig user(userToAdd.enabled, userToAdd.login, userToAdd.password, userToAdd.roles);
-        return users.addElement(user);
+        return users.addElement(user) ? ModificationResult::ok : ModificationResult::notEnoughMemory;
+    } else {
+        return ModificationResult::userAlreadyExist;
     }
-    return false;
 }
 
-bool UsersConfig::editUser(UserEditRequest &userToEdit) {
+UsersConfig::ModificationResult UsersConfig::editUser(UserEditRequest &userToEdit) {
     int idx = findUser(userToEdit.login);
     if(idx >= 0) {
         UserConfig &cfg = users[idx];
@@ -56,21 +70,23 @@ bool UsersConfig::editUser(UserEditRequest &userToEdit) {
         }
         cfg.roles = userToEdit.roles;
         UsersConfig::forceActiveAdmin(cfg);
-        return true;
+        return ModificationResult::ok;
+    } else {
+        return ModificationResult::userDoesntExist;
     }
-    return false;
 }
 
-bool UsersConfig::removeUser(UserDeleteRequest &userToDelete) {
+UsersConfig::ModificationResult UsersConfig::removeUser(UserDeleteRequest &userToDelete) {
     if(userToDelete.login == UsersConfig::adminLogin) {
-        return false;
+        return ModificationResult::cannotRemoveAdmin;
     }
     int idx = findUser(userToDelete.login);
     if(idx>=0) {
         users.remove(idx);
-        return true;
+        return ModificationResult::ok;
+    } else {
+        return ModificationResult::userDoesntExist;
     }
-    return false;
 }
 
  const UserConfig* UsersConfig::getUser(String login) const {

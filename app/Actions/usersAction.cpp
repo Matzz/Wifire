@@ -47,9 +47,9 @@ void userAddAction(HttpRequest &request, HttpResponse &response) {
 	} else {
 		usersConfig = *configOrError.getIfRight();
 	}
-	bool added = usersConfig.addUser(userToAdd);
+	auto addResult = usersConfig.addUser(userToAdd);
 
-	if(added) {
+	if(UsersConfig::ModificationResult::ok == addResult) {
 		auto& sessionManager = Injector::getInstance().getUserSessionManager();
 		sessionManager.signOutByLogin(userToAdd.login);
 		provider.save(usersConfig);
@@ -57,7 +57,7 @@ void userAddAction(HttpRequest &request, HttpResponse &response) {
 	} else {
 		JsonObjectStream* stream = new JsonObjectStream();
 		JsonObject json = stream->getRoot();
-		returnFailure(response, "User alredy exists.");
+		returnFailure(response, UsersConfig::resultToMessage(addResult));
 	}
 
 }
@@ -79,15 +79,15 @@ void userEditAction(HttpRequest &request, HttpResponse &response) {
 		usersConfig = *configOrError.getIfRight();
 	}
 
-	bool modified = usersConfig.editUser(userToEdit);
+	auto editResult = usersConfig.editUser(userToEdit);
 
-	if(modified) {
+	if(UsersConfig::ModificationResult::ok == editResult) {
 		auto& sessionManager = Injector::getInstance().getUserSessionManager();
 		sessionManager.signOutByLogin(userToEdit.login);
 		provider.save(usersConfig);
 		returnOk(response, "User modified.");
 	} else {
-		returnFailure(response, "User doesn't exist.");
+		returnFailure(response, UsersConfig::resultToMessage(editResult));
 	}
 }
 
@@ -106,14 +106,14 @@ void userRemoveAction(HttpRequest &request, HttpResponse &response) {
 	}
 	UsersConfig usersConfig = *configOrError.getIfRight();
 
-	bool modified = usersConfig.removeUser(userToDelete);
+	auto remvoeResult = usersConfig.removeUser(userToDelete);
 
-	if(modified) {
+	if(UsersConfig::ModificationResult::ok == remvoeResult) {
 		auto& sessionManager = Injector::getInstance().getUserSessionManager();
 		sessionManager.signOutByLogin(userToDelete.login);
 		provider.save(usersConfig);
 		returnOk(response, "User removed.");
 	} else {
-		returnFailure(response, "User doesn't exist.");
+		returnFailure(response, UsersConfig::resultToMessage(remvoeResult));
 	}
 }
