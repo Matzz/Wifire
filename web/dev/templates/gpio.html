@@ -18,11 +18,11 @@
 				<%= idx %>
 			</th>
 			<th>
-				<input type="text" name="<%= fieldName(idx, 'name') %>" value="<%= pin['name'] %>" />
+				<input type="text" name="<%= fieldName(idx, 'name') %>" value="<%= pin['name'] %>" class="form-control" />
 			</th>
 			<% if(GPIOHandler.isPinSafeToUse(idx)) { %>
 			<td>
-				<select name="<%= fieldName(idx, 'isInput') %>:boolean">
+				<select name="<%= fieldName(idx, 'isInput') %>:boolean" class="custom-select">
 					<option value="true" <%= pin["isInput"] ? "selected" : ""  %>>
 						Input
 					</option>
@@ -32,7 +32,12 @@
 				</select>
 			</td>
 			<td>
-				<input type="checkbox" name="<%= fieldName(idx, 'pull') %>:boolean" <%= pin["pull"] ? "checked" : "" %> value="true" />
+				<input
+					type="checkbox"
+					name="<%= fieldName(idx, 'pull') %>:boolean"
+					<%= pin["pull"] ? "checked" : "" %>
+					value="true"
+					class="form-check-input position-static" />
 			</td>
 			<% } else { %>
 				<td colspan="2">It is not safe to use that pin</td>
@@ -42,6 +47,8 @@
 		</tr>
 	</table>
 	<div class="col-sm-offset-3">
-			<button type="submit" class="btn btn-primary" id="form_submit">Submit</button>
+		<button type="submit" class="btn btn-primary" id="form_submit">Submit</button>
+		<button type="reset" class="btn btn-light" id="form_submit">Reset</button>
+		<br /><br />
 	</div>
 	</form>

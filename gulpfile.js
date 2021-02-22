@@ -72,11 +72,11 @@ gulp.task('minify', function() {
     return gulp.src(inputPath + '*.html')
         .pipe(useref())
         .pipe(gulpif('*.css', cleancss()))
-        // .pipe(gulpif('*.js', uglify()))
-        // .pipe(gulpif('*.html', htmlmin({
-        //     collapseWhitespace: true,
-        //     removeComments: true
-        // })))
+        .pipe(gulpif('*.js', uglify()))
+        .pipe(gulpif('*.html', htmlmin({
+            collapseWhitespace: true,
+            removeComments: true
+        })))
         .pipe(gulp.dest(outputPath));
 });
 

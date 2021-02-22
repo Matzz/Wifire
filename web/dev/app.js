@@ -51,9 +51,9 @@ class ContentManager {
 	renderTemplate(templateName, options = {}) {
 		var template = this.templates[templateName];
 		if(!_.isUndefined(template)) {
-			template(options);
+			return template(options);
 		} else {
-			null
+			return null;
 		}
 	}
 
@@ -119,7 +119,7 @@ class FormHelpers {
 		var formUrl = "/config/"+type+"/get";
 		var saveUrl = "/config/"+type+"/set";
 	
-		ApiHandler.getJSON(formUrl).success(function(response_data) {
+		ApiHandler.getJSON(formUrl).done(function(response_data) {
 			var inputs = FormHelpers.getInputType(response_data, custom_field_mapping)
 			contentManager.displayTemplate(template, {
 				title: response_data['title'] ? response_data['title'] : "Edit " + type + " configuration",
@@ -341,7 +341,7 @@ class UserEditManager {
 				$c.find('.add-user').on('click', this.addUserCallback);
 				this.hideUserForm();
 			}, this);
-			ApiHandler.getJSON("/config/users/list").success(loaded);
+			ApiHandler.getJSON("/config/users/list").done(loaded);
 		}
 
 		this.contentManager.addController("usersList", _.bind(listHandler, this));
@@ -370,7 +370,7 @@ class GPIOHandler {
 function addActions(contentManager) {
 	
 	contentManager.addController("info", function(contentManager, actionName) {
-		ApiHandler.getJSON("/info").success(function(data) {
+		ApiHandler.getJSON("/info").done(function(data) {
 			var opt = { rows: data };
 			contentManager.displayTemplate(actionName, opt);
 		});

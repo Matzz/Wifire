@@ -1,6 +1,6 @@
 .main-navbar {
 	margin-bottom: 50px;
 }
-a[onclick] {
+a {
 	cursor: pointer;
 }
