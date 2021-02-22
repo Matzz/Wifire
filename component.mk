@@ -49,10 +49,17 @@ SPIFF_FILES = web/build
 RBOOT_ENABLED ?= 1
 RBOOT_BIG_FLASH ?= 1
 SPI_SIZE        ?= 4M
-SPIFF_SIZE      ?= 524288
-DISABLE_SPIFFS = 0
 ENABLE_SSL=0
 DEBUG_VERBOSE_LEVEL=INFO
+
+## Use standard hardware config with two ROM slots and two SPIFFS partitions
+ifeq ($(SMING_ARCH),Esp8266)
+HWCONFIG := basic_rboot
+else
+HWCONFIG := spiffs
+# Emulate UART 0
+ENABLE_HOST_UARTID := 0
+endif
 
 web-pack:
 	$(Q) npx gulp

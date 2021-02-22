@@ -7,7 +7,6 @@
 
 class OtaUpdater {
 	protected:
-		int spiffsAddresses[2];
 		ConfigProvider<OtaConfig>& cfgProvider;
 
 		static uint8 activeSlot();
@@ -15,8 +14,7 @@ class OtaUpdater {
 		static void callback(RbootHttpUpdater& client, bool result);
 
 	public:
-		OtaUpdater(const int spiffsAddresses[2],
-					ConfigProvider<OtaConfig> &cfgProvider);
+		OtaUpdater(ConfigProvider<OtaConfig> &cfgProvider);
 		void update();
 		static void switchSlot();
 };

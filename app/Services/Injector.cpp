@@ -40,7 +40,7 @@ UserSessionManager& Injector::getUserSessionManager() {
 }
 
 OtaUpdater& Injector::getOtaUpdater() {
-	static OtaUpdater otaUpdater(spiffsAddresses, getOtaConfigProvider());
+	static OtaUpdater otaUpdater(getOtaConfigProvider());
 	return otaUpdater;
 }
 

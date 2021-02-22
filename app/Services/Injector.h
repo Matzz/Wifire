@@ -26,9 +26,6 @@ private:
 public:
 	static Injector& getInstance();
 
-	const int spiffsAddresses[2] = { RBOOT_SPIFFS_0, RBOOT_SPIFFS_1 };
-	const int spiffsSize = SPIFF_SIZE;
-
 	const int httpPort = 80;
 
 	const int ftpPort = 21;

@@ -1,6 +1,7 @@
 #include "OtaUpdater.h"
 
 #include <SmingCore.h>
+#include "SpiffsManager.h"
 
 uint8 OtaUpdater::activeSlot() {
 	return rboot_get_current_rom();
@@ -21,11 +22,7 @@ void OtaUpdater::callback(RbootHttpUpdater& client, bool result) {
 	}
 }
 
-OtaUpdater::OtaUpdater(const int spiffsAddresses[2],
-		ConfigProvider<OtaConfig> &cfgProvider) :
-		spiffsAddresses { spiffsAddresses[0], spiffsAddresses[1] }, cfgProvider(
-				cfgProvider) {
-}
+OtaUpdater::OtaUpdater(ConfigProvider<OtaConfig> &cfgProvider) : cfgProvider(cfgProvider) { }
 
 void OtaUpdater::update() {
 	auto configOrError = cfgProvider.load();
@@ -40,12 +37,14 @@ void OtaUpdater::update() {
 
 	// flash rom to position indicated in the rBoot config rom table
 	rboot_config boot_config = rboot_get_config();
+	
 	otaUpdater->addItem(boot_config.roms[slot], config.romUrl);
-	otaUpdater->addItem(spiffsAddresses[slot], config.spiffUrl);
 
-	// request switch and reboot on success
-	//otaUpdater->switchToRom(slot);
-	// and/or set a callback (called on failure or success without switching requested)
+	auto part = SpiffsManager::findSpiffsPartition(slot);
+	if(part) {
+		// use user supplied values (defaults for 4mb flash in hardware config)
+		otaUpdater->addItem(part.address(), config.spiffUrl, part.size());
+	}
 	otaUpdater->setCallback(callback);
 
 	// start update
