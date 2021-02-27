@@ -44,4 +44,5 @@ void signOutAction(HttpRequest &request, HttpResponse &response) {
     auto sessionId = getSessionId(request);
     sessionManager.signOut(sessionId);
     UserSessionManager::clearSessionCookie(response);
+    returnOk(response, "");
 }

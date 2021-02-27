@@ -1,8 +1,8 @@
 #include "WebServer.h"
 
 #include <SmingCore.h>
-#include "InfoProvider.h"
-#include "../Actions/infoAction.h"
+#include "StatusProvider.h"
+#include "../Actions/statusAction.h"
 #include "../Actions/authAction.h"
 #include "../Actions/staticAction.h"
 #include "../Actions/configActions.h"
@@ -61,7 +61,7 @@ void WebServer::authWrapper(const String& path, const String& requiredRole, cons
 }
 
 void WebServer::bindActions() {
-	authWrapper("/info", "show_info", infoAction);
+	authWrapper("/status", "show_statusx", statusAction);
 	authWrapper("/config/station/get", "edit_station_config", stationGetConfigAction);
 	authWrapper("/config/station/set", "edit_station_config", stationSetConfigAction);
 	authWrapper("/config/networks/refresh", "edit_station_config", stationRefreshNetworks);

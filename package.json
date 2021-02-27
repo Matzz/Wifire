@@ -27,6 +27,7 @@
   "dependencies": {
     "chai": "^4.3.0",
     "chai-http": "^4.3.0",
-    "gulp-uglify-es": "^2.0.0"
+    "gulp-uglify-es": "^2.0.0",
+    "react-scripts": "^4.0.3"
   }
 }

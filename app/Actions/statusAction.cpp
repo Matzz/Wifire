@@ -1,9 +1,9 @@
 #include <JsonObjectStream.h>
-#include "infoAction.h"
-#include "../Services/InfoProvider.h"
+#include "statusAction.h"
+#include "../Services/StatusProvider.h"
 
-void infoAction(HttpRequest &request, HttpResponse &response) {
-	auto info = InfoProvider::getInfo(false);
+void statusAction(HttpRequest &request, HttpResponse &response) {
+	auto info = StatusProvider::getStatus(false);
 
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();

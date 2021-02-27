@@ -2,7 +2,7 @@
 
 #include <SmingCore.h>
 #include "Injector.h"
-#include "InfoProvider.h"
+#include "StatusProvider.h"
 
 void SerialHandler::setup() {
 	Serial.begin(SERIAL_BAUD_RATE); // 115200 by default
@@ -55,14 +55,14 @@ void SerialHandler::callback(Stream& stream, char arrivedChar,
 			} else {
 				Serial.printf("File '%s' does not exist.\r\n", fileName.c_str());
 			}
-		} else if (!strcmp(str, "info")) {
-			auto info = InfoProvider::getInfo(true);
-			auto infoSize = info->count();
-			for (int i = 0; i < infoSize; i++) {
-				Serial.printf("%s - %s\r\n", info->keyAt(i).c_str(),
-						info->valueAt(i).c_str());
+		} else if (!strcmp(str, "status")) {
+			auto status = StatusProvider::getStatus(true);
+			auto statusSize = status->count();
+			for (int i = 0; i < statusSize; i++) {
+				Serial.printf("%s - %s\r\n", status->keyAt(i).c_str(),
+						status->valueAt(i).c_str());
 			}
-			delete info;
+			delete status;
 		} else if (!strcmp(str, "help")) {
 			Serial.println();
 			Serial.println("available commands:");
@@ -70,7 +70,7 @@ void SerialHandler::callback(Stream& stream, char arrivedChar,
 			Serial.println("  restart - restart the esp8266");
 			Serial.println("  switch - switch to the other rom and reboot");
 			Serial.println("  ota - perform ota update, switch rom and reboot");
-			Serial.println("  info - show esp8266 and wifi info");
+			Serial.println("  status - show esp8266 and wifi status");
 			Serial.println("  ls - list files in spiffs");
 			Serial.println("  cat - show first file in spiffs");
 			Serial.println();
