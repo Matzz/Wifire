@@ -11,6 +11,7 @@ import { Signin, Signout } from './pages/Auth';
 import Status from './pages/Status';
 import { EditAp, EditStation, EditOta } from "./pages/SimpleForms";
 import EditGpio from "./pages/EditGpio";
+import UserManagement from "./pages/Users";
 
 
 
@@ -52,7 +53,7 @@ class App extends React.Component {
           {this.hasRole("edit_station_config") && <li className="nav-item"><NavLink className="nav-link" to="/edit_station">Station config</NavLink></li>}
           {this.hasRole("edit_gpio_config") && <li className="nav-item"><NavLink className="nav-link" to="/edit_gpio">GPIO config</NavLink></li>}
           {this.hasRole("edit_ota_config") && <li className="nav-item"><NavLink className="nav-link" to="/edit_ota">Ota config</NavLink></li>}
-          {this.hasRole("edit_users_config") && <li className="nav-item"><NavLink className="nav-link" to="/users_list">Users</NavLink></li>}
+          {this.hasRole("edit_users_config") && <li className="nav-item"><NavLink className="nav-link" to="/users/list">Users</NavLink></li>}
         </ul>
       </nav>
       
@@ -81,6 +82,9 @@ class App extends React.Component {
           </Route>
           <Route path="/edit_gpio">
             <EditGpio apiHandler={this.apiHandler} />
+          </Route>
+          <Route path="/users">
+            <UserManagement apiHandler={this.apiHandler} />
           </Route>
           <Route>
             Not found.

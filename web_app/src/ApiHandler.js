@@ -64,9 +64,12 @@ export class ApiHandler {
 		return $.post(cfg).fail(this.handleRequestFailure)
 	}
 	
+	getFormData(formEl) {
+		return $(formEl).serializeJSON({checkboxUncheckedValue: "false"});
+	}
+	
 	postForm(url, formEl) {
-		let data = $(formEl).serializeJSON({checkboxUncheckedValue: "false"});
-		return this.postJSON(url, data);
+		return this.postJSON(url, this.getFormData(formEl));
 	}
 
 	handleAuthUpdate() {
