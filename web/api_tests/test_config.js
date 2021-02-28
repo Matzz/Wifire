@@ -1,5 +1,6 @@
 const chai = require('chai');
 const {
+    isUndefined,
     getAgent,
     doLogin,
     doSucessfulLogin,

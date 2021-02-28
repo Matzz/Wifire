@@ -61,7 +61,7 @@ void WebServer::authWrapper(const String& path, const String& requiredRole, cons
 }
 
 void WebServer::bindActions() {
-	authWrapper("/status", "show_statusx", statusAction);
+	authWrapper("/status", "show_status", statusAction);
 	authWrapper("/config/station/get", "edit_station_config", stationGetConfigAction);
 	authWrapper("/config/station/set", "edit_station_config", stationSetConfigAction);
 	authWrapper("/config/networks/refresh", "edit_station_config", stationRefreshNetworks);

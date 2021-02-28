@@ -45,7 +45,7 @@ COMPONENT_DEPENDS := malloc_count
 ## Configure flash parameters (for ESP12-E and other new boards):
 SPI_MODE = dio
 ## SPIFFS options
-SPIFF_FILES = web/build
+SPIFF_FILES = web/combined_build
 RBOOT_ENABLED ?= 1
 RBOOT_BIG_FLASH ?= 1
 SPI_SIZE        ?= 4M
@@ -62,7 +62,7 @@ ENABLE_HOST_UARTID := 0
 endif
 
 web-pack:
-	$(Q) npx gulp
-	$(Q) date +'%a, %d %b %Y %H:%M:%S GMT' -u > web/build/.lastModified
+	$(Q) cd web && npm run build
+	$(Q) cd web && npx gulp
 
 web-upload: web-pack spiffs-image-update

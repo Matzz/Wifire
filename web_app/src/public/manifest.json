@@ -1,7 +1,0 @@
-{
-  "short_name": "Wifire",
-  "name": "Wifire App",
-  "icons": [],
-  "start_url": ".",
-  "display": "standalone"
-}

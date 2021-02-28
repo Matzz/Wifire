@@ -17,7 +17,6 @@ config.optimization.runtimeChunk = false;
 // JS
 config.output.filename = 'static/js/[name].js';
 config.output.chunkFilename = 'static/js/[name].chunk.js';
-console.log(config.optimization);
 
 // console.log("pligns", config.plugins);
 // CSS. "5" is MiniCssPlugin

@@ -1,11 +1,14 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const { isUndefined } = require('underscore');
 
 const { serverConf } = require('./config');
 
 chai.use(chaiHttp);
 const expect = chai.expect
+
+function isUndefined(v) {
+    return typeof(v)=="undefined";
+}
 
 function getAgent() {
     return chai
@@ -122,6 +125,7 @@ function doSucessfulEditUser({agent, login, password, roles = [], enabled = true
 }
 
 module.exports = {
+    isUndefined: isUndefined,
     getAgent: getAgent,
     doLogin: doLogin,
     doSucessfulLogin: doSucessfulLogin,

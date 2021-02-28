@@ -59,4 +59,4 @@ include
 # Visual studio
 .vscode
 
-node_modules/
+web/node_modules/

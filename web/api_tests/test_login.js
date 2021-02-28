@@ -1,5 +1,6 @@
 const chai = require('chai');
 const {
+    isUndefined,
     getAgent,
     doLogin,
     doSucessfulLogin,
@@ -43,7 +44,7 @@ describe('login actions', function() {
 
 describe('permissions', function() {
     it('return an error if accessing restricted page without permissions', () => {
-        var urls = ["info",
+        var urls = ["status",
             "config/ap/get",
             "config/station/get",
             "config/gpio/get",
@@ -64,7 +65,7 @@ describe('permissions', function() {
 
     });
     it('return status 200 if accessing restricted page with permissions', () => {
-        var urls = ["info",
+        var urls = ["status",
             "config/ap/get",
             "config/station/get",
             "config/gpio/get",
@@ -100,7 +101,7 @@ describe('user management', function() {
             .then(() => { return doSucessfulLogin({agent: userAgent, login: userLogin, password: userPassword}) })
             .then(() => {
                 return userAgent
-                    .get("info")
+                    .get("status")
                     .then(res => {
                         expect(res).to.have.status(403);
                     })
@@ -123,7 +124,7 @@ describe('user management', function() {
                     agent: adminAgent,
                     login: userLogin,
                     password: userPassword,
-                    roles: ["edit_ap_config", "show_info"]
+                    roles: ["edit_ap_config", "show_status"]
                 });
             })
             .then(() => { return doSucessfulLogin({agent: userAgent, login: userLogin, password: userPassword}) })
@@ -137,9 +138,9 @@ describe('user management', function() {
                             .then(apCfgRes => {
                                 expect(apCfgRes).to.have.status(200);
                                 return userAgent
-                                .get("info")
-                                .then(infoRes => {
-                                    expect(infoRes).to.have.status(200);
+                                .get("status")
+                                .then(statusRes => {
+                                    expect(statusRes).to.have.status(200);
                                 });
                             })
                     })
