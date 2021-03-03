@@ -34,6 +34,8 @@ void otaGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	Injector &di = Injector::getInstance();
 	auto& provider = di.getOtaConfigProvider();
 	handleConfigGet(request, response, provider);
+	auto updater = di.getOtaUpdater();
+	updater.update();
 
 }
 
