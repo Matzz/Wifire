@@ -1,18 +1,27 @@
-import { GenericForm } from "./GenericForm";
+import React from 'react';
 import autoBind from 'react-autobind';
+import { StateProxy, AsyncFormHelper } from "./AsyncFormHelper";
 
-//TODO remove inheritance. Decouple GenericForm to reuse some state handling here
-export default class EditGpio extends GenericForm {
+export default class EditGpio extends React.Component {
     constructor(props) {
         super(props);
         autoBind(this);
-		this.state.type = "gpio";
+		this.state = {};
+		this.formHelper = new AsyncFormHelper("gpio", props.apiHandler, new StateProxy(this));
     }
 	
 	static isPinSafeToUse(pin) {
 		var safePins = [2,3,4,5,13,14,15,16];
 		return safePins.includes(parseInt(pin));
 	}
+
+    componentDidMount() {
+        this.formHelper.loadState()
+    }
+
+    onSubmitCallback(event) {
+        this.formHelper.submitForm(event);
+    }
 
 	fieldName(i, name, fieldType) {
 		// Single quotes doesn't work well with ArduinoJson
@@ -23,7 +32,7 @@ export default class EditGpio extends GenericForm {
         if(!this.state.dataLoaded) {
             return null;
         }
-		var inputs = this.state.response_data.gpio; // We dont use preformated state.inputs here
+		var inputs = this.state.formData.gpio; // We dont use preformated state.inputs here
 		let fields = Object.keys(inputs).map(idx => {
 			let pin = inputs[idx];
 			let editablePin = (<>
@@ -34,12 +43,14 @@ export default class EditGpio extends GenericForm {
 					</select>
 				</td>
 				<td>
-					<input
-						type="checkbox"
-						name={ this.fieldName(idx, 'pull', 'boolean') }
-						defaultChecked={pin["pull"]}
-						value="true"
-						className="form-check-input position-static" />
+					<div className="form-check">
+						<input
+							type="checkbox"
+							name={ this.fieldName(idx, 'pull', 'boolean') }
+							defaultChecked={pin["pull"]}
+							value="true"
+							className="form-check-input position-static" />
+					</div>
 				</td>
 			</>);
 			let nonEditablePin = (<td colSpan="2">It is not safe to use that pin</td>);
@@ -55,7 +66,7 @@ export default class EditGpio extends GenericForm {
 		return (
 			<form className="form-horizontal" 
 				id={ 'formId' in this.state ? this.state.formId : 'form' }
-				onSubmit={this.onSubmitCallback.bind(this)}>
+				onSubmit={this.onSubmitCallback}>
 			<h2>Edit GPIO configuration</h2>
 			<table className="table">
 				<thead>

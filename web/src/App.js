@@ -1,15 +1,19 @@
 
+
 import './App.css';
 import React from 'react';
 import { NavLink } from "react-router-dom";
 import { Route, Switch } from "react-router";
 import autoBind from 'react-autobind';
-import { ApiHandler } from "./ApiHandler";
+import { withRouter } from 'react-router';
+import ApiHandler from "./ApiHandler";
 
 import HomePage from "./pages/HomePage"
 import { Signin, Signout } from './pages/Auth';
 import Status from './pages/Status';
-import { EditAp, EditStation, EditOta } from "./pages/SimpleForms";
+import EditAp from "./pages/EditAp";
+import EditStation from "./pages/EditStation";
+import EditOta from "./pages/EditOta";
 import EditGpio from "./pages/EditGpio";
 import UserManagement from "./pages/Users";
 
@@ -19,7 +23,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     autoBind(this);
-    this.apiHandler = new ApiHandler();
+    this.apiHandler = new ApiHandler(props.history);
     this.apiHandler.addUpdateAuthCallback(this.updateAuth);
     this.state = {
       auth: ApiHandler.emptyAuth
@@ -96,4 +100,8 @@ class App extends React.Component {
   }
 }
 
-export default App;
+const AppWithRouter = withRouter(App);
+
+export {
+  AppWithRouter as App
+};

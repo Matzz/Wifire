@@ -24,9 +24,9 @@ template<> class Codec<WiFiStationConfig> {
 		json["enabled"] = obj.enabled;
 		json["ssid"] = obj.ssid;
 		json["password"] = obj.password;
-		json["ip"] = obj.ip.toString();
-		json["netmask"] = obj.netmask.toString();
-		json["gateway"] = obj.gateway.toString();
+		json["ip"] = obj.ip.isNull() ? "" : obj.ip.toString();
+		json["netmask"] = obj.netmask.isNull() ? "" : obj.netmask.toString();
+		json["gateway"] = obj.gateway.isNull() ? "" : obj.gateway.toString();
 	}
 
 	Either<String, WiFiStationConfig> decode(JsonObject& json) {
@@ -34,9 +34,9 @@ template<> class Codec<WiFiStationConfig> {
 		obj.enabled = CodecHelpers::getOrElse(json, "enabled", false);
 		obj.ssid = CodecHelpers::getOrElse(json, "ssid", "");
 		obj.password = CodecHelpers::getOrElse(json, "password", "");
-		obj.ip = CodecHelpers::getIp(json, "ip", IpAddress(192, 168, 1, 1));
-		obj.netmask = CodecHelpers::getIp(json, "netmask", IpAddress(255, 255, 255, 0));
-		obj.gateway = CodecHelpers::getIp(json, "gateway", IpAddress(192, 168, 1, 1));
+		obj.ip = CodecHelpers::getIp(json, "ip", IpAddress(""));
+		obj.netmask = CodecHelpers::getIp(json, "netmask", IpAddress(""));
+		obj.gateway = CodecHelpers::getIp(json, "gateway", IpAddress(""));
 		return obj;
 	}
 };

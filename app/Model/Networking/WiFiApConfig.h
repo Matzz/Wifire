@@ -28,7 +28,7 @@ template<> class Codec<WiFiApConfig> {
 		json["ssid"] = obj.ssid;
 		json["password"] = obj.password;
 		json["authMode"] = (int) obj.authMode;
-		json["ip"] = obj.ip.toString();
+		json["ip"] = obj.ip.isNull() ? "" obj.ip.toString();
 		json["hidden"] = obj.hidden;
 		json["channel"] = obj.channel;
 		json["beaconInterval"] = obj.beaconInterval;

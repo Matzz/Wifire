@@ -5,13 +5,13 @@ const config = defaults.__get__('config');
 
 // Consolidate chunk files instead
 config.optimization.splitChunks = {
-          chunks(chunk) {
-            return false
-          },
-          cacheGroups: {
+    chunks(chunk) {
+      return false
+    },
+    cacheGroups: {
 			default: false
 			}
-        };
+    };
 // Move runtime into bundle instead of separate file
 config.optimization.runtimeChunk = false;
 // JS

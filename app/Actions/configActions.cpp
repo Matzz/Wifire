@@ -1,4 +1,5 @@
 #include "configActions.h"
+#include <SmingCore.h>
 #include <ArduinoJson.h>
 #include <JsonObjectStream.h>
 #include "../Services/Injector.h"
@@ -56,10 +57,11 @@ void stationRefreshNetworks(HttpRequest &request, HttpResponse &response) {
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();
 	if(AvaiableNetworksProvider::isScanning()) {
-			response.code = HttpStatus::ALREADY_REPORTED;
-			json["message"] = "No networks. Scanning again.";
+		response.code = HttpStatus::ACCEPTED;
+		json["message"] = F("Scanning in progress...");
 	} else {
-			json["message"] = "Scanning started.";
+		response.code = HttpStatus::ACCEPTED;
+		json["message"] = F("Scanning started.");
 	}
 	AvaiableNetworksProvider::startScan();
 	response.setContentType(MIME_JSON);
@@ -70,19 +72,27 @@ void stationGetNetworks(HttpRequest &request, HttpResponse &response) {
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();
 	if(!AvaiableNetworksProvider::isScanning()) {
-		if(AvaiableNetworksProvider::networks.isEmpty()) {
+		if(!AvaiableNetworksProvider::wasEverScanned) {
+			AvaiableNetworksProvider::startScan();
+			response.code = HttpStatus::ACCEPTED;
+			json["message"] = F("Scanning in progress...");
+		}
+		else if(AvaiableNetworksProvider::networks.isEmpty()) {
 			AvaiableNetworksProvider::startScan();
 			response.code = HttpStatus::NO_CONTENT;
-			json["message"] = "No networks. Scanning again.";
+			json["message"] = F("No networks. Scanning again.");
 		} else {
+			response.code = HttpStatus::OK;
+			json["scanned_seconds_ago"] = AvaiableNetworksProvider::lastScanAgeSeconds();
 			JsonArray networksJson = json.createNestedArray("networks");
 			BssList networks = AvaiableNetworksProvider::networks;
 			for(int i=0; i<networks.size(); i++) {
 				BssInfo network = networks[i];
 				JsonObject networkJson = networksJson.createNestedObject();
+				networkJson["id"] = network.getHashId();
 				networkJson["ssid"] = network.ssid;
 				networkJson["bssid"] = network.bssid;
-				networkJson["authorization"] = network.authorization;
+				networkJson["authorization"] = network.getAuthorizationMethodName();
 				networkJson["channel"] = network.channel;
 				networkJson["channel"] = network.channel;
 				networkJson["rssi"] = network.rssi;
@@ -90,30 +100,9 @@ void stationGetNetworks(HttpRequest &request, HttpResponse &response) {
 			}
 		}
 	} else {
-		json["message"] = "Scanning in progress.";
+		response.code = HttpStatus::ACCEPTED;
+		json["message"] = F("Scanning in progress...");
 	}
-	response.setContentType(MIME_JSON);
-	response.sendNamedStream(stream);
-}
-
-void stationListNetworks(HttpRequest &request, HttpResponse &response) {
-	auto& provider = Injector::getInstance().getWiFiStationConfigProvider();
-	auto configOrError = provider.load();
-	if(configOrError.isLeft()) {
-		return returnFailure(response, F("Invalid json. Please save configration again."));
-	}
-	auto config = *configOrError.getIfRight();
-	
-	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject json = stream->getRoot();
-
-	json["enabled"] = config.enabled;
-	json["ssid"] = config.ssid;
-	json["password"] = config.password;
-	json["ip"] = config.ip.toString();
-	json["netmask"] = config.netmask.toString();
-	json["gateway"] = config.gateway.toString();
-
 	response.setContentType(MIME_JSON);
 	response.sendNamedStream(stream);
 }

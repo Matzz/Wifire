@@ -3,15 +3,20 @@ import $ from "jquery";
 import Cookies from 'js-cookie'
 import autoBind from 'react-autobind';
 
-export class ApiHandler {
+export default class ApiHandler {
     static emptyAuth = {
         login: "",
         roles: []
     }
 
-    constructor() {
+    constructor(history) {
+	  this.history = history;
 	  autoBind(this);
       this.authUpdateCallbacks = [];
+    }
+    
+    render() { 
+        return null;
     }
 
     addUpdateAuthCallback(fn) {
@@ -23,7 +28,7 @@ export class ApiHandler {
 		var jsonStr = Cookies.get('auth');
 		if(jsonStr) {
 			try {
-				authJson = $.parseJSON(jsonStr);
+				authJson = JSON.parse(jsonStr);
 			} catch(error) {
 				console.warn("Invalid auth json", jsonStr, error);
 			}
@@ -40,6 +45,7 @@ export class ApiHandler {
 		if(jqXHR.status === 403) {
 			alert("You don't have access rights to see that page.");
 			this.handleAuthUpdate();
+			this.history.push('/');
 		} else {
 			var msg = errorThrown;
 			if('responseJSON' in jqXHR && 'message' in jqXHR['responseJSON']) {
