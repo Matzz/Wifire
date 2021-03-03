@@ -1,6 +1,6 @@
 import React from 'react';
 import autoBind from 'react-autobind';
-import { StateProxy, AsyncFormHelper } from "./AsyncFormHelper";
+import { StateProxy, AsyncFormHelper } from "../AsyncFormHelper";
 
 const selectMessages = Object.freeze({
     scanning: "Scanning for networks...",

@@ -16,5 +16,6 @@ export default function EditOta(props) {
         type="ota"
         apiHandler={props.apiHandler}
         customFieldMapping={customFieldMapping}
+        submitMsg="Submit and update"
         />
 }

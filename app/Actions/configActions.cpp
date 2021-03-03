@@ -31,8 +31,10 @@ void stationSetConfigAction(HttpRequest &request, HttpResponse &response) {
 }
 
 void otaGetConfigAction(HttpRequest &request, HttpResponse &response) {
-	auto& provider = Injector::getInstance().getOtaConfigProvider();
+	Injector &di = Injector::getInstance();
+	auto& provider = di.getOtaConfigProvider();
 	handleConfigGet(request, response, provider);
+
 }
 
 void otaSetConfigAction(HttpRequest &request, HttpResponse &response) {

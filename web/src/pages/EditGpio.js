@@ -1,6 +1,6 @@
 import React from 'react';
 import autoBind from 'react-autobind';
-import { StateProxy, AsyncFormHelper } from "./AsyncFormHelper";
+import { StateProxy, AsyncFormHelper } from "../AsyncFormHelper";
 
 export default class EditGpio extends React.Component {
     constructor(props) {

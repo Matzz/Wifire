@@ -1,6 +1,6 @@
 import React from 'react';
 import autoBind from 'react-autobind';
-import {StateProxy, AsyncFormHelper} from './AsyncFormHelper';
+import {StateProxy, AsyncFormHelper} from '../AsyncFormHelper';
 
 export class GenericForm extends React.Component {
     constructor(props) {
@@ -147,7 +147,7 @@ export class GenericForm extends React.Component {
                 { controls}
 
                 <div className="col-sm-offset-3">
-                    <button type="submit" className="btn btn-primary" id="form_submit">Submit</button>
+                    <button type="submit" className="btn btn-primary" id="form_submit">{ this.props.submitMsg || "Submit"}</button>
                 </div>
             </form>
         )

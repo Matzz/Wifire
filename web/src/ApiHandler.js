@@ -2,6 +2,7 @@
 import $ from "jquery";
 import Cookies from 'js-cookie'
 import autoBind from 'react-autobind';
+import "jquery-serializejson";
 
 export default class ApiHandler {
     static emptyAuth = {

@@ -1,6 +1,4 @@
 import React from 'react';
-import $ from "jquery";
-import "jquery-serializejson";
 import autoBind from 'react-autobind';
 import { withRouter } from 'react-router';
 
@@ -12,8 +10,7 @@ class Signin extends React.Component {
     }
 
     handleSubmit(event) {
-        let data = $(event.target).serializeJSON();
-        this.apiHandler.postJSON("/signin", data)
+        this.apiHandler.postForm("/signin", event.target)
             .done(function(data) {
                 alert("You have been signed in.");
                 this.apiHandler.handleAuthUpdate();
@@ -25,7 +22,7 @@ class Signin extends React.Component {
 
     render() {
         return (
-            <form id="signin_form" onSubmit={this.handleSubmit}>
+            <form id="signin_form" className="form-signin" onSubmit={this.handleSubmit}>
                 <div className="form-group">
                     <label htmlFor="form_login">Login</label>
                     <input type="text" className="form-control" id="form_login" name="login" placeholder="Enter login" />
@@ -34,7 +31,7 @@ class Signin extends React.Component {
                     <label htmlFor="form_password">Password</label>
                     <input type="password" className="form-control" id="form_password" name="password" placeholder="Password" />
                 </div>
-                <button type="submit" className="btn btn-primary">Submit</button>
+                <button type="submit" className="btn btn-lg btn-primary btn-block">Submit</button>
             </form>
         )
     }
