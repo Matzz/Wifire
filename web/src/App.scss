@@ -1,0 +1,220 @@
+$sidebar-font-color: rgba(255, 255, 255, 0.5);
+$sidebar-bg-color: rgb(52, 58, 64);
+
+$sidebar-link-active-font-color: #fff;
+$sidebar-link-active-bg-color: rgb(52, 58, 64);
+
+$sidebar-link-hover-font-color: rgba(255, 255, 255, 0.75);
+$sidebar-link-hover-bg-color: rgb(52, 58, 64);
+
+
+$sidebar-header-font-color: #fff;
+$sidebar-header-bg-color: #6f42c1;
+
+$hide-nav-transition: all 0.6s cubic-bezier(0.945, 0.020, 0.270, 0.665);
+
+a {
+	cursor: pointer;
+}
+
+.form-signin {
+    max-width: 330px;
+    margin: 0 auto;
+}
+
+#root {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    perspective: 1500px;
+}
+
+#content {
+    width: 100%;
+    padding: 20px;
+    min-height: 100vh;
+    transition: all 0.3s;
+}
+
+
+.dropdown-toggle {
+    position: relative;
+}
+
+.dropdown-toggle::after {
+    display: block;
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+}
+
+@mixin wide-nav-width {
+    min-width: 250px;
+    max-width: 250px;
+}
+
+@mixin sidebar-wide {
+    min-width: 250px;
+    max-width: 250px;
+}
+
+@mixin sidebar-short {
+    min-width: 40px;
+    max-width: 40px;
+    ul {
+        margin-left: -250px;
+    }
+}
+
+#sidebar {
+    @include wide-nav-width;
+    position: relative;
+    background: $sidebar-bg-color;
+    color: $sidebar-font-color;
+    transition: $hide-nav-transition;
+    transform-origin: bottom left;
+
+    a, a:hover, a:focus, .btn-link {
+        color: inherit;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+
+    ul {
+        @include wide-nav-width;
+        transition: $hide-nav-transition;
+        
+        ul {
+            max-height: 0px;
+            overflow: hidden;
+            transition: all .5s ease 0s;
+        }
+        ul.open {
+            max-height: 500px;
+        }
+    
+        ul a {
+            padding-left: 30px !important;
+        }
+
+        p {
+            color: $sidebar-font-color;
+            padding: 10px;
+        }
+    
+        li a {
+            padding: 10px;
+            font-size: 1.1em;
+            display: block;
+        }
+    
+        li a.active {
+            color: $sidebar-link-active-font-color;
+            background-color: $sidebar-link-active-bg-color;
+        }
+        li a:hover {
+            color: $sidebar-link-hover-font-color;
+            background: $sidebar-link-hover-bg-color;
+        }
+    }
+
+    .sidebar-header {
+        padding: 10px;
+        font-size: 20px;
+        color: $sidebar-header-font-color;
+        background: $sidebar-header-bg-color;
+        transition: $hide-nav-transition;
+    }
+    .sidebar-header a {
+        padding: 0;
+    }
+}
+
+#sidebar.active {
+    @include sidebar-short;
+
+    .sidebar-header {
+        margin-left: -250px;
+    }
+}
+
+@mixin sidebar-collapse-btn-short {
+    margin-left: 0;
+    transform: none;
+    
+    span:first-of-type,
+    span:nth-of-type(2),
+    span:last-of-type {
+        margin: 0px auto;
+        }
+
+    span:first-of-type {
+        transform: rotate(45deg) translate(2px, 2px);
+    }
+    span:nth-of-type(2) {
+        opacity: 0;
+    }
+    span:last-of-type {
+        transform: rotate(-45deg) translate(1px, -1px);
+    }
+}
+
+@mixin sidebar-collapse-btn-wide {
+    span:first-of-type,
+    span:nth-of-type(2),
+    span:last-of-type {
+        transform: none;
+        opacity: 1;
+        margin: 5px auto;
+        }
+}
+
+#sidebar-collapse-btn {
+    @include sidebar-collapse-btn-short;
+
+    position: absolute;
+    right: 0;
+    top: 5px;
+    width: 40px;
+    height: 40px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+
+    span {
+        width: 80%;
+        height: 2px;
+        display: block;
+        background: $sidebar-font-color;
+        transition: all 0.8s cubic-bezier(0.810, -0.330, 0.345, 1.375);
+        transition-delay: 0.2s;
+    }
+
+}
+
+
+#sidebar-collapse-btn.active {
+    @include sidebar-collapse-btn-wide;
+}
+
+/* ---------------------------------------------------
+    MEDIAQUERIES
+----------------------------------------------------- */
+@media (max-width: 768px) {
+    #sidebar {
+        @include sidebar-short;
+    }
+    #sidebar.active {
+        @include sidebar-wide;
+    }
+
+    #sidebar-collapse-btn {
+        @include sidebar-collapse-btn-wide;
+    }
+
+    #sidebar-collapse-btn.active {
+        @include sidebar-collapse-btn-short;
+    }
+
+}
