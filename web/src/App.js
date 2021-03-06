@@ -48,8 +48,10 @@ class App extends React.Component {
     return (
       <>
       <nav className="main-navbar navbar navbar-expand-lg navbar-dark bg-primary">
-        <NavLink className="navbar-brand" to="/">Wifire <span className="user_name">{this.state.auth.login}</span></NavLink>
         <ul className="navbar-nav">
+          <li>
+            <NavLink className="navbar-brand" to="/">Wifire <span className="user_name">{this.state.auth.login}</span></NavLink>
+          </li>
           {!this.isSignedin() && <li className="nav-item"><NavLink className="nav-link" to="/signin">Sign in</NavLink></li>}
           {this.isSignedin() && <li className="nav-item"><NavLink className="nav-link" to="/signout">Sign out</NavLink></li>}
           {this.hasRole("show_status") && <li className="nav-item"><NavLink className="nav-link" to="/status">Status</NavLink></li>}
