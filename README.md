@@ -32,7 +32,7 @@ make web-upload
 It will trigger `web-pack` and `spiffs-image-update` commands.
 
 ## Modifing the frontend
-Packing and flashing web app after each change is cumbersome. Wifire is based on (Create react app)[https://create-react-app.dev/] which
+Packing and flashing web app after each change is cumbersome. Wifire is based on [Create react app](https://create-react-app.dev/) which
 add a support of hot code replacement and proxy server. Basically, rather than a web app hosted by ESP chip you start a local web proxy
 which redirect all HTTP requests to ESP chip. Thanks to that you could code your fronend app and see changes immediately.
 It increases your development performance significantly by removing `change -> make -> flash` loop.
