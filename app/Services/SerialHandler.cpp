@@ -33,14 +33,12 @@ void SerialHandler::callback(Stream& stream, char arrivedChar,
 			System.restart();
 		} else if (!strcmp(str, "ls")) {
 			Vector<String> files = fileList();
-			Serial.printf("filecount %d\r\n", files.count());
-			for (unsigned int i = 0; i < files.count(); i++) {
-				Serial.println(files[i]);
+			for(auto& f: files) {
+				Serial.println(f);
 			}
 		} else if (!strncmp(str, "cat ", 4)) {
-
 			Vector<String> files = fileList();
-			int idx = -1;
+			Serial.printf("filecount %d\r\n", files.count());
 			String fileName = String(str).substring(4);
 			if(fileExist(fileName)) {
 				Serial.println(fileGetContent(fileName));

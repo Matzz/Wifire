@@ -34,14 +34,15 @@ void otaGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	Injector &di = Injector::getInstance();
 	auto& provider = di.getOtaConfigProvider();
 	handleConfigGet(request, response, provider);
-	auto updater = di.getOtaUpdater();
-	updater.update();
 
 }
 
 void otaSetConfigAction(HttpRequest &request, HttpResponse &response) {
-	auto& provider = Injector::getInstance().getOtaConfigProvider();
+	Injector &di = Injector::getInstance();
+	auto& provider = di.getOtaConfigProvider();
 	handleConfigSet(request, response, provider);
+	auto updater = di.getOtaUpdater();
+	updater.update();
 }
 
 void gpioGetConfigAction(HttpRequest &request, HttpResponse &response) {
