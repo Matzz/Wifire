@@ -35,11 +35,13 @@ void WiFiManager::startNetwork() {
 			debug_w("Cannot connect to station.");
 		}
 	} else {
-		if(!tempStationEnabled) {
+		if(tempStationEnabled) {
 			// We don't want to to turn off station while network scann is in progress.
+			debug_i("Enabled station mode withut connecting.");
+		} else {
+			debug_i("Station mode disabled.");
 			WifiStation.enable(false, false);
 		}
-		debug_i("Station mode disabled.");
 	}
 
 	if(apCfg.enabled) {

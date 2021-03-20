@@ -45,6 +45,7 @@ template<> class Codec<WiFiApConfig> {
 			obj.authMode = WifiAuthMode::AUTH_OPEN;
 			obj.hidden = false;
 		} else {
+			obj.enabled = CodecHelpers::getOrElse(json, "enabled", false);
 			obj.ssid = CodecHelpers::getOrElse(json, "ssid", defaultSsid);
 			obj.password = CodecHelpers::getOrElse(json, "password", "");
 			obj.ip = CodecHelpers::getIp(json, "ip", IpAddress(192,168,1,1));
