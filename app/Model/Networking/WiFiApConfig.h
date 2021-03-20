@@ -37,14 +37,22 @@ template<> class Codec<WiFiApConfig> {
 	Either<String, WiFiApConfig> decode(JsonObject& json) {
 		WiFiApConfig obj;
 		String defaultSsid = "Wifire_" + String(system_get_chip_id(), 10);
-		obj.enabled = CodecHelpers::getOrElse(json, "enabled", true);
-		obj.ssid = CodecHelpers::getOrElse(json, "ssid", defaultSsid);
-		obj.password = CodecHelpers::getOrElse(json, "password", "");
-		obj.ip = CodecHelpers::getIp(json, "ip", IpAddress(192,168,1,1));
-		obj.authMode = (WifiAuthMode) CodecHelpers::getOrElse<int>(json, "authMode", AUTH_OPEN);
-		obj.hidden = CodecHelpers::getOrElse(json, "hidden", false);
-		obj.channel = CodecHelpers::getOrElse(json, "channel", 7);
-		obj.beaconInterval = CodecHelpers::getOrElse<unsigned int>(json, "beaconInterval", 200);
+		if(json.isNull()) {
+			obj.ssid = defaultSsid;
+			obj.enabled = true;
+			obj.password = "";
+			obj.ip = IpAddress(192,168,1,1);
+			obj.authMode = WifiAuthMode::AUTH_OPEN;
+			obj.hidden = false;
+		} else {
+			obj.ssid = CodecHelpers::getOrElse(json, "ssid", defaultSsid);
+			obj.password = CodecHelpers::getOrElse(json, "password", "");
+			obj.ip = CodecHelpers::getIp(json, "ip", IpAddress(192,168,1,1));
+			obj.authMode = (WifiAuthMode) CodecHelpers::getOrElse<int>(json, "authMode", AUTH_OPEN);
+			obj.hidden = CodecHelpers::getOrElse(json, "hidden", false);
+			obj.channel = CodecHelpers::getOrElse(json, "channel", 7);
+			obj.beaconInterval = CodecHelpers::getOrElse<unsigned int>(json, "beaconInterval", 200);
+		}
 		return obj;
 	}
 };

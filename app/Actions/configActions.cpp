@@ -3,7 +3,6 @@
 #include <ArduinoJson.h>
 #include <JsonObjectStream.h>
 #include "../Services/Injector.h"
-#include "../Services/Networking/AvaiableNetworksProvider.h"
 #include "../Model/GPIOConfig.h"
 #include "../Model/OtaConfig.h"
 #include "../Model/Networking/WiFiApConfig.h"
@@ -34,14 +33,15 @@ void otaGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	Injector &di = Injector::getInstance();
 	auto& provider = di.getOtaConfigProvider();
 	handleConfigGet(request, response, provider);
-	auto updater = di.getOtaUpdater();
-	updater.update();
 
 }
 
 void otaSetConfigAction(HttpRequest &request, HttpResponse &response) {
-	auto& provider = Injector::getInstance().getOtaConfigProvider();
+	Injector &di = Injector::getInstance();
+	auto& provider = di.getOtaConfigProvider();
 	handleConfigSet(request, response, provider);
+	// auto& updater = di.getOtaUpdater();
+	// updater.update();
 }
 
 void gpioGetConfigAction(HttpRequest &request, HttpResponse &response) {
@@ -56,49 +56,47 @@ void gpioSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	di.getGPIOStateManager().update();
 }
 
-
 void stationRefreshNetworks(HttpRequest &request, HttpResponse &response) {
+	AvaiableNetworksProvider& networksProvider = Injector::getInstance().getAvaiableNetworksProvider();
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();
-	if(AvaiableNetworksProvider::isScanning()) {
+	if(networksProvider.isScanning()) {
 		response.code = HttpStatus::ACCEPTED;
 		json["message"] = F("Scanning in progress...");
 	} else {
 		response.code = HttpStatus::ACCEPTED;
 		json["message"] = F("Scanning started.");
 	}
-	AvaiableNetworksProvider::startScan();
+	networksProvider.startScan();
 	response.setContentType(MIME_JSON);
 	response.sendNamedStream(stream);
 }
 
 void stationGetNetworks(HttpRequest &request, HttpResponse &response) {
+	AvaiableNetworksProvider& networksProvider = Injector::getInstance().getAvaiableNetworksProvider();
+
 	JsonObjectStream* stream = new JsonObjectStream();
 	JsonObject json = stream->getRoot();
-	if(!AvaiableNetworksProvider::isScanning()) {
-		if(!AvaiableNetworksProvider::wasEverScanned) {
-			AvaiableNetworksProvider::startScan();
+	if(!networksProvider.isScanning()) {
+		BssList networks = networksProvider.getNetworks();
+		if(!networksProvider.wasEverScanned()) {
+			networksProvider.startScan();
 			response.code = HttpStatus::ACCEPTED;
 			json["message"] = F("Scanning in progress...");
 		}
-		else if(AvaiableNetworksProvider::networks.isEmpty()) {
-			AvaiableNetworksProvider::startScan();
+		else if(networks.isEmpty()) {
+			networksProvider.startScan();
 			response.code = HttpStatus::NO_CONTENT;
 			json["message"] = F("No networks. Scanning again.");
 		} else {
 			response.code = HttpStatus::OK;
-			json["scanned_seconds_ago"] = AvaiableNetworksProvider::lastScanAgeSeconds();
+			json["scanned_seconds_ago"] = networksProvider.lastScanAgeSeconds();
 			JsonArray networksJson = json.createNestedArray("networks");
-			BssList networks = AvaiableNetworksProvider::networks;
 			for(int i=0; i<networks.size(); i++) {
 				BssInfo network = networks[i];
 				JsonObject networkJson = networksJson.createNestedObject();
-				networkJson["id"] = network.getHashId();
 				networkJson["ssid"] = network.ssid;
-				networkJson["bssid"] = network.bssid;
 				networkJson["authorization"] = network.getAuthorizationMethodName();
-				networkJson["channel"] = network.channel;
-				networkJson["channel"] = network.channel;
 				networkJson["rssi"] = network.rssi;
 				networkJson["hidden"] = network.hidden;
 			}

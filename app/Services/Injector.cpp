@@ -51,6 +51,13 @@ WiFiManager& Injector::getWiFiManager() {
 	return wiFiManager;
 }
 
+AvaiableNetworksProvider& Injector::getAvaiableNetworksProvider() {
+	static AvaiableNetworksProvider avaiableNetworksProvider(
+		getWiFiManager()
+	);
+	return avaiableNetworksProvider;
+}
+
 WebServer& Injector::getWebServer() {
 	static WebServer webServer(80, getUserSessionManager());
 	return webServer;

@@ -1,9 +1,10 @@
 #pragma once
 
 #include <SmingCore.h>
+#include "../Utils/NonCopyable.h"
 #include "UserSessionManager.h"
 
-class WebServer {
+class WebServer : private NonCopyable {
 public:
 
 	WebServer(const int port, UserSessionManager& sessionManager);

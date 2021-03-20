@@ -14,6 +14,7 @@ export default class EditStation extends React.Component {
     constructor(props) {
         super(props);
         autoBind(this);
+        this.reloadAfterRefreshTime = props.reloadAfterRefreshTime || 5000;
 		this.state = {};
         this.apiHandler = props.apiHandler;
         this.state = {
@@ -21,7 +22,8 @@ export default class EditStation extends React.Component {
             networks: [],
             networkSelectInfo: selectMessages.scanning,
             selectedNetwork: "none",
-            selectedNetworkDetails: {}
+            selectedNetworkDetails: {},
+            reloadTimer: null
         };
         this.formHelper = new AsyncFormHelper("station", props.apiHandler, new StateProxy(this));
     }
@@ -49,6 +51,10 @@ export default class EditStation extends React.Component {
                 }
             })
     }
+    
+    componentWillUnmount() {
+        this.clearTimer();
+    }
 
     onSubmitCallback(event) {
         this.formHelper.submitForm(event);
@@ -58,7 +64,9 @@ export default class EditStation extends React.Component {
         networks = networks.map(network => {
             // https://www.speedguide.net/faq/how-does-rssi-dbm-relate-to-signal-quality-percent-439
             let quality = 0;
-            if(network.rssi >= -50) {
+            if(!("rssi" in network)) {
+                quality = 0;
+            } else if(network.rssi >= -50) {
                 quality = 100;
             } else if(network.rssi <= -100) {
                 quality = 0;
@@ -80,7 +88,35 @@ export default class EditStation extends React.Component {
         return networks.sort(compare)
     }
 
+    loadAfterTime() {
+        if(this.state.reloadTimer === null) {
+            let reloadTimer = setTimeout(this.loadNetworks, this.reloadAfterRefreshTime);
+            this.setState({
+                reloadTimer: reloadTimer,
+                networkSelectInfo: selectMessages.scanning
+            });
+        }
+    }
+
+    clearTimer() {
+        if(this.state.reloadTimer !== null) {
+            clearTimeout(this.state.reloadTimer);
+            this.setState({
+                reloadTimer: null
+            });
+        }
+    }
+
+    refreshNetworks() {
+        let url = "/config/networks/refresh";
+        if(this.state.reloadTimer === null) {
+            this.loadAfterTime();
+            this.apiHandler.getJSON(url);
+            }
+    }
+
     loadNetworks() {
+        this.clearTimer();
 		let url = "/config/networks/get";
 		this.apiHandler.getJSON(url)
             .done(function(data, status, jqXHR) {
@@ -95,6 +131,7 @@ export default class EditStation extends React.Component {
                         newState.networkSelectInfo = selectMessages.networksAvailable;
                     break;
                     case 202:
+                        this.loadAfterTime();
                         newState.networkSelectInfo = selectMessages.scanning;
                     break;
                     case 204:
@@ -158,21 +195,32 @@ export default class EditStation extends React.Component {
             <div className="form-group row" id="form_row_availableNetworks">
                 <label className="col-sm-2 col-form-label" htmlFor="form_availableNetworks">Available networks</label>
                 <div className="col-sm-10">
-                <select
-                    className="form-control"
-                    id="form_availableNetworks"
-                    name="availableNetworks:string"
-                    onChange={this.networkSelectChange}
-                    value={this.state.selectedNetwork}
-                    >
-                    <option value="none" key="none"></option>
-                    { this.state.networks.map(network => 
-                        <option key={network.ssid} value={network.ssid}>
-                            {network.ssid} ({network.quality}%)
-                        </option>
-                    ) }
-                </select>
-                <small className="form-text text-muted">{this.state.networkSelectInfo}</small>
+                    <div className="input-group">
+                        <select
+                            className="form-control"
+                            id="form_availableNetworks"
+                            name="availableNetworks:string"
+                            onChange={this.networkSelectChange}
+                            value={this.state.selectedNetwork}
+                            >
+                            <option value="none" key="none"></option>
+                            { this.state.networks.map(network => 
+                                <option key={network.ssid} value={network.ssid}>
+                                    {network.ssid} ({network.quality}%)
+                                </option>
+                            ) }
+                        </select>
+                        <div className="input-group-append">
+                            <button
+                             className="btn btn-outline-secondary"
+                             disabled={this.state.reloadTimer !== null}
+                             type="button"
+                             onClick={this.refreshNetworks}>
+                                 {this.state.reloadTimer === null ? "Refresh" : "Refreshing..."}
+                            </button>
+                        </div>
+                    </div>
+                    <small className="form-text text-muted">{this.state.networkSelectInfo}</small>
                 </div>
             </div>
             )
@@ -243,6 +291,15 @@ export default class EditStation extends React.Component {
                 </div>
             }
             
+
+            <div className="form-group row" id="form_row_hostname">
+                <label className="col-sm-2 col-form-label" htmlFor="form_hostname">Ssid</label>
+                <div className="col-sm-10">
+                    <input className="form-control" type="text" id="form_hostname" name="hostname:string"
+                        value={data.hostname} onChange={this.formFieldChange} />
+                </div>
+            </div>
+
             <div className="form-group row" id="form_row_ip">
                 <label className="col-sm-2 col-form-label" htmlFor="form_dhcp">Use DHCP</label>
                 <div className="col-sm-10">

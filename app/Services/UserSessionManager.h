@@ -3,6 +3,7 @@
 #include <SmingCore.h>
 #include "ConfigProvider.h"
 #include "../Model/Users/UsersConfig.h"
+#include "../Utils/NonCopyable.h"
 #include "../Utils/Either.h"
 
 class Session {
@@ -20,7 +21,7 @@ public:
     }
 };
 
-class UserSessionManager {
+class UserSessionManager : private NonCopyable {
 public:
     static void setSessionCookie(HttpResponse& response, String cookie);
     static void clearSessionCookie(HttpResponse& response);

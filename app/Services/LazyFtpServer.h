@@ -1,8 +1,9 @@
 #pragma once
 
 #include <SmingCore.h>
+#include "../Utils/NonCopyable.h"
 
-class LazyFtpServer {
+class LazyFtpServer : private NonCopyable {
 protected:
 	FtpServer ftp;
 	String user;

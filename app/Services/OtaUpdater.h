@@ -3,9 +3,10 @@
 #include <SmingCore.h>
 #include <Network/RbootHttpUpdater.h>
 #include "ConfigProvider.h"
+#include "../Utils/NonCopyable.h"
 #include "../Model/OtaConfig.h"
 
-class OtaUpdater {
+class OtaUpdater : private NonCopyable {
 	protected:
 		ConfigProvider<OtaConfig>& cfgProvider;
 
