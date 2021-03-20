@@ -293,7 +293,7 @@ export default class EditStation extends React.Component {
             
 
             <div className="form-group row" id="form_row_hostname">
-                <label className="col-sm-2 col-form-label" htmlFor="form_hostname">Ssid</label>
+                <label className="col-sm-2 col-form-label" htmlFor="form_hostname">Hostname</label>
                 <div className="col-sm-10">
                     <input className="form-control" type="text" id="form_hostname" name="hostname:string"
                         value={data.hostname} onChange={this.formFieldChange} />
