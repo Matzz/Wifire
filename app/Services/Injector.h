@@ -12,6 +12,7 @@
 #include "OtaUpdater.h"
 #include "LazyFtpServer.h"
 #include "Networking/WiFiManager.h"
+#include "Networking/AvaiableNetworksProvider.h"
 #include "WebServer.h"
 #include "GPIOStateManager.h"
 
@@ -40,6 +41,7 @@ public:
 	UserSessionManager& getUserSessionManager();
 	OtaUpdater& getOtaUpdater();
 	WiFiManager& getWiFiManager();
+	AvaiableNetworksProvider& getAvaiableNetworksProvider();
 	WebServer& getWebServer();
 	LazyFtpServer& getFtpServer();
 	GPIOStateManager& getGPIOStateManager();

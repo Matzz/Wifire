@@ -1,16 +1,22 @@
 #pragma once
 
 #include <SmingCore.h>
+#include "../../Utils/NonCopyable.h"
+#include "WiFiManager.h"
 
-class AvaiableNetworksProvider {
+class AvaiableNetworksProvider : private NonCopyable {
 public:
-	static BssList networks;
-	static void startScan();
+	AvaiableNetworksProvider(WiFiManager& wiFiManager);
+	void startScan();
+	bool isScanning() { return scanning; }
+	bool wasEverScanned() { return lastScanTime > 0; }
+	unsigned long lastScanAgeSeconds() { return (millis() - lastScanTime)/1000; }
+	const BssList getNetworks() { return networks; }
+
+	WiFiManager& wiFiManager;
+
+	BssList networks = BssList();
+	bool scanning = false;
+	unsigned long lastScanTime = 0;
 	static void networkScanCompleted(bool succeeded, BssList list);
-	static bool isScanning() { return scanning; }
-	static bool wasEverScanned() { return lastScanTime > 0; }
-	static unsigned long lastScanAgeSeconds() { return (millis() - lastScanTime)/1000; }
-private:
-	static bool scanning;
-	static unsigned long lastScanTime;
 };

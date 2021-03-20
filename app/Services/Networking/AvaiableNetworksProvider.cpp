@@ -1,25 +1,27 @@
 #include "AvaiableNetworksProvider.h"
+#include "../Injector.h"
 
-bool AvaiableNetworksProvider::scanning = false;
-BssList AvaiableNetworksProvider::networks;
-unsigned long AvaiableNetworksProvider::lastScanTime = 0;
+AvaiableNetworksProvider::AvaiableNetworksProvider(WiFiManager& wiFiManager) :
+	wiFiManager(wiFiManager) { }
 
 void AvaiableNetworksProvider::startScan() {
 	if(!scanning) {
-		scanning = true;
-		WifiStation.startScan(networkScanCompleted);
+		wiFiManager.startTempStationMode();
+		Serial.printf("Pointer 2: %p\n", this);
+		scanning = WifiStation.startScan(AvaiableNetworksProvider::networkScanCompleted);
+		lastScanTime = micros();
 	}
 }
 
 void AvaiableNetworksProvider::networkScanCompleted(bool succeeded, BssList list) {
-	networks.clear();
-	scanning = false;
+	// binding using std:bind cause and memory errors
+	AvaiableNetworksProvider& provider = Injector::getInstance().getAvaiableNetworksProvider();
+	provider.scanning = false;
 	if (succeeded) {
-		lastScanTime = micros();
-		for (int i = 0; i < list.count(); i++)
-			if (!list[i].hidden && list[i].ssid.length() > 0)
-				networks.add(list[i]);
+		provider.networks = list;
+		// TODO TEST BELOW
+		// provider.wiFiManager.stopTempStationMode();
 	} else {
-		startScan();
+		provider.startScan();
 	}
 }

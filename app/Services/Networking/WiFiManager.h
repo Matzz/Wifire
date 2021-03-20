@@ -2,16 +2,20 @@
 
 #include "../../Model/Networking/WiFiStationConfig.h"
 #include "../../Model/Networking/WiFiApConfig.h"
+#include "../../Utils/NonCopyable.h"
 #include "../ConfigProvider.h"
 
-class WiFiManager {
+class WiFiManager : private NonCopyable {
 public:
 	WiFiManager(ConfigProvider<WiFiStationConfig>& stationConfigProvider,
-			ConfigProvider<WiFiApConfig>& apConfigProvider);
+			    ConfigProvider<WiFiApConfig>& apConfigProvider);
 
 	void startNetwork();
+	void startTempStationMode();
+	void stopTempStationMode();
 
 protected:
+	bool tempStationEnabled = false;
 	ConfigProvider<WiFiStationConfig>& stationConfigProvider;
 	ConfigProvider<WiFiApConfig>& apConfigProvider;
 

@@ -2,8 +2,8 @@
 #include <SmingCore.h>
 #include <Wiring/WHashMap.h>
 #include "ConfigProvider.h"
-#include "../Model/GPIOConfig.h"
 #include "../Utils/NonCopyable.h"
+#include "../Model/GPIOConfig.h"
 
 class GPIOStateManager : private NonCopyable {
 	protected:
