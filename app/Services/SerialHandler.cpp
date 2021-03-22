@@ -11,7 +11,7 @@ void SerialHandler::setup() {
 	Serial.commandProcessing(true);
 
 	String group = F("Wifire commands");
-	commandHandler.setCommandPrompt(_F("Wifire"));
+	commandHandler.setCommandPrompt(_F("Wifire>"));
 	commandHandler.registerCommand(CommandDelegate(F("ls"), F("List files for provided directories."), group, lsCommand));
 	commandHandler.registerCommand(CommandDelegate(F("cat"), F("Concatenate files and print."), group, catCommand));
 	commandHandler.registerCommand(CommandDelegate(F("rm"), F("Remove files."), group, rmCommand));

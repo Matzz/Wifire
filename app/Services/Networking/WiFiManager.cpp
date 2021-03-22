@@ -3,51 +3,44 @@
 
 
 WiFiManager::WiFiManager(ConfigProvider<WiFiStationConfig>& stationConfigProvider,
-		ConfigProvider<WiFiApConfig>& apConfigProvider) :
-		stationConfigProvider(stationConfigProvider), apConfigProvider(
-				apConfigProvider) { }
+	ConfigProvider<WiFiApConfig>& apConfigProvider) :
+	stationConfigProvider(stationConfigProvider), apConfigProvider(apConfigProvider) {
+	WifiEvents.onAccessPointConnect(onAccessPointConnect);
+	WifiEvents.onAccessPointDisconnect(onAccessPointDisconnect);
+	WifiEvents.onStationConnect(onStationConnect);
+	WifiEvents.onStationDisconnect(onStationDisconnect);
+	WifiEvents.onStationGotIP(onStationGotIP);
+}
 
-void WiFiManager::startNetwork() {
-	auto stCfgOrError = stationConfigProvider.load();
-	if(stCfgOrError.isLeft()) {
-		debug_w("Station config error: %s", stCfgOrError.getIfLeft()->c_str());
-		return;
-	}
-	auto stCfg = *stCfgOrError.getIfRight();
 
+void WiFiManager::reloadConfiguration() {
 	auto apCfgOrError = apConfigProvider.load();
 	if(apCfgOrError.isLeft()) {
 		debug_w("Access point config error: %s", apCfgOrError.getIfLeft()->c_str());
-		return;
-	}
-	auto apCfg = *apCfgOrError.getIfRight();
-	
-
-	bool connectedToStation = false;
-	bool apStarted = false;
-
-	if(stCfg.enabled) {
-		debug_i("Station mode enabled.");
-		if(connectStation(stCfg)) {
-			debug_i("Connected to station.");
-			connectedToStation = true;
-		} else {
-			debug_w("Cannot connect to station.");
-		}
+		currentApConfig = WiFiApConfig();
 	} else {
-		if(tempStationEnabled) {
-			// We don't want to to turn off station while network scann is in progress.
-			debug_i("Enabled station mode withut connecting.");
-		} else {
-			debug_i("Station mode disabled.");
-			WifiStation.enable(false, false);
-		}
+		currentApConfig = *apCfgOrError.getIfRight();
 	}
 
-	if(apCfg.enabled) {
-		if(startAccessPoint(apCfg)) {
+	auto stCfgOrError = stationConfigProvider.load();
+	if(stCfgOrError.isLeft()) {
+		debug_w("Station config error: %s", stCfgOrError.getIfLeft()->c_str());
+		currentStationConfig = WiFiStationConfig();
+	} else {
+		currentStationConfig = *stCfgOrError.getIfRight();
+	}
+}
+
+void WiFiManager::refreshNetwork() {
+	reloadConfiguration();
+	refreshStation();
+	refreshAccessPoint();
+}
+
+void WiFiManager::refreshAccessPoint() {
+	if(currentApConfig.enabled) {
+		if(startAccessPoint()) {
 			debug_i("AP created.");
-			apStarted = true;
 		} else {
 			debug_w("Cannot create AP.");
 		}
@@ -57,53 +50,20 @@ void WiFiManager::startNetwork() {
 	}
 }
 
-/**
- * Usend only to list available networks. We don't connect to real network in this mode.
- * It should be disabled just after listing available networks.
- **/
-void WiFiManager::startTempStationMode() {
-	if(!WifiStation.isEnabled()) {
-		// const String& ssid, const String& password, bool autoConnectOnStartup, bool save
-		WifiStation.config(String::empty, String::empty, false, false);
-		WifiStation.enable(true, false);
-		tempStationEnabled = true;
-	} else {
-		// Started anyway. Nothing to do
-	}
-}
-
-void WiFiManager::stopTempStationMode() {
-	if(tempStationEnabled) {
-		tempStationEnabled = false;
-		WifiStation.enable(false, false);
-	}
-}
-
-void onAccessPointConnect(MacAddress mac, uint16_t aid) {
-	debug_i("AccessPointConnect mac: %s, aid: %d", mac.toString().c_str(), aid);
-}
-
-void onAccessPointDisconnect(MacAddress mac, uint16_t aid) {
-	debug_i("AccessPointDisconnect mac: %s, aid: %d", mac.toString().c_str(), aid);
-}
-
-bool WiFiManager::startAccessPoint(WiFiApConfig& config) {
-	WifiEvents.onAccessPointConnect(onAccessPointConnect);
-	WifiEvents.onAccessPointDisconnect(onAccessPointDisconnect);
-
-	debug_i("Starting network %s", config.ssid.c_str());
+bool WiFiManager::startAccessPoint() {
+	debug_i("Starting network %s", currentApConfig.ssid.c_str());
 	WifiAccessPoint.enable(true, false);
-	bool configStatus = WifiAccessPoint.config(config.ssid, config.password,
-			config.authMode, config.hidden, config.channel,
-			config.beaconInterval);
+	bool configStatus = WifiAccessPoint.config(currentApConfig.ssid, currentApConfig.password,
+			currentApConfig.authMode, currentApConfig.hidden, currentApConfig.channel,
+			currentApConfig.beaconInterval);
 	if (!configStatus) {
 		debug_w("Setting AP config failed.");
 	}
 
 	IpAddress oldIp = WifiAccessPoint.getIP();
-	if (!(oldIp==config.ip)) {
-		debug_i("Setting new ip %s. Old ip %s\n", config.ip.toString().c_str(), oldIp.toString().c_str());
-		if (!WifiAccessPoint.setIP(config.ip)) {
+	if (!(oldIp == currentApConfig.ip)) {
+		debug_i("Setting new ip %s. Old ip %s\n", currentApConfig.ip.toString().c_str(), oldIp.toString().c_str());
+		if (!WifiAccessPoint.setIP(currentApConfig.ip)) {
 			debug_w("Setting ip failed.");
 		}
 	} else {
@@ -113,7 +73,69 @@ bool WiFiManager::startAccessPoint(WiFiApConfig& config) {
 	return true;
 }
 
-void onStationConnect(const String& ssid, MacAddress bssid, uint8_t channel)
+void WiFiManager::refreshStation() {
+	if(currentStationConfig.enabled) {
+		debug_i("Station mode enabled.");
+		if(connectStation()) {
+			debug_i("Connected to station.");
+		} else {
+			debug_w("Cannot connect to station.");
+		}
+	} else {
+		WifiStation.disconnect();
+		if(tempStationUsersCnt>0) {
+			WifiStation.disconnect();
+			WifiStation.enable(true, false);
+			debug_i("Enabled station mode withut connecting.");
+		} else {
+			WifiStation.enable(false, false);
+			debug_i("Station mode disabled.");
+		}
+	}
+}
+
+bool WiFiManager::connectStation() {
+	if(currentStationConfig.hostname.length()>0) {
+		WifiStation.setHostname(currentStationConfig.hostname);
+	}
+	if (!currentStationConfig.ip.isNull()) {
+		WifiStation.setIP(currentStationConfig.ip, currentStationConfig.netmask, currentStationConfig.gateway);
+	} else {
+		debug_i("Station DHCP enabled");
+		WifiStation.enableDHCP(true);
+	}
+	bool status =  WifiStation.config(currentStationConfig.ssid, currentStationConfig.password, false, true);
+	if (!status) {
+		return false;
+	}
+	WifiStation.enable(true, false);
+	return WifiStation.connect();
+}
+
+/**
+ * Usend only to list available networks. We don't connect to real network in this mode.
+ * It should be disabled just after listing available networks.
+ **/
+void WiFiManager::startTempStationMode() {
+	tempStationUsersCnt++;
+	refreshStation();
+}
+
+void WiFiManager::stopTempStationMode() {
+	tempStationUsersCnt--;
+	refreshStation();
+}
+
+
+void WiFiManager::onAccessPointConnect(MacAddress mac, uint16_t aid) {
+	debug_i("AccessPointConnect mac: %s, aid: %d", mac.toString().c_str(), aid);
+}
+
+void WiFiManager::onAccessPointDisconnect(MacAddress mac, uint16_t aid) {
+	debug_i("AccessPointDisconnect mac: %s, aid: %d", mac.toString().c_str(), aid);
+}
+
+void WiFiManager::onStationConnect(const String& ssid, MacAddress bssid, uint8_t channel)
 {
 	debug_i("Station connected to SSID: %s, MAC: %s, channel: %d.",
 		ssid.c_str(),
@@ -121,7 +143,7 @@ void onStationConnect(const String& ssid, MacAddress bssid, uint8_t channel)
 		channel);
 }
 
-void onStationDisconnect(const String& ssid, MacAddress bssid, WifiDisconnectReason reason)
+void WiFiManager::onStationDisconnect(const String& ssid, MacAddress bssid, WifiDisconnectReason reason)
 {
 	debug_i("Station disconnected from SSID: %s, MAC: %s, reason: %s.",
 		ssid,
@@ -129,33 +151,10 @@ void onStationDisconnect(const String& ssid, MacAddress bssid, WifiDisconnectRea
 		WifiEvents.getDisconnectReasonDesc(reason).c_str());
 }
 
-void onStationGotIP(IpAddress ip, IpAddress netmask, IpAddress gateway) {
+void WiFiManager::onStationGotIP(IpAddress ip, IpAddress netmask, IpAddress gateway) {
 	debug_i("Station got IP. IP: %s, Netmask: %s, Gateway: %s.",
 		ip.toString().c_str(),
 		netmask.toString().c_str(),
 		gateway.toString().c_str());
 
-}
-
-bool WiFiManager::connectStation(WiFiStationConfig& config) {
-
-	WifiEvents.onStationConnect(onStationConnect);
-	WifiEvents.onStationDisconnect(onStationDisconnect);
-	WifiEvents.onStationGotIP(onStationGotIP);
-
-	if(config.hostname.length()>0) {
-		WifiStation.setHostname(config.hostname);
-	}
-	if (!config.ip.isNull()) {
-		WifiStation.setIP(config.ip, config.netmask, config.gateway);
-	} else {
-		debug_i("Station DHCP enabled");
-		WifiStation.enableDHCP(true);
-	}
-	bool status =  WifiStation.config(config.ssid, config.password, false, true);
-	if (!status) {
-		return false;
-	}
-	WifiStation.enable(true, false);
-	return WifiStation.connect();
 }

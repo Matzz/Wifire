@@ -17,6 +17,6 @@ void init() {
 	SerialHandler::setup();
 	SpiffsManager::setup();
 	Injector &di = Injector::getInstance();
-	di.getWiFiManager().startNetwork();
+	di.getWiFiManager().refreshNetwork();
 	System.onReady(onReady);
 }

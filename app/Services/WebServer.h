@@ -9,11 +9,11 @@ public:
 
 	WebServer(const int port, UserSessionManager& sessionManager);
 	void start();
-	void bindActions();
+	bool addAction(const String& path, const String& requiredRole, const HttpPathDelegate& callback, bool overrideIfExists = false);
 
 private:
 	HttpServer server;
 	int port;
 	UserSessionManager& sessionManager;
-	void authWrapper(const String& path, const String& requiredRole, const HttpPathDelegate& callback);
+	void bindDefaultActions();
 };

@@ -14,13 +14,14 @@ void AvaiableNetworksProvider::startScan() {
 }
 
 void AvaiableNetworksProvider::networkScanCompleted(bool succeeded, BssList list) {
-	// binding using std:bind cause and memory errors
+	// binding using std:bind cause and memory errors. So we use Injector directly (inpure)
 	AvaiableNetworksProvider& provider = Injector::getInstance().getAvaiableNetworksProvider();
 	provider.scanning = false;
 	if (succeeded) {
 		provider.networks = list;
-		// TODO TEST BELOW
-		// provider.wiFiManager.stopTempStationMode();
+		System.queueCallback(InterruptCallback([]() {
+			Injector::getInstance().getWiFiManager().stopTempStationMode();
+		}));
 	} else {
 		provider.startScan();
 	}
