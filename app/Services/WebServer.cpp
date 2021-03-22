@@ -14,7 +14,7 @@
 
 WebServer::WebServer(const int port, UserSessionManager& sessionManager) :
 		port(port), sessionManager(sessionManager) {
-	server.setBodyParser(MIME_JSON, bodyToStringParser); 
+	server.setBodyParser(MIME_JSON, bodyToStringParser);
 }
 
 void WebServer::start() {

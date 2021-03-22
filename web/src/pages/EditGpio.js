@@ -11,7 +11,7 @@ export default class EditGpio extends React.Component {
     }
 	
 	static isPinSafeToUse(pin) {
-		var safePins = [2,3,4,5,13,14,15,16];
+		var safePins = [2,4,5,13,14,15,16];
 		return safePins.includes(parseInt(pin));
 	}
 

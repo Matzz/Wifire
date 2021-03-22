@@ -2,7 +2,7 @@
 
 #include <SmingCore.h>
 
-const unsigned int GPIOConfig::safe_pins[] = {2,3,4,5,13,14,15,16};
+const unsigned int GPIOConfig::safe_pins[] = {2,4,5,13,14,15,16};
 
 /**
 https://tttapa.github.io/ESP8266/Chap04%20-%20Microcontroller.html

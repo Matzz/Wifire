@@ -1,82 +1,127 @@
 #include "SerialHandler.h"
-
-#include <SmingCore.h>
+#include <Debug.h>
 #include "Injector.h"
 #include "StatusProvider.h"
 
 void SerialHandler::setup() {
 	Serial.begin(SERIAL_BAUD_RATE); // 115200 by default
-	Serial.systemDebugOutput(true); // Debug output to serial
-	Serial.onDataReceived(SerialHandler::callback);
+	commandHandler.registerSystemCommands();
+	Debug.setDebug(Serial);
+	Serial.systemDebugOutput(true);
+	Serial.commandProcessing(true);
+
+	String group = F("Wifire commands");
+	commandHandler.setCommandPrompt(_F("Wifire"));
+	commandHandler.registerCommand(CommandDelegate(F("ls"), F("List files for provided directories."), group, lsCommand));
+	commandHandler.registerCommand(CommandDelegate(F("cat"), F("Concatenate files and print."), group, catCommand));
+	commandHandler.registerCommand(CommandDelegate(F("rm"), F("Remove files."), group, rmCommand));
+	commandHandler.registerCommand(CommandDelegate(F("restart"), F("Restar ESP chip."), group, restartCommand));
+	commandHandler.registerCommand(CommandDelegate(F("info"), F("Displays system information."), group, statusCommand));
+	commandHandler.registerCommand(CommandDelegate(F("ota"), F("Runs ota updater."), group, otaCommand));
+	commandHandler.registerCommand(CommandDelegate(F("switch_slot"), F("Switch firmare slot."), group, switchSlotCommand));
+
 	Serial.println("Serial handler set.");
 }
 
-void SerialHandler::callback(Stream& stream, char arrivedChar,
-		unsigned short availableCharsCount) {
+Vector<String> getParams(String commandLine) {
+	Vector<String> parameters;
+	splitString(commandLine, ' ', parameters);
+	parameters.removeElementAt(0);
+	return parameters;
+}
 
-	Injector &injector = Injector::getInstance();
+void fileNotExist(const String &fileName, CommandOutput* commandOutput) {
+	commandOutput->printf(_F("File '%s' does not exist.\r\n"), fileName.c_str());
+}
 
-	if (arrivedChar == '\n') {
-		char str[availableCharsCount];
-		for (int i = 0; i < availableCharsCount; i++) {
-			str[i] = stream.read();
-			if (str[i] == '\r' || str[i] == '\n') {
-				str[i] = '\0';
-			}
-		}
+void SerialHandler::lsCommand(String commandLine, CommandOutput* commandOutput) {
+	commandOutput->println();
 
-		if (!strcmp(str, "ota")) {
-			injector.getOtaUpdater().update();
-		} else if (!strcmp(str, "switch")) {
-			injector.getOtaUpdater().switchSlot();
-		} else if (!strcmp(str, "restart")) {
-			System.restart();
-		} else if (!strcmp(str, "ls")) {
-			Vector<String> files = fileList();
-			for(auto& f: files) {
-				Serial.println(f);
+	Vector<String> parameters = getParams(commandLine);
+	
+	if(parameters.size()==0) {
+		parameters.add("/");
+	}
+
+	for(auto& dirName: parameters) {
+		Serial.printf("Directory %s:\r\n", dirName.c_str());
+		Directory dir;
+		if(dir.open(dirName)) {
+			while(dir.next()) {
+				commandOutput->println(dir.stat().name);
 			}
-		} else if (!strncmp(str, "cat ", 4)) {
-			Vector<String> files = fileList();
-			Serial.printf("filecount %d\r\n", files.count());
-			String fileName = String(str).substring(4);
-			if(fileExist(fileName)) {
-				Serial.println(fileGetContent(fileName));
-			} else {
-				Serial.printf("File '%s' does not exist.\r\n", fileName.c_str());
-			}
-		} else if (!strncmp(str, "rm ", 3)) {
-			String fileName = String(str).substring(3);
-			if(fileExist(fileName)) {
-				fileDelete(fileName);
-				Serial.printf("Deleted '%s'\r\n", fileName.c_str());
-			} else {
-				Serial.printf("File '%s' does not exist.\r\n", fileName.c_str());
-			}
-		} else if (!strcmp(str, "status")) {
-			auto status = StatusProvider::getStatus(true);
-			auto statusSize = status->count();
-			for (int i = 0; i < statusSize; i++) {
-				Serial.printf("%s - %s\r\n", status->keyAt(i).c_str(),
-						status->valueAt(i).c_str());
-			}
-			delete status;
-		} else if (!strcmp(str, "help")) {
-			Serial.println();
-			Serial.println("available commands:");
-			Serial.println("  help - display this message");
-			Serial.println("  restart - restart the esp8266");
-			Serial.println("  switch - switch to the other rom and reboot");
-			Serial.println("  ota - perform ota update, switch rom and reboot");
-			Serial.println("  status - show esp8266 and wifi status");
-			Serial.println("  ls - list files in spiffs");
-			Serial.println("  cat - show first file in spiffs");
-			Serial.println();
-		} else if (!strcmp(str, "")) {
-			// No command
-			Serial.println();
-		} else {
-			Serial.println("unknown command");
 		}
 	}
+}
+
+void SerialHandler::catCommand(String commandLine, CommandOutput* commandOutput) {
+	commandOutput->println();
+
+	Vector<String> parameters = getParams(commandLine);
+	if(parameters.size()==0) {
+		commandOutput->println("Please provide file name.");
+		return;
+	}
+	
+	for(auto& fileName: parameters) {
+		if(fileExist(fileName)) {
+			commandOutput->println(fileGetContent(fileName));
+		} else {
+			fileNotExist(fileName, commandOutput);
+		}
+	}
+
+}
+
+void SerialHandler::rmCommand(String commandLine, CommandOutput* commandOutput) {
+	commandOutput->println();
+
+	Vector<String> parameters = getParams(commandLine);
+	if(parameters.size()==0) {
+		commandOutput->println(_F("Please provide file name."));
+		return;
+	}
+	
+	for(auto& fileName: parameters) {
+		if(fileExist(fileName)) {
+			fileDelete(fileName);
+			commandOutput->printf(_F("File '%s' removed.\r\n"), fileName.c_str());
+		} else {
+			fileNotExist(fileName, commandOutput);
+		}
+	}
+}
+
+void SerialHandler::restartCommand(String commandLine, CommandOutput* commandOutput) {
+	commandOutput->println();
+
+	commandOutput->println(_F("Restarting..."));
+	System.restart();
+}
+
+void SerialHandler::statusCommand(String commandLine, CommandOutput* commandOutput) {
+	commandOutput->println();
+
+	auto status = StatusProvider::getStatus(true);
+	auto statusSize = status->count();
+	for (int i = 0; i < statusSize; i++) {
+		commandOutput->printf(_F("%s - %s\r\n"), status->keyAt(i).c_str(), status->valueAt(i).c_str());
+	}
+	delete status;
+}
+
+void SerialHandler::otaCommand(String commandLine, CommandOutput* commandOutput) {
+	commandOutput->println();
+
+	Injector &injector = Injector::getInstance();
+	commandOutput->println(_F("OTA update..."));
+	injector.getOtaUpdater().update();
+}
+
+void SerialHandler::switchSlotCommand(String commandLine, CommandOutput* commandOutput) {
+	commandOutput->println();
+	
+	Injector &injector = Injector::getInstance();
+	commandOutput->println(_F("Switching firmeware slot..."));
+	injector.getOtaUpdater().switchSlot();
 }
