@@ -10,13 +10,13 @@ export default class EditGpio extends React.Component {
 		this.formHelper = new AsyncFormHelper("gpio", props.apiHandler, new StateProxy(this));
     }
 	
-	static isPinSafeToUse(pin) {
-		var safePins = [2,4,5,13,14,15,16];
-		return safePins.includes(parseInt(pin));
+	isPinSafeToUse(pin) {
+		let formData = this.state.formData;
+		return formData && formData.safePins && formData.safePins.includes(parseInt(pin));
 	}
 
     componentDidMount() {
-        this.formHelper.loadState()
+        this.formHelper.loadState();
     }
 
     onSubmitCallback(event) {
@@ -59,7 +59,7 @@ export default class EditGpio extends React.Component {
 				<th>
 					<input type="text" name={ this.fieldName(idx, 'name', 'string') } defaultValue={ pin['name'] } className="form-control" />
 				</th>
-				{ EditGpio.isPinSafeToUse(idx) ? editablePin : nonEditablePin }
+				{ this.isPinSafeToUse(idx) ? editablePin : nonEditablePin }
 			</tr>
 		})
 
@@ -68,13 +68,17 @@ export default class EditGpio extends React.Component {
 				id={ 'formId' in this.state ? this.state.formId : 'form' }
 				onSubmit={this.onSubmitCallback}>
 			<h2>Edit GPIO configuration</h2>
+			<p>
+				To avoid infinite restart loop, not all pins available ESP pins options are configurable here. What's more, pull-down resistor are also not supported.
+				If you need them, please use raw ESP api.
+			</p>
 			<table className="table">
 				<thead>
 					<tr>
 						<th scope="col">Pin number</th>
 						<th scope="col">Pin name</th>
 						<th scope="col">Mode</th>
-						<th scope="col">Pull up (down GPIO 16)</th>
+						<th scope="col">Pull up</th>
 					</tr>
 				</thead>
 				<tbody>

@@ -2,7 +2,6 @@
 
 #include <SmingCore.h>
 
-const unsigned int GPIOConfig::safe_pins[] = {2,4,5,13,14,15,16};
 
 /**
 https://tttapa.github.io/ESP8266/Chap04%20-%20Microcontroller.html
@@ -19,6 +18,10 @@ D7	GPIO13	OK	OK	SPI (MOSI)
 D5	GPIO14	OK	OK	SPI (SCLK)
 D8	GPIO15	pulled to GND	OK	SPI (CS) Boot fails if pulled HIGH
 D0	GPIO16	no interrupt	no PWM or I2C support	HIGH at boot used to wake up from deep sleep
+
+https://randomnerdtutorials.com/esp8266-pinout-reference-gpios/
+https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
+https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/gpio.html
 */
 bool GPIOConfig::isSafeToUse(unsigned int pin) {
 	return std::find(std::begin(GPIOConfig::safe_pins), std::end(GPIOConfig::safe_pins), pin) != std::end(GPIOConfig::safe_pins);
