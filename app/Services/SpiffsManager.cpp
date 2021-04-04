@@ -15,6 +15,8 @@ Storage::Partition SpiffsManager::findSpiffsPartition(uint8_t slot)
 void SpiffsManager::setup() {
 	auto partition = SpiffsManager::findSpiffsPartition();
 
-	debug_i("Mouting spiffs partition %s (%d).\n", partition.name().c_str(), partition.address());
+
+	debug_i("trying to mount '%s' at 0x%08x, length %d", partition.name().c_str(), partition.address(),
+			partition.size());
 	spiffs_mount(partition);
 }

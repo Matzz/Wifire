@@ -65,4 +65,4 @@ web-pack:
 	$(Q) cd web && npm run build
 	$(Q) cd web && npx gulp
 
-web-upload: web-pack spiffs-image-update
+web-upload: web-pack buildpart

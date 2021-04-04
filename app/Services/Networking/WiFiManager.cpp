@@ -58,19 +58,21 @@ bool WiFiManager::startAccessPoint() {
 			currentApConfig.beaconInterval);
 	if (!configStatus) {
 		debug_w("Setting AP config failed.");
-	}
-
-	IpAddress oldIp = WifiAccessPoint.getIP();
-	if (!(oldIp == currentApConfig.ip)) {
-		debug_i("Setting new ip %s. Old ip %s\n", currentApConfig.ip.toString().c_str(), oldIp.toString().c_str());
-		if (!WifiAccessPoint.setIP(currentApConfig.ip)) {
-			debug_w("Setting ip failed.");
-		}
+		return false;
 	} else {
-		debug_i("Keeping old ip %s\n", oldIp.toString().c_str());
+
+		IpAddress oldIp = WifiAccessPoint.getIP();
+		if (!(oldIp == currentApConfig.ip)) {
+			debug_i("Setting new ip %s. Old ip %s\n", currentApConfig.ip.toString().c_str(), oldIp.toString().c_str());
+			if (!WifiAccessPoint.setIP(currentApConfig.ip)) {
+				debug_w("Setting ip failed.");
+			}
+		} else {
+			debug_i("Keeping old ip %s\n", oldIp.toString().c_str());
+		}
+		return true;
 	}
 
-	return true;
 }
 
 void WiFiManager::refreshStation() {
@@ -82,9 +84,10 @@ void WiFiManager::refreshStation() {
 			debug_w("Cannot connect to station.");
 		}
 	} else {
+		#ifndef ARCH_HOST
 		WifiStation.disconnect();
+		#endif
 		if(tempStationUsersCnt>0) {
-			WifiStation.disconnect();
 			WifiStation.enable(true, false);
 			debug_i("Enabled station mode withut connecting.");
 		} else {
