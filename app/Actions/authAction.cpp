@@ -3,7 +3,6 @@
 #include "../Model/StringVectorCodec.h"
 #include "actionsHelpers.h"
 
-
 void signInAction(HttpRequest &request, HttpResponse &response) {
 	UserSessionManager& sessionManager = Injector::getInstance().getUserSessionManager();
 

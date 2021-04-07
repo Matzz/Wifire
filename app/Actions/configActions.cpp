@@ -46,7 +46,14 @@ void otaSetConfigAction(HttpRequest &request, HttpResponse &response) {
 
 void gpioGetConfigAction(HttpRequest &request, HttpResponse &response) {
 	auto& provider = Injector::getInstance().getGPIOConfigProvider();
-	handleConfigGet(request, response, provider);
+	auto jsonMapper = [](JsonDocument& doc) {
+		auto obj = doc.as<JsonObject>();
+		JsonArray safePins = obj.createNestedArray("safePins");
+		for(const auto pin: GPIOConfig::safe_pins) {
+			safePins.add(pin);
+		}
+	};
+	handleConfigGet(request, response, provider, jsonMapper);
 }
 
 void gpioSetConfigAction(HttpRequest &request, HttpResponse &response) {

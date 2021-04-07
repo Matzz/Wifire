@@ -46,10 +46,6 @@ template<> class Codec<GPIOConfig> {
 			pinObj["isInput"] = isSafe ? cfg.gpio[i].isInput : false;
 			pinObj["pull"] = isSafe ? cfg.gpio[i].pull : false;
 		}
-		JsonArray safePins = json.createNestedArray("safePins");
-		for(const auto pin: GPIOConfig::safe_pins) {
-			safePins.add(pin);
-		}
 	}
 
 	Either<String, GPIOConfig> decode(JsonObject& json) {

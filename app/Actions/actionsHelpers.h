@@ -29,7 +29,11 @@ Either<String, T> decodeJson(HttpRequest &request) {
 }
 
 template<typename T>
-void handleConfigGet(HttpRequest &request, HttpResponse &response, ConfigProvider<T> &cfgProvider) {
+void handleConfigGet(
+	HttpRequest &request,
+	HttpResponse &response,
+	ConfigProvider<T> &cfgProvider,
+	std::function<void(JsonDocument&)> jsonMapper = nullptr) {
 	auto configOrError = cfgProvider.load();
 	if(configOrError.isLeft()) {
 		return returnFailure(response, *configOrError.getIfLeft());
@@ -38,6 +42,9 @@ void handleConfigGet(HttpRequest &request, HttpResponse &response, ConfigProvide
 
 	DynamicJsonDocument doc(JSON_MAX_SIZE);
 	CodecHelpers::encodeDoc<T>(Codec<T>::getInstance(), doc, config);
+	if(jsonMapper != nullptr) {
+		jsonMapper(doc);
+	}
 	String body;
 	serializeJson(doc, body);
 
