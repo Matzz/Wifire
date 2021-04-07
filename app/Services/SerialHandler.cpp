@@ -100,14 +100,12 @@ void SerialHandler::restartCommand(String commandLine, CommandOutput* commandOut
 }
 
 void SerialHandler::statusCommand(String commandLine, CommandOutput* commandOutput) {
-	commandOutput->println();
-
-	auto status = StatusProvider::getStatus(true);
-	auto statusSize = status->count();
-	for (int i = 0; i < statusSize; i++) {
-		commandOutput->printf(_F("%s - %s\r\n"), status->keyAt(i).c_str(), status->valueAt(i).c_str());
-	}
-	delete status;
+	Status status = StatusProvider::getStatus(true);
+	DynamicJsonDocument doc(JSON_MAX_SIZE);
+	CodecHelpers::encodeDoc<Status>(Codec<Status>::getInstance(), doc, status);
+	String jsonString;
+	serializeJsonPretty(doc, jsonString);
+	commandOutput->println(jsonString);
 }
 
 void SerialHandler::otaCommand(String commandLine, CommandOutput* commandOutput) {

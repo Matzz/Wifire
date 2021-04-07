@@ -1,7 +1,6 @@
 #include "StatusProvider.h"
 
 #include <SmingCore.h>
-#include <WHashMap.h>
 #include <esp_spi_flash.h>
 #ifdef ENABLE_MALLOC_COUNT
 #include <malloc_count.h>
@@ -20,68 +19,67 @@ String restartReasonString() {
 	}
 }
 
-HashMap<String, String>* StatusProvider::getStatus(bool showPassword)  {
-	auto map = new HashMap<String, String>;
-	HashMap<String, String> &mapRef = *map;
+Status StatusProvider::getStatus(bool showPassword)  {
+	Status status;
 
-	mapRef["sming version"] = SMING_VERSION;
-	mapRef["sdk"] = system_get_sdk_version();
-	mapRef["time"] = SystemClock.getSystemTimeString();
-	mapRef["system start reason"] = restartReasonString();
+	status.smingVersion = SMING_VERSION;
+	status.sdk = system_get_sdk_version();
+	status.time = SystemClock.getSystemTimeString();
+	status.systemRestartReason = restartReasonString();
 
 	char buf[128] = {0};
 	sprintf(buf, "%d.%d.%d", LWIP_VERSION_MAJOR, LWIP_VERSION_MINOR, LWIP_VERSION_REVISION);
-	mapRef["lwIP version"] = String(buf);
+	status.lwIpVersion = String(buf);
 
-	auto heep_free = system_get_free_heap_size();
-	mapRef["heep current free memory"] = String(heep_free, 10);
+	status.cpuFrequency = system_get_cpu_freq();
+	status.chipId = system_get_chip_id();
+	status.flashId = spi_flash_get_id();
+
+	auto heap_free = system_get_free_heap_size();
+	status.heapCurrentFreeMemory = heap_free;
 
 #ifdef ENABLE_MALLOC_COUNT
-	auto heep_current = MallocCount::getCurrent();
-	auto heep_size = heep_current+heep_free;
-	float heep_perc = heep_current;
-	heep_perc = heep_perc/heep_size*100;
-	mapRef["heep current memory allocated"] = heep_current;
-	mapRef["heep usage percentage"] = heep_perc;
-	mapRef["heep peak memory allocated"] = MallocCount::getPeak();
-	mapRef["heep number of allocations called"] = MallocCount::getAllocCount();
-	mapRef["heep cumulative memory allocated"] = MallocCount::getTotal();
+	auto heap_current = MallocCount::getCurrent();
+	auto heap_size = heap_current+heap_free;
+	float heap_perc = heap_current;
+	heap_perc = heap_perc/heap_size*100;
+	status.heapUsagePercentage = heap_perc;
+	status.heapCurrentMemoryAllocated = heap_current;
+	status.heapPeakMemoryAllocated = MallocCount::getPeak();
+	status.heapNumberOfAllocationsCalled = MallocCount::getAllocCount();
+	status.heapCumulativeMemoryAllocated = MallocCount::getTotal();
 #endif
 
-	mapRef["cpu frequency"] = String(system_get_cpu_freq(), 10);
-	mapRef["chip id"] = String(system_get_chip_id(), 10);
-	mapRef["flash id"] = String(spi_flash_get_id(), 10);
-
-	mapRef["wifi station enabled"] = WifiStation.isEnabled() ? "true" : "false";
-	mapRef["wifi station channel"] = String(WifiStation.getChannel(), 10);
-	mapRef["wifi station is connected"] = WifiStation.isConnected() ? "true" : "false";
-	mapRef["wifi station is connection failed"] = WifiStation.isConnectionFailed() ? "true" : "false";
-	mapRef["wifi station DHCP enaled"] = WifiStation.isEnabledDHCP() ? "true" : "false";
-	mapRef["wifi station connection status"] = WifiStation.getConnectionStatusName();
-	String hostName = WifiStation.getHostname();
-	mapRef["wifi station hostname"] = hostName != NULL ? hostName : "null";
-	mapRef["wifi station ip"] = WifiStation.getIP().toString();
-	mapRef["wifi station mac"] = WifiStation.getMAC();
-	mapRef["wifi station brodcast"] = WifiStation.getNetworkBroadcast().toString();
-	mapRef["wifi station gateway"] = WifiStation.getNetworkGateway().toString();
-	mapRef["wifi station mask"] = WifiStation.getNetworkMask().toString();
+	status.wifiStationEnabled = WifiStation.isEnabled();
+	status.wifiStationChannel = WifiStation.getChannel();
+	status.wifiStationIsConnected = WifiStation.isConnected();
+	status.wifiStationIsConnectionFailed = WifiStation.isConnectionFailed();
+	status.wifiStationDhcpEnaled = WifiStation.isEnabledDHCP();
+	status.wifiStationConnectionStatus = WifiStation.getConnectionStatusName();
+	status.wifiStationHostname = WifiStation.getHostname();
+	status.wifiStationIp = WifiStation.getIP();
+	status.wifiStationMac = WifiStation.getMAC();
+	status.wifiStationBrodcast = WifiStation.getNetworkBroadcast();
+	status.wifiStationGateway = WifiStation.getNetworkGateway();
+	status.wifiStationMask = WifiStation.getNetworkMask();
 	if(showPassword) {
-		mapRef["wifi station password"] = WifiStation.getPassword();
+		status.wifiStationPassword = WifiStation.getPassword();
 	}
-	mapRef["wifi station Rssi"] = WifiStation.getRssi();
-	mapRef["wifi station SSID"] = WifiStation.getSSID();
+	status.wifiStationRssi = WifiStation.getRssi();
+	status.wifiStationSsid = WifiStation.getSSID();
 
-	mapRef["wifi AP enabled"] = WifiAccessPoint.isEnabled() ? "true" : "false";
-	mapRef["wifi AP ip"] = WifiAccessPoint.getIP().toString();
-	mapRef["wifi AP mac"] = WifiAccessPoint.getMAC();
-	mapRef["wifi AP broadcast"] = WifiAccessPoint.getNetworkBroadcast().toString();
-	mapRef["wifi AP gateway"] = WifiAccessPoint.getNetworkGateway().toString();
-	mapRef["wifi AP mask"] = WifiAccessPoint.getNetworkMask().toString();
+
+	status.wifiApEnabled = WifiAccessPoint.isEnabled() ? "true" : "false";
+	status.wifiApIp = WifiAccessPoint.getIP();
+	status.wifiApMac = WifiAccessPoint.getMAC();
+	status.wifiApBroadcast = WifiAccessPoint.getNetworkBroadcast();
+	status.wifiApGateway = WifiAccessPoint.getNetworkGateway();
+	status.wifiApMask = WifiAccessPoint.getNetworkMask();
 	if(showPassword) {
-		mapRef["wifi AP password"] = WifiAccessPoint.getPassword();
+		status.wifiApPassword = WifiAccessPoint.getPassword();
 	}
-	mapRef["wifi AP SSID"] = WifiAccessPoint.getSSID();
+	status.wifiApSsid = WifiAccessPoint.getSSID();
 
-	return map;
+	return status;
 }
 

@@ -27,9 +27,9 @@ template<> class Codec<WiFiStationConfig> {
 		json["ssid"] = obj.ssid;
 		json["password"] = obj.password;
 		json["hostname"] = obj.hostname;
-		json["ip"] = obj.ip.isNull() ? "" : obj.ip.toString();
-		json["netmask"] = obj.netmask.isNull() ? "" : obj.netmask.toString();
-		json["gateway"] = obj.gateway.isNull() ? "" : obj.gateway.toString();
+		json["ip"] = CodecHelpers::ipToString(obj.ip);
+		json["netmask"] = CodecHelpers::ipToString(obj.netmask);
+		json["gateway"] = CodecHelpers::ipToString(obj.gateway);
 	}
 
 	Either<String, WiFiStationConfig> decode(JsonObject& json) {

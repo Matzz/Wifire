@@ -1,9 +1,9 @@
 #pragma once
 
 #include <SmingCore.h>
-#include <Wiring/WHashMap.h>
+#include "../Model/Status.h"
 
 class StatusProvider {
 public:
-	static HashMap<String, String>* getStatus(bool showPassword);
+	static Status getStatus(bool showPassword);
 };

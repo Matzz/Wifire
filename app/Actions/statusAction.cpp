@@ -3,15 +3,14 @@
 #include "../Services/StatusProvider.h"
 
 void statusAction(HttpRequest &request, HttpResponse &response) {
-	auto info = StatusProvider::getStatus(false);
+	Status status = StatusProvider::getStatus(false);
 
-	JsonObjectStream* stream = new JsonObjectStream();
-	JsonObject json = stream->getRoot();
 
-	auto infoSize = info->count();
-	for(int i=0; i<infoSize; i++) {
-		json[info->keyAt(i)] = info->valueAt(i);
-	}
-	delete info;
-	response.sendNamedStream(stream);
+	DynamicJsonDocument doc(JSON_MAX_SIZE);
+	CodecHelpers::encodeDoc<Status>(Codec<Status>::getInstance(), doc, status);
+	String body;
+	serializeJson(doc, body);
+
+	response.setContentType(MIME_JSON);
+	response.sendString(body);
 }

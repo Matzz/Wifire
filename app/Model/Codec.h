@@ -38,6 +38,10 @@ class CodecHelpers {
 		return doc.containsKey(field) ? doc[field].as<T>() : elseVal;
 	}
 
+	static String ipToString(const IpAddress& ip) {
+		return ip.isNull() ? "" : String::nullstr;
+	}
+
 	static IpAddress getIp(JsonObject& json, String field, IpAddress defaultIp) {
 		if(json.containsKey(field)) {
 			String ipStr = json[field];

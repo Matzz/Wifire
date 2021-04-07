@@ -23,7 +23,7 @@ public:
 	}
 	
 	Either<String, T> load() {
-		DynamicJsonDocument doc(JSON_MAX_SIZE);
+		DynamicJsonDocument doc(JSON_MAX_SIZE*2);
 		debug_i("Loading config: %s", fileName.c_str());
 		if (fileExist(fileName)) {
 			if(!Json::loadFromFile(doc, fileName)) {
