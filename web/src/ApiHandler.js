@@ -1,4 +1,3 @@
-
 import $ from "jquery";
 import Cookies from 'js-cookie'
 import autoBind from 'react-autobind';
@@ -57,8 +56,13 @@ export default class ApiHandler {
 		}
 	}
 	
-	getJSON(url) {
-		return $.getJSON(url).fail(this.handleRequestFailure);
+	getJSON(url, data) {
+		return $.ajax({
+			dataType: "json",
+			url: url,
+			data: data
+		  })
+		  .fail(this.handleRequestFailure);
 	}
 	
 	postJSON(url, data) {

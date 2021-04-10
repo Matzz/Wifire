@@ -82,7 +82,10 @@ class Sidebar extends React.Component {
                 {this.hasRole("edit_station_config") && <li className="nav-item"><NavLink className="nav-link" to="/edit_station">Station config</NavLink></li>}
             </CollapsableMenu>
             
-            {this.hasRole("edit_gpio_config") && <li className="nav-item"><NavLink className="nav-link" to="/edit_gpio">GPIO config</NavLink></li>}
+            <CollapsableMenu title="GPIO">
+                {this.hasRole("edit_gpio_config") && <li className="nav-item"><NavLink className="nav-link" to="/edit_gpio">GPIO config</NavLink></li>}
+                {this.hasRole("switch_gpio") && <li className="nav-item"><NavLink className="nav-link" to="/switch_gpio">GPIO swich</NavLink></li>}
+            </CollapsableMenu>
             {this.hasRole("edit_ota_config") && <li className="nav-item"><NavLink className="nav-link" to="/edit_ota">Ota config</NavLink></li>}
             {this.hasRole("edit_users_config") && <li className="nav-item"><NavLink className="nav-link" to="/users/list">Users</NavLink></li>}
           </ul>

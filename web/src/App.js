@@ -15,6 +15,7 @@ import EditAp from "./pages/EditAp";
 import EditStation from "./pages/EditStation";
 import EditOta from "./pages/EditOta";
 import EditGpio from "./pages/EditGpio";
+import SwitchGpio from "./pages/SwitchGpio";
 import UserManagement from "./pages/Users";
 
 
@@ -59,6 +60,9 @@ class App extends React.Component {
             </Route>
             <Route path="/edit_gpio">
               <EditGpio apiHandler={this.apiHandler} />
+            </Route>
+            <Route path="/switch_gpio">
+              <SwitchGpio apiHandler={this.apiHandler} />
             </Route>
             <Route path="/users">
               <UserManagement apiHandler={this.apiHandler} />

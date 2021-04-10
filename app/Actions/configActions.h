@@ -14,6 +14,3 @@ void stationGetNetworks(HttpRequest &request, HttpResponse &response);
 
 void otaGetConfigAction(HttpRequest &request, HttpResponse &response);
 void otaSetConfigAction(HttpRequest &request, HttpResponse &response);
-
-void gpioGetConfigAction(HttpRequest &request, HttpResponse &response);
-void gpioSetConfigAction(HttpRequest &request, HttpResponse &response);

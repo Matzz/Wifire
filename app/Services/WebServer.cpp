@@ -6,7 +6,7 @@
 #include "../Actions/authAction.h"
 #include "../Actions/staticAction.h"
 #include "../Actions/configActions.h"
-#include "../Actions/gpioSwitchAction.h"
+#include "../Actions/gpioAction.h"
 #include "../Actions/usersAction.h"
 #include "../Actions/authAction.h"
 #include "../Actions/actionsHelpers.h"
@@ -86,6 +86,7 @@ void WebServer::bindDefaultActions() {
 	addAction("/config/users/edit", "edit_users_config", userEditAction);
 	addAction("/config/users/remove", "edit_users_config", userRemoveAction);
 	addAction("/gpio/switch", "switch_gpio", gpioSwitchAction);
+	addAction("/gpio/available", "switch_gpio", gpioSwitchGetAvailableAction);
 	addAction("/signin", String::empty, signInAction);
 	addAction("/signout", String::empty, signOutAction);
 

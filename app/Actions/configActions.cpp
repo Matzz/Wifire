@@ -44,25 +44,6 @@ void otaSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	// updater.update();
 }
 
-void gpioGetConfigAction(HttpRequest &request, HttpResponse &response) {
-	auto& provider = Injector::getInstance().getGPIOConfigProvider();
-	auto jsonMapper = [](JsonDocument& doc) {
-		auto obj = doc.as<JsonObject>();
-		JsonArray safePins = obj.createNestedArray("safePins");
-		for(const auto pin: GPIOConfig::safe_pins) {
-			safePins.add(pin);
-		}
-	};
-	handleConfigGet(request, response, provider, jsonMapper);
-}
-
-void gpioSetConfigAction(HttpRequest &request, HttpResponse &response) {
-	Injector &di = Injector::getInstance();
-	auto& provider = di.getGPIOConfigProvider();
-	handleConfigSet(request, response, provider);
-	di.getGPIOStateManager().update();
-}
-
 void stationRefreshNetworks(HttpRequest &request, HttpResponse &response) {
 	AvaiableNetworksProvider& networksProvider = Injector::getInstance().getAvaiableNetworksProvider();
 	JsonObjectStream* stream = new JsonObjectStream();

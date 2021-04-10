@@ -14,7 +14,7 @@ GPIOStateManager::~GPIOStateManager() {
 	delete timers;
 }
 
-int GPIOStateManager::getPinByName(GPIOConfig &config, String name) {
+int GPIOStateManager::getPinByName(GPIOConfig &config, const String name) {
 	for(int i=0; i<=GPIOConfig::max_pin; i++) {
 		if(config.gpio[i].name == name) {
 			return i;

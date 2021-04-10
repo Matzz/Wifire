@@ -17,10 +17,35 @@ a {
 	cursor: pointer;
 }
 
+/* for lg */
+
+.custom-switch.custom-switch-lg .custom-control-label {
+    padding-left: 3rem;
+    padding-top: 0.5rem;
+}
+
+.custom-switch.custom-switch-lg .custom-control-label::before {
+    height: 2rem;
+    width: calc(3rem + 0.75rem);
+    border-radius: 4rem;
+}
+
+.custom-switch.custom-switch-lg .custom-control-label::after {
+    width: calc(2rem - 4px);
+    height: calc(2rem - 4px);
+    border-radius: calc(3rem - (2rem / 2));
+}
+
+.custom-switch.custom-switch-lg .custom-control-input:checked ~ .custom-control-label::after {
+    transform: translateX(calc(2rem - 0.25rem));
+}
+
+
 .form-signin {
     max-width: 330px;
     margin: 0 auto;
 }
+
 .status_table_col {
     width: 30%;
 }
@@ -60,12 +85,21 @@ a {
 @mixin sidebar-wide {
     min-width: 250px;
     max-width: 250px;
+    ul {
+        margin-left: 0px;
+    }
+    .sidebar-header {
+        margin-left: 0px;
+    }
 }
 
 @mixin sidebar-short {
     min-width: 40px;
     max-width: 40px;
     ul {
+        margin-left: -250px;
+    }
+    .sidebar-header {
         margin-left: -250px;
     }
 }
@@ -77,6 +111,7 @@ a {
     color: $sidebar-font-color;
     transition: $hide-nav-transition;
     transform-origin: bottom left;
+    box-shadow: 0px 0px 5px 3px #343a40;
 
     a, a:hover, a:focus, .btn-link {
         color: inherit;
@@ -136,10 +171,6 @@ a {
 
 #sidebar.active {
     @include sidebar-short;
-
-    .sidebar-header {
-        margin-left: -250px;
-    }
 }
 
 @mixin sidebar-collapse-btn-short {

@@ -42,9 +42,8 @@ template<> class Codec<GPIOConfig> {
 			String key = String(i);
 			JsonObject pinObj = gpioObj.createNestedObject(key);
 			pinObj["name"] = cfg.gpio[i].name;
-			bool isSafe = GPIOConfig::isSafeToUse(i);
-			pinObj["isInput"] = isSafe ? cfg.gpio[i].isInput : false;
-			pinObj["pull"] = isSafe ? cfg.gpio[i].pull : false;
+			pinObj["isInput"] = cfg.gpio[i].isInput;
+			pinObj["pull"] = cfg.gpio[i].pull;
 		}
 	}
 

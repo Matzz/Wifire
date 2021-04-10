@@ -35,31 +35,35 @@ export default class EditGpio extends React.Component {
 		var inputs = this.state.formData.gpio; // We dont use preformated state.inputs here
 		let fields = Object.keys(inputs).map(idx => {
 			let pin = inputs[idx];
-			let editablePin = (<>
-				<td>
-					<select name={ this.fieldName(idx, 'isInput', 'boolean') } defaultValue={pin["isInput"]} className="custom-select">
-						<option value="true">Input</option>
-						<option value="false">Output</option>
-					</select>
-				</td>
-				<td>
-					<div className="form-check">
-						<input
-							type="checkbox"
-							name={ this.fieldName(idx, 'pull', 'boolean') }
-							defaultChecked={pin["pull"]}
-							value="true"
-							className="form-check-input position-static" />
-					</div>
-				</td>
-			</>);
-			let nonEditablePin = (<td colSpan="2">It is not safe to use that pin</td>);
+			var pinHtml;
+			if(inputs[idx].isSafe) {
+				pinHtml = (<>
+					<td>
+						<select name={ this.fieldName(idx, 'isInput', 'boolean') } defaultValue={pin["isInput"]} className="custom-select">
+							<option value="true">Input</option>
+							<option value="false">Output</option>
+						</select>
+					</td>
+					<td>
+						<div className="form-check">
+							<input
+								type="checkbox"
+								name={ this.fieldName(idx, 'pull', 'boolean') }
+								defaultChecked={pin["pull"]}
+								value="true"
+								className="form-check-input position-static" />
+						</div>
+					</td>
+				</>);
+			} else {
+				pinHtml = (<td colSpan="2">It is not safe to use that pin</td>);
+			}
 			return <tr key={idx}>
 				<th>{ idx }</th>
 				<th>
 					<input type="text" name={ this.fieldName(idx, 'name', 'string') } defaultValue={ pin['name'] } className="form-control" />
 				</th>
-				{ this.isPinSafeToUse(idx) ? editablePin : nonEditablePin }
+				{ pinHtml }
 			</tr>
 		})
 
