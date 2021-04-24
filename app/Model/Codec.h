@@ -22,7 +22,7 @@ class CodecHelpers {
     public:
     
     template<typename T>
-    static void encodeDoc(Codec<T>& codec, JsonDocument& doc, T& obj) {
+    static void encodeDoc(Codec<T>& codec, JsonDocument& doc, const T& obj) {
 		JsonObject json = doc.to<JsonObject>();
 		codec.encode(json, obj);
 	}
@@ -39,7 +39,7 @@ class CodecHelpers {
 	}
 
 	static String ipToString(const IpAddress& ip) {
-		return ip.isNull() ? "" : String::nullstr;
+		return ip.isNull() ? String::nullstr : ip.toString();
 	}
 
 	static IpAddress getIp(JsonObject& json, String field, IpAddress defaultIp) {

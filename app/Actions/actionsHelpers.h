@@ -39,7 +39,15 @@ void handleConfigGet(
 		return returnFailure(response, *configOrError.getIfLeft());
 	}
 	auto config = *configOrError.getIfRight();
+	handleConfigGet(request, response, config, jsonMapper);
+}
 
+template<typename T>
+void handleConfigGet(
+	HttpRequest &request,
+	HttpResponse &response,
+	const T &config,
+	std::function<void(JsonDocument&)> jsonMapper = nullptr) {
 	DynamicJsonDocument doc(JSON_MAX_SIZE);
 	CodecHelpers::encodeDoc<T>(Codec<T>::getInstance(), doc, config);
 	if(jsonMapper != nullptr) {

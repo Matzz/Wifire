@@ -57,6 +57,7 @@ Status StatusProvider::getStatus(bool showPassword)  {
 	status.wifiStationDhcpEnaled = WifiStation.isEnabledDHCP();
 	status.wifiStationConnectionStatus = WifiStation.getConnectionStatusName();
 	status.wifiStationHostname = WifiStation.getHostname();
+	debugf("CURRENT IP ========== %s", WifiStation.getIP().toString().c_str());
 	status.wifiStationIp = WifiStation.getIP();
 	status.wifiStationMac = WifiStation.getMAC();
 	status.wifiStationBrodcast = WifiStation.getNetworkBroadcast();
@@ -69,7 +70,7 @@ Status StatusProvider::getStatus(bool showPassword)  {
 	status.wifiStationSsid = WifiStation.getSSID();
 
 
-	status.wifiApEnabled = WifiAccessPoint.isEnabled() ? "true" : "false";
+	status.wifiApEnabled = WifiAccessPoint.isEnabled();
 	status.wifiApIp = WifiAccessPoint.getIP();
 	status.wifiApMac = WifiAccessPoint.getMAC();
 	status.wifiApBroadcast = WifiAccessPoint.getNetworkBroadcast();
