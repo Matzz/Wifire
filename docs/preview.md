@@ -5,6 +5,6 @@
 ![Edit station](./img/edit_station.png)
 ![Edit ota](./img/edit_ota.png)
 ![Edit GPIO](./img/edit_gpio.png)
-![Edit GPIO](./img/swich_gpio.png)
+![Edit GPIO](./img/switch_gpio.png)
 ![Users list](./img/list_users.png)
 ![User edit](./img/edit_user.png)
