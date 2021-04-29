@@ -1,6 +1,9 @@
 # Wifire
 ESP8266 application skeleton based on [Sming framework](https://github.com/SmingHub/Sming) and [ReactJS](https://reactjs.org/).
 
+# Preview
+The Wifire pages screenshos are available here [here](./docs/preview.md)
+
 # Features
 - Rich fronend AJAX based architecture
 - WiFi Station and Access Point configuration
@@ -14,7 +17,6 @@ ESP8266 application skeleton based on [Sming framework](https://github.com/Sming
 # Extending
 Wifire is in an alpha stage now. Nice way of extending in without modifying the source code is not available yet.
 It will be added in future releases. For now you could just check it out and modify the source code.
-
 
 # Modifing backend
 The Wifire is made of couple of singleton objects which are created by `Injector` class.
@@ -56,7 +58,15 @@ npm start
 Now all changes which you do in `web/src/` directory will be visible by refreshing 'localhost:3000` web page.
 After all, you could run `make web-upload` to bundle and upload your changes to a Spiffis filesystem image.
 
-
+# Command line
+Beside the standard Sming framework cli commands Wifire offers some additional features:
+- `ls [directory or empty]` - List files in a given directory. Works like unix `ls`
+- `cat [file path]` - Concatenate files and print. Works like unix `cat`
+- `rm [file path]` - Remove file. Works like unix `rm`
+- `info` - Provide comprehensive data about the ESP chip status. The same data is displayed by web interface
+- `restart` - restart ESP chip
+- `ota` - runs OTA updater
+- `switch_slot` - Switch firmware slot
 
 # Bugs and feature requests
 - Session retention after chip restarts. We don't want to loog out all userers after ESP chip restarts.
@@ -64,6 +74,3 @@ After all, you could run `make web-upload` to bundle and upload your changes to 
 - Wifi connection strategies (AP, Station, AP if Station not connected etc, Fallback to AP after disconnect etc.)
 - Nice way to extend this application without modifying its source code.
 - Ota update is not tested. In plans, there is also an adding support of uploading firmware file rather than providing an external HTTP link.
-
-# Preview
-Wifire pages screenshot is available here [here](./docs/preview.md)
