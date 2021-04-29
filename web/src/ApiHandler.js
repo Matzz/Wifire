@@ -48,8 +48,9 @@ export default class ApiHandler {
 			this.history.push('/');
 		} else {
 			var msg = errorThrown;
-			if('responseJSON' in jqXHR && 'message' in jqXHR['responseJSON']) {
-				msg = jqXHR.responseJSON['message'];
+			var responseMsg = ApiHandler.getSafe(() => jqXHR.responseJSON.message, null);
+			if(responseMsg) {
+				msg = responseMsg;
 			}
 			alert("Error: "+msg);
 			console.warn("Error: ", arguments);
@@ -88,5 +89,13 @@ export default class ApiHandler {
         this.authUpdateCallbacks.forEach(callback => {
             callback(auth);
 		});
+	}
+
+	static getSafe(fn, defaultVal) {
+		try {
+			return fn();
+		} catch (e) {
+			return defaultVal;
+		}
 	}
 }

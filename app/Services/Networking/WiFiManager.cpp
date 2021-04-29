@@ -99,18 +99,27 @@ void WiFiManager::refreshStation() {
 
 bool WiFiManager::connectStation() {
 	if(currentStationConfig.hostname.length()>0) {
+		debug_i("Station setting hostname to %s", currentStationConfig.hostname.c_str());
 		WifiStation.setHostname(currentStationConfig.hostname);
 	}
 	if (!currentStationConfig.ip.isNull()) {
+		debug_i("Station set Ip: %s, netmask %s, gateway %s",
+			currentStationConfig.ip.toString(), 
+			currentStationConfig.netmask.toString(), 
+			currentStationConfig.gateway.toString()
+			);
 		WifiStation.setIP(currentStationConfig.ip, currentStationConfig.netmask, currentStationConfig.gateway);
 	} else {
 		debug_i("Station DHCP enabled");
 		WifiStation.enableDHCP(true);
 	}
-	bool status =  WifiStation.config(currentStationConfig.ssid, currentStationConfig.password, false, true);
+	bool status =  WifiStation.config(currentStationConfig.ssid, currentStationConfig.password, false, false);
 	if (!status) {
+		debug_i("Station failed to set configuration.");
 		return false;
 	}
+
+	debug_i("Station invoking WifiStation.connect.");
 	WifiStation.enable(true, false);
 	return WifiStation.connect();
 }
@@ -159,5 +168,4 @@ void WiFiManager::onStationGotIP(IpAddress ip, IpAddress netmask, IpAddress gate
 		ip.toString().c_str(),
 		netmask.toString().c_str(),
 		gateway.toString().c_str());
-
 }
