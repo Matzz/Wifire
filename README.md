@@ -7,6 +7,7 @@ The Wifire pages screenshos are available here [here](./docs/preview.md)
 # Features
 - Rich fronend AJAX based architecture
 - WiFi Station and Access Point configuration
+- User management with roles based authentication
 - GPIO configuration
 - GPIO pins switch with timeouts
 - Over-the-air updates
