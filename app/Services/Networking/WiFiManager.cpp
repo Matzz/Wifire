@@ -13,33 +13,36 @@ WiFiManager::WiFiManager(ConfigProvider<WiFiStationConfig>& stationConfigProvide
 }
 
 
-void WiFiManager::reloadConfiguration() {
+const WiFiApConfig WiFiManager::loadApConfig() {
 	auto apCfgOrError = apConfigProvider.load();
 	if(apCfgOrError.isLeft()) {
 		debug_w("Access point config error: %s", apCfgOrError.getIfLeft()->c_str());
-		currentApConfig = WiFiApConfig();
+		return WiFiApConfig();
 	} else {
-		currentApConfig = *apCfgOrError.getIfRight();
+		return *apCfgOrError.getIfRight();
 	}
+}
 
+
+const WiFiStationConfig WiFiManager::loadStationConfig() {
 	auto stCfgOrError = stationConfigProvider.load();
 	if(stCfgOrError.isLeft()) {
 		debug_w("Station config error: %s", stCfgOrError.getIfLeft()->c_str());
-		currentStationConfig = WiFiStationConfig();
+		return WiFiStationConfig();
 	} else {
-		currentStationConfig = *stCfgOrError.getIfRight();
+		return *stCfgOrError.getIfRight();
 	}
 }
 
 void WiFiManager::refreshNetwork() {
-	reloadConfiguration();
 	refreshStation();
 	refreshAccessPoint();
 }
 
 void WiFiManager::refreshAccessPoint() {
+	const WiFiApConfig& currentApConfig = loadApConfig();
 	if(currentApConfig.enabled) {
-		if(startAccessPoint()) {
+		if(startAccessPoint(currentApConfig)) {
 			debug_i("AP created.");
 		} else {
 			debug_w("Cannot create AP.");
@@ -50,7 +53,7 @@ void WiFiManager::refreshAccessPoint() {
 	}
 }
 
-bool WiFiManager::startAccessPoint() {
+bool WiFiManager::startAccessPoint(const WiFiApConfig& currentApConfig) {
 	debug_i("Starting network %s", currentApConfig.ssid.c_str());
 	WifiAccessPoint.enable(true, false);
 	bool configStatus = WifiAccessPoint.config(currentApConfig.ssid, currentApConfig.password,
@@ -76,9 +79,10 @@ bool WiFiManager::startAccessPoint() {
 }
 
 void WiFiManager::refreshStation() {
+	const WiFiStationConfig& currentStationConfig = loadStationConfig();
 	if(currentStationConfig.enabled) {
 		debug_i("Station mode enabled.");
-		if(connectStation()) {
+		if(connectStation(currentStationConfig)) {
 			debug_i("Connected to station.");
 		} else {
 			debug_w("Cannot connect to station.");
@@ -97,7 +101,7 @@ void WiFiManager::refreshStation() {
 	}
 }
 
-bool WiFiManager::connectStation() {
+bool WiFiManager::connectStation(const WiFiStationConfig& currentStationConfig) {
 	if(currentStationConfig.hostname.length()>0) {
 		debug_i("Station setting hostname to %s", currentStationConfig.hostname.c_str());
 		WifiStation.setHostname(currentStationConfig.hostname);
