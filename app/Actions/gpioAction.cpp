@@ -14,7 +14,6 @@ void currentState(ConfigProvider<GPIOConfig> &cfgProvider, JsonDocument& doc) {
 	auto obj = doc.as<JsonObject>();
 	auto state = obj.createNestedObject("state");
 	for(int i=0; i<=GPIOConfig::max_pin; i++) {
-		debugf("Adding state to %d", i);
 		PinConfig& pinCfg = config.gpio[i];
 		if(!pinCfg.isInput) { // and credentials
 			state[String(i)] = digitalRead(i);

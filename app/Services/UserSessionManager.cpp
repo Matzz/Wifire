@@ -1,19 +1,5 @@
 #include "UserSessionManager.h"
 
-Session::Session():
-    login(""), sessionId(""), roles(Vector<String>(1, 1)), lastUsed(0) { }
-
-Session::Session(String login, String sessionId, const Vector<String> &roles, uint64_t lastUsed):
-    login(login), sessionId(sessionId), roles(roles), lastUsed(lastUsed) { }
-
-Session& Session::operator=(const Session &session) {
-        login = session.login;
-        sessionId = session.sessionId;
-        roles = session.roles;
-        lastUsed = session.lastUsed;
-        return *this;
-}
-
 void UserSessionManager::setSessionCookie(HttpResponse& response, const String cookie) {
         response.setCookie("auth", cookie + "; Path=/");
 }
@@ -22,8 +8,16 @@ void UserSessionManager::clearSessionCookie(HttpResponse& response) {
         response.setCookie("auth", "; Path=/");
 }
 
-UserSessionManager::UserSessionManager(ConfigProvider<UsersConfig>& configProvider) :
-		configProvider(configProvider) { }
+UserSessionManager::UserSessionManager(ConfigProvider<UsersConfig>& userProvider, ConfigProvider<Vector<Session>>& sessionProvider) :
+		userProvider(userProvider), sessionProvider(sessionProvider)  {
+    auto sessionsOrError = sessionProvider.load();
+    if(sessionsOrError.isLeft()) {
+        debug_w("Cannot load sessions from file: %s", *sessionsOrError.getIfLeft());
+        return;
+    }
+    auto fileSessiosn = *sessionsOrError.getIfRight();
+    this->sessions = fileSessiosn;
+}
 
 int UserSessionManager::getSessionByLogin(const String& login) {
     for(int i=0; i<sessions.size(); i++) {
@@ -58,7 +52,7 @@ Either<String, Session> UserSessionManager::validateSession(const String& sessio
 
 Either<String, Session> UserSessionManager::signIn(const String& login, const String& password) {
 
-	auto configOrError = configProvider.load();
+	auto configOrError = userProvider.load();
 	if(configOrError.isLeft()) {
 		return {LeftTagT(), *configOrError.getIfLeft()};
 	}
@@ -79,6 +73,7 @@ Either<String, Session> UserSessionManager::signIn(const String& login, const St
             sessionIdx = sessions.size() -1;
         }
         sessions[sessionIdx].markUsed();
+        sessionProvider.save(sessions);
         return {RightTagT(), std::move(sessions[sessionIdx])};
 
     } else {
@@ -91,6 +86,7 @@ void UserSessionManager::signOut(const String& sessionId) {
     if(idx >= 0) {
         sessions.removeElementAt(idx);
     }
+    sessionProvider.save(sessions);
 }
 
 void UserSessionManager::signOutByLogin(const String& login) {
@@ -98,6 +94,7 @@ void UserSessionManager::signOutByLogin(const String& login) {
     if(idx >= 0) {
         sessions.removeElementAt(idx);
     }
+    sessionProvider.save(sessions);
 }
 
 String UserSessionManager::mkSessionId(const String& login) {

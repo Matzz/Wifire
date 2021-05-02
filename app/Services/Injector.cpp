@@ -33,8 +33,13 @@ ConfigProvider<UsersConfig>& Injector::getUsersConfigProvider() {
 	return usersConfigProvider;
 }
 
+ConfigProvider<Vector<Session>>& Injector::getSessionsProvider() {
+	static SessionsConfigProvider sessionsProvider("config/sessions.json", getUsersConfigProvider());
+	return sessionsProvider;
+}
+
 UserSessionManager& Injector::getUserSessionManager() {
-	static UserSessionManager userSessionManager(getUsersConfigProvider());
+	static UserSessionManager userSessionManager(getUsersConfigProvider(), getSessionsProvider());
 	return userSessionManager;
 }
 

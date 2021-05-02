@@ -54,7 +54,8 @@ template <typename T>
 class CachedConfigProvider: public ConfigProvider<T> {
 protected:
 	ConfigProvider<T> &innerProvider;
-	T *config = nullptr;
+	bool isAvailable = false;
+	T config;
 public:
 	CachedConfigProvider(ConfigProvider<T> &innerProvider) : innerProvider(innerProvider) { }
 
@@ -63,16 +64,16 @@ public:
 	}
 	
 	Either<String, T> load() {
-		// return innerProvider.load();
-		if(config == nullptr) {
+		if(!isAvailable) {
 			Either<String, T> configOrError = innerProvider.load();
 			if(configOrError.isLeft()) {
-				config = nullptr;
+				isAvailable = false;
 				return configOrError; // Do not cache errors
 			} else {
-				config = configOrError.getIfRight();
+				isAvailable = true;
+				config = *configOrError.getIfRight();
 			}
 		}
-		return {RightTagT(), *config};
+		return {RightTagT(), config};
 	}
 };
