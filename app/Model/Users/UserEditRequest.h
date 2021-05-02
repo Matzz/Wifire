@@ -21,7 +21,7 @@ template<> class Codec<UserEditRequest> {
             return instance;
         }
 
-	void encode(JsonObject& json, UserEditRequest userToEdit) {
+	void encode(JsonObject& json, const UserEditRequest &userToEdit) {
         json["enabled"] = userToEdit.enabled;
         json["login"] = userToEdit.login;
         json["password"] = userToEdit.password;

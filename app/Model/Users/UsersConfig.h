@@ -46,8 +46,8 @@ public:
 	ModificationResult addUser(UserConfig &user);
 	ModificationResult editUser(UserEditRequest &userToEdit);
 	ModificationResult removeUser(UserDeleteRequest &userToDelete);
-	Vector<UserConfig> const getUsersList() { return users; } const
-	UserConfig* getUser(String login) const;
+	Vector<UserConfig> const getUsersList() const { return users; };
+	UserConfig const * getUser(String login) const;
 	bool addAdminIfDoesntExist();
 
 private:
@@ -65,7 +65,7 @@ template<> class Codec<UsersConfig> {
 		return instance;
 	}
 
-	void encode(JsonObject& json, UsersConfig config) {
+	void encode(JsonObject& json, const UsersConfig &config) {
 		JsonArray usersArr = json.createNestedArray("users");
 		const Vector<UserConfig> users = config.getUsersList();
 		for(int i=0; i<users.size(); i++) {

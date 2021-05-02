@@ -15,7 +15,7 @@ public:
         return instance;
     }
 
-	void encode(JsonObject& json, UserSigninRequest user) {
+	void encode(JsonObject& json, const UserSigninRequest &user) {
         json["login"] = user.login;
         json["password"] = user.password;
 	}

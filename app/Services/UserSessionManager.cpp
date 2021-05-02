@@ -63,7 +63,7 @@ Either<String, Session> UserSessionManager::signIn(const String& login, const St
 		return {LeftTagT(), *configOrError.getIfLeft()};
 	}
 	auto usersConfig = *configOrError.getIfRight();
-    const UserConfig* user = usersConfig.getUser(login);
+    UserConfig const * user = usersConfig.getUser(login);
 
     if(user != nullptr) {
         if(!user->enabled) {

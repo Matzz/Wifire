@@ -10,7 +10,7 @@ class Codec: private NonCopyable {
     public:
     static T& getInstance();
 
-    virtual void encode(JsonObject& json, T obj) = 0;
+    virtual void encode(JsonObject& json, const T &obj) = 0;
     virtual Either<String, T> decode(JsonObject& json) = 0;
     
     private:

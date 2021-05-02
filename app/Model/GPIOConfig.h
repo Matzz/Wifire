@@ -36,7 +36,7 @@ template<> class Codec<GPIOConfig> {
             return instance;
         }
 
-	void encode(JsonObject& json, GPIOConfig cfg) {
+	void encode(JsonObject& json, const GPIOConfig &cfg) {
 		JsonObject gpioObj = json.createNestedObject("gpio");
 		for(int i=0; i<=GPIOConfig::max_pin; i++) {
 			String key = String(i);

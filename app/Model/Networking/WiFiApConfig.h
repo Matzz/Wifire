@@ -23,7 +23,7 @@ template<> class Codec<WiFiApConfig> {
             return instance;
         }
 
-	void encode(JsonObject& json, WiFiApConfig obj) {
+	void encode(JsonObject& json, const WiFiApConfig &obj) {
 		json["enabled"] = obj.enabled;
 		json["ssid"] = obj.ssid;
 		json["password"] = obj.password;
