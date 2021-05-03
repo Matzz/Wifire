@@ -58,47 +58,8 @@ private:
 	Vector<UserConfig> users;
 };
 
-template<> class Codec<UsersConfig> {
-	public:
-	static Codec<UsersConfig>& getInstance() {
-		static Codec<UsersConfig> instance;
-		return instance;
-	}
+template<>
+void Codec<UsersConfig>::encode(JsonObject& json, const UsersConfig &config);
 
-	void encode(JsonObject& json, const UsersConfig &config) {
-		JsonArray usersArr = json.createNestedArray("users");
-		const Vector<UserConfig> users = config.getUsersList();
-		for(int i=0; i<users.size(); i++) {
-			auto user = users[i];
-			JsonObject userObj = usersArr.createNestedObject();
-			userObj["enabled"] = user.enabled;
-			userObj["login"] = user.login;
-			userObj["hash"] = user.hash;
-			userObj["salt"] = user.salt;
-			StringVectorCodec::encode(userObj, user.roles, "roles");
-		}
-	}
-
-	Either<String, UsersConfig> decode(JsonObject& json) {
-		UsersConfig cfg;
-		JsonArray usersArr = json["users"].as<JsonArray>();
-		int usersArrSize = usersArr.size();
-
-		for(int i=0; i<usersArrSize; i++) {
-			JsonObject userObj = usersArr[i].as<JsonObject>();
-			UserConfig user(
-				userObj["enabled"].as<bool>(),
-				userObj["login"].as<String>(),
-				userObj["salt"].as<String>(),
-				userObj["hash"].as<String>(),
-				StringVectorCodec::decode(userObj,  "roles")
-			);
-
-        	cfg.addUser(user);
-		}
-
-		cfg.addAdminIfDoesntExist();
-		
-		return {RightTagT(), std::move(cfg)};
-	}
-};
+template<>
+Either<String, UsersConfig> Codec<UsersConfig>::decode(JsonObject& json);

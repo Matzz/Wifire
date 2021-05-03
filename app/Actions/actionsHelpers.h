@@ -24,7 +24,7 @@ Either<String, T> decodeJson(HttpRequest &request) {
 	if(desRes != DeserializationError::Code::Ok) {
 		return String(desRes.c_str());
 	}
-	auto objOrError = CodecHelpers::decodeDoc(Codec<T>::getInstance(), doc);
+	auto objOrError = CodecHelpers::decodeDoc<T>(doc);
 	return objOrError;
 }
 
@@ -49,7 +49,7 @@ void handleConfigGet(
 	const T &config,
 	std::function<void(JsonDocument&)> jsonMapper = nullptr) {
 	DynamicJsonDocument doc(JSON_MAX_SIZE);
-	CodecHelpers::encodeDoc<T>(Codec<T>::getInstance(), doc, config);
+	CodecHelpers::encodeDoc<T>(doc, config);
 	if(jsonMapper != nullptr) {
 		jsonMapper(doc);
 	}

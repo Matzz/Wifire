@@ -9,22 +9,8 @@ public:
 	String spiffUrl;
 };
 
-template<> class Codec<OtaConfig> {
-	public:
-        static Codec<OtaConfig>& getInstance() {
-            static Codec<OtaConfig> instance;
-            return instance;
-        }
+template<>
+void Codec<OtaConfig>::encode(JsonObject& json, const OtaConfig &cfg);
 
-	void encode(JsonObject& json, const OtaConfig &cfg) {
-		json["romUrl"] = cfg.romUrl;
-		json["spiffUrl"] = cfg.spiffUrl;
-	}
-
-	Either<String, OtaConfig> decode(JsonObject& json) {
-		OtaConfig cfg;
-		cfg.romUrl = CodecHelpers::getOrElse(json, "romUrl", String::empty);
-		cfg.spiffUrl = CodecHelpers::getOrElse(json, "spiffUrl", String::empty);
-		return cfg;
-	}
-};
+template<>
+Either<String, OtaConfig> Codec<OtaConfig>::decode(JsonObject& json);

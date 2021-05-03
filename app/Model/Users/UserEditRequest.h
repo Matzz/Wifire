@@ -1,8 +1,6 @@
 #pragma once
 
-#include <SmingCore.h>
 #include "../Codec.h"
-#include "../StringVectorCodec.h"
 
 class UserEditRequest {
 public:
@@ -10,31 +8,10 @@ public:
 	String login;
 	String password;
 	Vector<String> roles;
-
-    UserEditRequest(bool enabled, String login, String password, const Vector<String> &roles);
 };
 
-template<> class Codec<UserEditRequest> {
-	public:
-        static Codec<UserEditRequest>& getInstance() {
-            static Codec<UserEditRequest> instance;
-            return instance;
-        }
+template<>
+void Codec<UserEditRequest>::encode(JsonObject& json, const UserEditRequest &userToEdit);
 
-	void encode(JsonObject& json, const UserEditRequest &userToEdit) {
-        json["enabled"] = userToEdit.enabled;
-        json["login"] = userToEdit.login;
-        json["password"] = userToEdit.password;
-        StringVectorCodec::encode(json, userToEdit.roles, "roles");
-	}
-
-	Either<String, UserEditRequest> decode(JsonObject& json) {
-		UserEditRequest cfg(
-            json["enabled"].as<bool>(),
-            json["login"].as<String>(),
-            json["password"].as<String>(),
-            StringVectorCodec::decode(json,  "roles")
-        );
-		return {RightTagT(), std::move(cfg)};
-	}
-};
+template<>
+Either<String, UserEditRequest> Codec<UserEditRequest>::decode(JsonObject& json);

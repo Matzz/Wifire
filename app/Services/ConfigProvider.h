@@ -18,19 +18,19 @@ public:
 template <typename T>
 class FileConfigProvider: public ConfigProvider<T> {
 protected:
-	String fileName = "none";
-	Codec<T>& codec;
+	String fileName;
 public:
-	FileConfigProvider(String fileName, Codec<T> &codec) : fileName(fileName), codec(codec) { }
-	void save(T& obj) {
+	FileConfigProvider(String fileName) : fileName(fileName) { }
+
+	void save(T& obj) override {
 		DynamicJsonDocument doc(JSON_MAX_SIZE);
 		String output;
-		CodecHelpers::encodeDoc(codec, doc, obj);
+		CodecHelpers::encodeDoc<T>(doc, obj);
 		serializeJson(doc, output);
 		fileSetContent(fileName, output);
 	}
 	
-	Either<String, T> load() {
+	Either<String, T> load() override {
 		DynamicJsonDocument doc(JSON_MAX_SIZE*2);
 		debug_i("Loading config: %s", fileName.c_str());
 		if (fileExist(fileName)) {
@@ -42,7 +42,7 @@ public:
 			debug_i("File '%s' doesn't exist.", this->fileName.c_str());
 		}
 		
-		return CodecHelpers::decodeDoc(codec, doc);
+		return CodecHelpers::decodeDoc<T>(doc);
 	}
 };
 
@@ -59,12 +59,12 @@ protected:
 public:
 	CachedConfigProvider(ConfigProvider<T> &innerProvider) : innerProvider(innerProvider) { }
 
-	void save(T& obj) {
+	void save(T& obj) override {
 		config = obj;
 		innerProvider.save(obj);
 	}
 	
-	Either<String, T> load() {
+	Either<String, T> load() override {
 		if(!isAvailable) {
 			Either<String, T> configOrError = innerProvider.load();
 			if(configOrError.isLeft()) {

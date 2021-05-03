@@ -102,7 +102,7 @@ void SerialHandler::restartCommand(String commandLine, CommandOutput* commandOut
 void SerialHandler::statusCommand(String commandLine, CommandOutput* commandOutput) {
 	Status status = StatusProvider::getStatus(true);
 	DynamicJsonDocument doc(JSON_MAX_SIZE);
-	CodecHelpers::encodeDoc<Status>(Codec<Status>::getInstance(), doc, status);
+	CodecHelpers::encodeDoc<Status>(doc, status);
 	String jsonString;
 	serializeJsonPretty(doc, jsonString);
 	commandOutput->println(jsonString);

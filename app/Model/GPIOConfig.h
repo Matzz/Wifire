@@ -29,40 +29,8 @@ public:
 	PinConfig gpio[max_pin+1];
 };
 
-template<> class Codec<GPIOConfig> {
-	public:
-        static Codec<GPIOConfig>& getInstance() {
-            static Codec<GPIOConfig> instance;
-            return instance;
-        }
+template<>
+void Codec<GPIOConfig>::encode(JsonObject& json, const GPIOConfig &cfg);
 
-	void encode(JsonObject& json, const GPIOConfig &cfg) {
-		JsonObject gpioObj = json.createNestedObject("gpio");
-		for(int i=0; i<=GPIOConfig::max_pin; i++) {
-			String key = String(i);
-			JsonObject pinObj = gpioObj.createNestedObject(key);
-			pinObj["name"] = cfg.gpio[i].name;
-			pinObj["isInput"] = cfg.gpio[i].isInput;
-			pinObj["pull"] = cfg.gpio[i].pull;
-		}
-	}
-
-	Either<String, GPIOConfig> decode(JsonObject& json) {
-		GPIOConfig cfg;
-		JsonObject gpioObj = json["gpio"].as<JsonObject>();
-		for(unsigned int i=0; i<=GPIOConfig::max_pin; i++) {
-			String key = String(i);
-			if(gpioObj.containsKey(key)) {
-				auto pinObj = gpioObj[key].as<JsonObject>();
-				cfg.gpio[i] = {
-					pinObj["name"].as<String>(),
-					CodecHelpers::getOrElse(pinObj, "isInput", true),
-					CodecHelpers::getOrElse(pinObj, "pull", false)
-					};
-			} else {
-				cfg.gpio[i] = {"GPIO_"+String(i), true, false};
-			}
-		}
-		return {RightTagT(), cfg};
-	}
-};
+template<>
+Either<String, GPIOConfig> Codec<GPIOConfig>::decode(JsonObject& json);

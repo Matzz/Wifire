@@ -8,10 +8,13 @@
 template<typename T>
 class Codec: private NonCopyable {
     public:
-    static T& getInstance();
+	static Codec<T>& getInstance() {
+		static Codec<T> instance;
+		return instance;
+	}
 
-    virtual void encode(JsonObject& json, const T &obj) = 0;
-    virtual Either<String, T> decode(JsonObject& json) = 0;
+    void encode(JsonObject& json, const T &obj);
+    Either<String, T> decode(JsonObject& json);
     
     private:
         Codec() {}
@@ -22,15 +25,15 @@ class CodecHelpers {
     public:
     
     template<typename T>
-    static void encodeDoc(Codec<T>& codec, JsonDocument& doc, const T& obj) {
+    static void encodeDoc(JsonDocument& doc, const T& obj) {
 		JsonObject json = doc.to<JsonObject>();
-		codec.encode(json, obj);
+		Codec<T>::getInstance().encode(json, obj);
 	}
 	
     template<typename T>
-    static Either<String, T> decodeDoc(Codec<T>& codec, JsonDocument& doc) {
+    static Either<String, T> decodeDoc(JsonDocument& doc) {
 		JsonObject json = doc.as<JsonObject>();
-		return codec.decode(json);
+		return Codec<T>::getInstance().decode(json);
 	}
     
     template<typename T>

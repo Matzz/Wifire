@@ -13,36 +13,8 @@ class SessionsConfigProvider : public FileConfigProvider<Vector<Session>> {
     ConfigProvider<UsersConfig>& usersProvider;
 
     public:
-	SessionsConfigProvider(String fileName, ConfigProvider<UsersConfig>& usersProvider) :
-        FileConfigProvider(fileName, Codec<Vector<Session>>::getInstance()),
-        usersProvider(usersProvider) {}
-
-	Either<String, Vector<Session>> load() {
-        auto sessionsOrError = FileConfigProvider::load();
-        if(sessionsOrError.isRight()) {
-            auto usersOrError = usersProvider.load();
-            if(usersOrError.isLeft()) {
-                return {LeftTagT(), *usersOrError.getIfLeft()};
-            }
-
-            auto users = *usersOrError.getIfRight();
-	        auto sessions = *sessionsOrError.getIfRight();
-            int size = sessions.size();
-            for(int i=0; i<size; i++) {
-                Session& session = sessions[i];
-                auto user  = users.getUser(session.login);
-                if(user != nullptr) {
-                    session.roles = user->roles;
-                } else {
-                    debug_w("Not found a user for a persisted session - %s", session.login);
-                    sessions.removeElementAt(i);
-                    size--;
-                }
-            }
-            return {RightTagT(), sessions};
-        }
-        return sessionsOrError;
-	}
+	SessionsConfigProvider(String fileName, ConfigProvider<UsersConfig>& usersProvider);
+	Either<String, Vector<Session>> load();
 
 };
 

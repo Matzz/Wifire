@@ -26,3 +26,35 @@ https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/periph
 bool GPIOConfig::isSafeToUse(unsigned int pin) {
 	return std::find(std::begin(GPIOConfig::safe_pins), std::end(GPIOConfig::safe_pins), pin) != std::end(GPIOConfig::safe_pins);
 }
+
+template<>
+void Codec<GPIOConfig>::encode(JsonObject& json, const GPIOConfig &cfg) {
+	JsonObject gpioObj = json.createNestedObject("gpio");
+	for(int i=0; i<=GPIOConfig::max_pin; i++) {
+		String key = String(i);
+		JsonObject pinObj = gpioObj.createNestedObject(key);
+		pinObj["name"] = cfg.gpio[i].name;
+		pinObj["isInput"] = cfg.gpio[i].isInput;
+		pinObj["pull"] = cfg.gpio[i].pull;
+	}
+}
+
+template<>
+Either<String, GPIOConfig> Codec<GPIOConfig>::decode(JsonObject& json) {
+	GPIOConfig cfg;
+	JsonObject gpioObj = json["gpio"].as<JsonObject>();
+	for(unsigned int i=0; i<=GPIOConfig::max_pin; i++) {
+		String key = String(i);
+		if(gpioObj.containsKey(key)) {
+			auto pinObj = gpioObj[key].as<JsonObject>();
+			cfg.gpio[i] = {
+				pinObj["name"].as<String>(),
+				CodecHelpers::getOrElse(pinObj, "isInput", true),
+				CodecHelpers::getOrElse(pinObj, "pull", false)
+				};
+		} else {
+			cfg.gpio[i] = {"GPIO_"+String(i), true, false};
+		}
+	}
+	return {RightTagT(), cfg};
+}
