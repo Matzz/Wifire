@@ -9,11 +9,19 @@
 
 template <typename T>
 class ConfigProvider: private NonCopyable {
+public:
+	virtual void save(T& obj);
+	virtual Either<String, T> load();
+};
+
+
+template <typename T>
+class FileConfigProvider: public ConfigProvider<T> {
 protected:
 	String fileName = "none";
 	Codec<T>& codec;
 public:
-	ConfigProvider(String fileName, Codec<T> &codec) : fileName(fileName), codec(codec) { }
+	FileConfigProvider(String fileName, Codec<T> &codec) : fileName(fileName), codec(codec) { }
 	void save(T& obj) {
 		DynamicJsonDocument doc(JSON_MAX_SIZE);
 		String output;
@@ -35,5 +43,38 @@ public:
 		}
 		
 		return CodecHelpers::decodeDoc(codec, doc);
+	}
+};
+
+/**
+ * This class cache configuration loaded from file to reduce CPU overhead when we require the same config multiple times.
+ * Be aware about the memory overhead of caching.
+ **/
+template <typename T>
+class CachedConfigProvider: public ConfigProvider<T> {
+protected:
+	ConfigProvider<T> &innerProvider;
+	bool isAvailable = false;
+	T config;
+public:
+	CachedConfigProvider(ConfigProvider<T> &innerProvider) : innerProvider(innerProvider) { }
+
+	void save(T& obj) {
+		config = obj;
+		innerProvider.save(obj);
+	}
+	
+	Either<String, T> load() {
+		if(!isAvailable) {
+			Either<String, T> configOrError = innerProvider.load();
+			if(configOrError.isLeft()) {
+				isAvailable = false;
+				return configOrError; // Do not cache errors
+			} else {
+				isAvailable = true;
+				config = *configOrError.getIfRight();
+			}
+		}
+		return {RightTagT(), config};
 	}
 };

@@ -15,9 +15,9 @@
 
 struct PinConfig {
 public:
-	String name;
-	bool isInput; // true = input, false = output
-	bool pull;
+	String name = String::nullstr;
+	bool isInput = true; // true = input, false = output
+	bool pull = false;
 };
 
 class GPIOConfig {
@@ -36,7 +36,7 @@ template<> class Codec<GPIOConfig> {
             return instance;
         }
 
-	void encode(JsonObject& json, GPIOConfig cfg) {
+	void encode(JsonObject& json, const GPIOConfig &cfg) {
 		JsonObject gpioObj = json.createNestedObject("gpio");
 		for(int i=0; i<=GPIOConfig::max_pin; i++) {
 			String key = String(i);
@@ -54,7 +54,11 @@ template<> class Codec<GPIOConfig> {
 			String key = String(i);
 			if(gpioObj.containsKey(key)) {
 				auto pinObj = gpioObj[key].as<JsonObject>();
-				cfg.gpio[i] = {pinObj["name"].as<String>(), pinObj["isInput"].as<bool>(), pinObj["pull"].as<bool>()};
+				cfg.gpio[i] = {
+					pinObj["name"].as<String>(),
+					CodecHelpers::getOrElse(pinObj, "isInput", true),
+					CodecHelpers::getOrElse(pinObj, "pull", false)
+					};
 			} else {
 				cfg.gpio[i] = {"GPIO_"+String(i), true, false};
 			}

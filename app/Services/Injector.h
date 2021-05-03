@@ -38,6 +38,7 @@ public:
 	ConfigProvider<WiFiApConfig>& getWiFiApConfigProvider();
 	ConfigProvider<GPIOConfig>& getGPIOConfigProvider();
 	ConfigProvider<UsersConfig>& getUsersConfigProvider();
+	ConfigProvider<Vector<Session>>& getSessionsProvider();
 	UserSessionManager& getUserSessionManager();
 	OtaUpdater& getOtaUpdater();
 	WiFiManager& getWiFiManager();

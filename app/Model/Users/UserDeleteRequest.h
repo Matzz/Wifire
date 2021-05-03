@@ -14,7 +14,7 @@ public:
         return instance;
     }
 
-	void encode(JsonObject& json, UserDeleteRequest req) {
+	void encode(JsonObject& json, const UserDeleteRequest &req) {
         json["login"] = req.login;
 	}
 

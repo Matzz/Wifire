@@ -14,20 +14,19 @@ public:
 	void startTempStationMode();
 	void stopTempStationMode();
 
-protected:
+private:
 	char tempStationUsersCnt = 0;
 	ConfigProvider<WiFiStationConfig>& stationConfigProvider;
 	ConfigProvider<WiFiApConfig>& apConfigProvider;
-	WiFiApConfig currentApConfig;
-	WiFiStationConfig currentStationConfig;
 
-	void reloadConfiguration();
+	const WiFiApConfig loadApConfig();
+	const WiFiStationConfig loadStationConfig();
 
 	void refreshAccessPoint();
-	bool startAccessPoint();
+	bool startAccessPoint(const WiFiApConfig& currentApConfig);
 
 	void refreshStation();
-	bool connectStation();
+	bool connectStation(const WiFiStationConfig& currentStationConfig);
 
 	static void onAccessPointConnect(MacAddress mac, uint16_t aid);
 	static void onAccessPointDisconnect(MacAddress mac, uint16_t aid);

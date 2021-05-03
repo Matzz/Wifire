@@ -57,7 +57,7 @@ template<> class Codec<Status> {
             return instance;
         }
 
-	void encode(JsonObject& json, Status cfg) {
+	void encode(JsonObject& json, const Status &cfg) {
 		json["smingVersion"] = cfg.smingVersion;
         json["sdk"] = cfg.sdk;
         json["time"] = cfg.time;

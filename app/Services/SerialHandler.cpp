@@ -12,13 +12,13 @@ void SerialHandler::setup() {
 
 	String group = F("Wifire commands");
 	commandHandler.setCommandPrompt(_F("Wifire>"));
-	commandHandler.registerCommand(CommandDelegate(F("ls"), F("List files for provided directories."), group, lsCommand));
+	commandHandler.registerCommand(CommandDelegate(F("ls"), F("List files for provided paths."), group, lsCommand));
 	commandHandler.registerCommand(CommandDelegate(F("cat"), F("Concatenate files and print."), group, catCommand));
 	commandHandler.registerCommand(CommandDelegate(F("rm"), F("Remove files."), group, rmCommand));
-	commandHandler.registerCommand(CommandDelegate(F("restart"), F("Restar ESP chip."), group, restartCommand));
-	commandHandler.registerCommand(CommandDelegate(F("info"), F("Displays system information."), group, statusCommand));
-	commandHandler.registerCommand(CommandDelegate(F("ota"), F("Runs ota updater."), group, otaCommand));
-	commandHandler.registerCommand(CommandDelegate(F("switch_slot"), F("Switch firmare slot."), group, switchSlotCommand));
+	commandHandler.registerCommand(CommandDelegate(F("restart"), F("Restart ESP chip."), group, restartCommand));
+	commandHandler.registerCommand(CommandDelegate(F("info"), F("Display system information."), group, statusCommand));
+	commandHandler.registerCommand(CommandDelegate(F("ota"), F("Run ota updater."), group, otaCommand));
+	commandHandler.registerCommand(CommandDelegate(F("switch_slot"), F("Switch firmware slot."), group, switchSlotCommand));
 
 	Serial.println("Serial handler set.");
 }

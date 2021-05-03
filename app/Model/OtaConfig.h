@@ -16,7 +16,7 @@ template<> class Codec<OtaConfig> {
             return instance;
         }
 
-	void encode(JsonObject& json, OtaConfig cfg) {
+	void encode(JsonObject& json, const OtaConfig &cfg) {
 		json["romUrl"] = cfg.romUrl;
 		json["spiffUrl"] = cfg.spiffUrl;
 	}

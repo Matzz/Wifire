@@ -6,36 +6,40 @@ Injector& Injector::getInstance() {
 }
 
 ConfigProvider<OtaConfig>& Injector::getOtaConfigProvider() {
-	static ConfigProvider<OtaConfig> otaConfigProvider("config/ota.json", Codec<OtaConfig>::getInstance());
+	static FileConfigProvider<OtaConfig> otaConfigProvider("config/ota.json", Codec<OtaConfig>::getInstance());
 	return otaConfigProvider;
 }
 
 ConfigProvider<WiFiStationConfig>& Injector::getWiFiStationConfigProvider() {
-	static ConfigProvider<WiFiStationConfig> wiFiStationConfigProvider(
+	static FileConfigProvider<WiFiStationConfig> wiFiStationConfigProvider(
 		"config/wifi_station.json",
 		Codec<WiFiStationConfig>::getInstance());
 	return wiFiStationConfigProvider;
 }
 
 ConfigProvider<WiFiApConfig>& Injector::getWiFiApConfigProvider() {
-	static ConfigProvider<WiFiApConfig> wiFiApConfigProvider(
-		"config/wifi_ap.json",
-		Codec<WiFiApConfig>::getInstance());
+	static auto wiFiApConfigProvider = FileConfigProvider<WiFiApConfig>( "config/wifi_ap.json", Codec<WiFiApConfig>::getInstance());
 	return wiFiApConfigProvider;
 }
 
 ConfigProvider<GPIOConfig>& Injector::getGPIOConfigProvider() {
-	static ConfigProvider<GPIOConfig> gpioConfigProvider("config/gpio.json", Codec<GPIOConfig>::getInstance());
+	static FileConfigProvider<GPIOConfig> fCfg("config/gpio.json", Codec<GPIOConfig>::getInstance());
+	static CachedConfigProvider<GPIOConfig> gpioConfigProvider = CachedConfigProvider(fCfg);
 	return gpioConfigProvider;
 }
 
 ConfigProvider<UsersConfig>& Injector::getUsersConfigProvider() {
-	static ConfigProvider<UsersConfig> usersConfigProvider("config/users.json", Codec<UsersConfig>::getInstance());
+	static FileConfigProvider<UsersConfig> usersConfigProvider("config/users.json", Codec<UsersConfig>::getInstance());
 	return usersConfigProvider;
 }
 
+ConfigProvider<Vector<Session>>& Injector::getSessionsProvider() {
+	static SessionsConfigProvider sessionsProvider("config/sessions.json", getUsersConfigProvider());
+	return sessionsProvider;
+}
+
 UserSessionManager& Injector::getUserSessionManager() {
-	static UserSessionManager userSessionManager(getUsersConfigProvider());
+	static UserSessionManager userSessionManager(getUsersConfigProvider(), getSessionsProvider());
 	return userSessionManager;
 }
 

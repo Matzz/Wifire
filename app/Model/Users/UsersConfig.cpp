@@ -89,7 +89,7 @@ UsersConfig::ModificationResult UsersConfig::removeUser(UserDeleteRequest &userT
     }
 }
 
- const UserConfig* UsersConfig::getUser(String login) const {
+ UserConfig const * UsersConfig::getUser(String login) const {
     int idx = findUser(login);
     if(idx > -1) {
         return &(users[idx]);
