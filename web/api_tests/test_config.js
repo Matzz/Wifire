@@ -54,8 +54,11 @@ describe('config actions', function() {
                 for(var i=0; i<=16; i++) {
                     expectedGPIO["gpio"][i] = {};
                     expectedGPIO["gpio"][i]["name"] = "GPIO_"+i+"_"+rnd
-                    expectedGPIO["gpio"][i]["isInput"] = true;
-                    expectedGPIO["gpio"][i]["pull"] = true;
+                    var isSafe = safePins.includes(i);
+                    if(isSafe) {
+                        expectedGPIO["gpio"][i]["isInput"] = false;
+                        expectedGPIO["gpio"][i]["pull"] = true;
+                    }
                 }
                 return agent
                     .post("config/gpio/set")
@@ -71,8 +74,9 @@ describe('config actions', function() {
                         for(var i=0; i<=16; i++) {
                             expect(body[i].name).to.be.eql("GPIO_"+i+"_"+rnd);
                             var isSafe = safePins.includes(i);
-                            expect(body[i].isInput).to.be.eql(isSafe ? true : false);
+                            expect(body[i].isInput).to.be.eql(isSafe ? false : true);
                             expect(body[i].pull).to.be.eql(isSafe ? true : false);
+                            expect(body[i].isSafe).to.be.eql(isSafe);
                         }
                     })
             });

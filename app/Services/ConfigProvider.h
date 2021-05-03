@@ -60,6 +60,7 @@ public:
 	CachedConfigProvider(ConfigProvider<T> &innerProvider) : innerProvider(innerProvider) { }
 
 	void save(T& obj) {
+		config = obj;
 		innerProvider.save(obj);
 	}
 	
