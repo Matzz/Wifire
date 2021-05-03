@@ -5,31 +5,36 @@ Injector& Injector::getInstance() {
 	return injector;
 }
 
+template<typename T>
+ConfigProvider<T>& Injector::getFileConfigProvider(const String &fileName) {
+	static FileConfigProvider<T> instance(fileName);
+	return instance;
+}
+
+template<typename T>
+ConfigProvider<T>& Injector::getCachedFileConfigProvider(const String &fileName) {
+	static CachedConfigProvider<T> instance = CachedConfigProvider(getFileConfigProvider<T>(fileName));
+	return instance;
+}
+
 ConfigProvider<OtaConfig>& Injector::getOtaConfigProvider() {
-	static FileConfigProvider<OtaConfig> otaConfigProvider("config/ota.json");
-	return otaConfigProvider;
+	return getFileConfigProvider<OtaConfig>("config/ota.json");
 }
 
 ConfigProvider<WiFiStationConfig>& Injector::getWiFiStationConfigProvider() {
-	static FileConfigProvider<WiFiStationConfig> wiFiStationConfigProvider(
-		"config/wifi_station.json");
-	return wiFiStationConfigProvider;
+	return getFileConfigProvider<WiFiStationConfig>("config/wifi_station.json");
 }
 
 ConfigProvider<WiFiApConfig>& Injector::getWiFiApConfigProvider() {
-	static auto wiFiApConfigProvider = FileConfigProvider<WiFiApConfig>("config/wifi_ap.json");
-	return wiFiApConfigProvider;
+	return getFileConfigProvider<WiFiApConfig>("config/wifi_ap.json");
 }
 
 ConfigProvider<GPIOConfig>& Injector::getGPIOConfigProvider() {
-	static FileConfigProvider<GPIOConfig> fCfg("config/gpio.json");
-	static CachedConfigProvider<GPIOConfig> gpioConfigProvider = CachedConfigProvider(fCfg);
-	return gpioConfigProvider;
+	return getCachedFileConfigProvider<GPIOConfig>("config/gpio.json");
 }
 
 ConfigProvider<UsersConfig>& Injector::getUsersConfigProvider() {
-	static FileConfigProvider<UsersConfig> usersConfigProvider("config/users.json");
-	return usersConfigProvider;
+	return getFileConfigProvider<UsersConfig>("config/users.json");
 }
 
 ConfigProvider<Vector<Session>>& Injector::getSessionsProvider() {

@@ -24,6 +24,13 @@ private:
 	Injector(Injector const&);             // copy constructor is private
 	Injector& operator=(Injector const&);  // assignment operator is private
 
+protected:
+	template<typename T>
+	ConfigProvider<T>& getFileConfigProvider(const String &fileName);
+	
+	template<typename T>
+	ConfigProvider<T>& getCachedFileConfigProvider(const String &fileName);
+
 public:
 	static Injector& getInstance();
 
