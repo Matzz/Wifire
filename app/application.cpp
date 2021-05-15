@@ -4,9 +4,11 @@
 #include "Services/SpiffsManager.h"
 #include "Model/GPIOConfig.h"
 
+char chipname[] = "testtesttest";
 void onReady() {
 	debug_i("System ready callback.");
 	Injector &di = Injector::getInstance();
+	di.getWiFiManager().startNetwork();
 	di.getWebServer().start();
 	di.getGPIOStateManager().update();
 	//di.getFtpServer().start();
@@ -17,6 +19,6 @@ void init() {
 	SerialHandler::setup();
 	SpiffsManager::setup();
 	Injector &di = Injector::getInstance();
-	di.getWiFiManager().refreshNetwork();
+	di.getWiFiManager().initNetwork();
 	System.onReady(onReady);
 }

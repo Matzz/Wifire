@@ -10,7 +10,7 @@ class Signin extends React.Component {
     }
 
     handleSubmit(event) {
-        this.apiHandler.postForm("/signin", event.target)
+        this.apiHandler.postJSON("/signin", this.apiHandler.getFormData(event.target))
             .done(function(data) {
                 alert("You have been signed in.");
                 this.apiHandler.handleAuthUpdate();

@@ -24,6 +24,7 @@ export class AsyncFormHelper {
         // We do that to keep external formData fields which are not present in response body
         return Object.assign({}, this.state.get().formData, responseData);
     }
+
     loadState() {
         var formUrl = "/config/" + this.type + "/get";
         return this.apiHandler
@@ -43,8 +44,10 @@ export class AsyncFormHelper {
         if (state.dataLoaded && !state.submitInProgress) {
             this.state.set({ submitInProgress: true });
             let saveUrl = "/config/" + this.type + "/set";
+            let formData = this.apiHandler.getFormData(event.target);
+            let queryParams = 'actionName' in formData ? {'actionName': formData.actionName} : null;
             this.apiHandler
-                .postForm(saveUrl, event.target)
+                .postJSON(saveUrl, formData, queryParams)
                 .done(function (data) {
                     alert("Configuration saved.");
                     return data;

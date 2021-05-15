@@ -34,58 +34,95 @@ const WiFiStationConfig WiFiManager::loadStationConfig() {
 	}
 }
 
-void WiFiManager::refreshNetwork() {
-	refreshStation();
-	refreshAccessPoint();
+void WiFiManager::initNetwork() {
+	initStation();
+	initAccessPoint();
 }
 
-void WiFiManager::refreshAccessPoint() {
+void WiFiManager::startNetwork() {
+	startStation();
+	startAccessPoint();
+}
+
+void WiFiManager::initAccessPoint() {
 	const WiFiApConfig& currentApConfig = loadApConfig();
 	if(currentApConfig.enabled) {
-		if(startAccessPoint(currentApConfig)) {
-			debug_i("AP created.");
-		} else {
-			debug_w("Cannot create AP.");
-		}
-	} else {
-		WifiAccessPoint.enable(false, false);
-		debug_i("AP mode disabled.");
-	}
-}
-
-bool WiFiManager::startAccessPoint(const WiFiApConfig& currentApConfig) {
-	debug_i("Starting network %s", currentApConfig.ssid.c_str());
-	WifiAccessPoint.enable(true, false);
-	bool configStatus = WifiAccessPoint.config(currentApConfig.ssid, currentApConfig.password,
-			currentApConfig.authMode, currentApConfig.hidden, currentApConfig.channel,
-			currentApConfig.beaconInterval);
-	if (!configStatus) {
-		debug_w("Setting AP config failed.");
-		return false;
-	} else {
-
+		debug_i("AP mode enabled. Initializing.");
 		IpAddress oldIp = WifiAccessPoint.getIP();
 		if (!(oldIp == currentApConfig.ip)) {
-			debug_i("Setting new ip %s. Old ip %s\n", currentApConfig.ip.toString().c_str(), oldIp.toString().c_str());
+			debug_i("Setting new AP IP %s. Old ip %s\n", currentApConfig.ip.toString().c_str(), oldIp.toString().c_str());
 			if (!WifiAccessPoint.setIP(currentApConfig.ip)) {
-				debug_w("Setting ip failed.");
+				debug_w("Setting AP IP failed.");
 			}
 		} else {
-			debug_i("Keeping old ip %s\n", oldIp.toString().c_str());
+			debug_i("Keeping old AP IP %s\n", oldIp.toString().c_str());
 		}
-		return true;
+	} else {
+		debug_i("AP mode initializing disabled.");
 	}
-
 }
 
-void WiFiManager::refreshStation() {
+void WiFiManager::startAccessPoint() {
+	const WiFiApConfig& currentApConfig = loadApConfig();
+	if(currentApConfig.enabled) {
+		debug_i("Starting AP network %s", currentApConfig.ssid.c_str());
+		WifiAccessPoint.enable(true, false);
+		bool configStatus = WifiAccessPoint.config(currentApConfig.ssid, currentApConfig.password,
+				currentApConfig.authMode, currentApConfig.hidden, currentApConfig.channel,
+				currentApConfig.beaconInterval);
+		if (!configStatus) {
+			debug_w("Setting AP config failed. Cannot create AP");
+			return;
+		} else {
+			debug_i("AP created.");
+			return;
+		}
+	} else {
+		debug_i("AP mode disabled.");
+		WifiAccessPoint.enable(false, false);
+	}
+}
+
+void WiFiManager::initStation() {
+	const WiFiStationConfig& currentStationConfig = loadStationConfig();
+	if(currentStationConfig.enabled) {
+		debug_i("Connectiong station network %s", currentStationConfig.ssid.c_str());
+		if(currentStationConfig.hostname.length()>0) {
+			debug_i("Station setting hostname to %s", currentStationConfig.hostname.c_str());
+			WifiStation.setHostname(currentStationConfig.hostname);
+		}
+		if (!currentStationConfig.ip.isNull()) {
+			debug_i("Station set Ip: %s, netmask %s, gateway %s",
+				currentStationConfig.ip.toString(), 
+				currentStationConfig.netmask.toString(), 
+				currentStationConfig.gateway.toString()
+				);
+			WifiStation.setIP(currentStationConfig.ip, currentStationConfig.netmask, currentStationConfig.gateway);
+		} else {
+			debug_i("Station DHCP enabled");
+			WifiStation.enableDHCP(true);
+		}
+	} else {
+		debug_i("Station mode disabled.");
+	}
+}
+
+void WiFiManager::startStation() {
 	const WiFiStationConfig& currentStationConfig = loadStationConfig();
 	if(currentStationConfig.enabled) {
 		debug_i("Station mode enabled.");
-		if(connectStation(currentStationConfig)) {
-			debug_i("Connected to station.");
+		bool status =  WifiStation.config(currentStationConfig.ssid, currentStationConfig.password, false, false);
+		if (!status) {
+			debug_i("Station failed to set configuration.");
+			return;
+		}
+
+		debug_i("Station invoking WifiStation.connect.");
+		WifiStation.enable(true, false);
+		if(WifiStation.connect()) {
+			debug_i("Connected to station");
 		} else {
-			debug_w("Cannot connect to station.");
+			debug_i("Station connection failed.");
 		}
 	} else {
 		#ifndef ARCH_HOST
@@ -101,45 +138,18 @@ void WiFiManager::refreshStation() {
 	}
 }
 
-bool WiFiManager::connectStation(const WiFiStationConfig& currentStationConfig) {
-	if(currentStationConfig.hostname.length()>0) {
-		debug_i("Station setting hostname to %s", currentStationConfig.hostname.c_str());
-		WifiStation.setHostname(currentStationConfig.hostname);
-	}
-	if (!currentStationConfig.ip.isNull()) {
-		debug_i("Station set Ip: %s, netmask %s, gateway %s",
-			currentStationConfig.ip.toString(), 
-			currentStationConfig.netmask.toString(), 
-			currentStationConfig.gateway.toString()
-			);
-		WifiStation.setIP(currentStationConfig.ip, currentStationConfig.netmask, currentStationConfig.gateway);
-	} else {
-		debug_i("Station DHCP enabled");
-		WifiStation.enableDHCP(true);
-	}
-	bool status =  WifiStation.config(currentStationConfig.ssid, currentStationConfig.password, false, false);
-	if (!status) {
-		debug_i("Station failed to set configuration.");
-		return false;
-	}
-
-	debug_i("Station invoking WifiStation.connect.");
-	WifiStation.enable(true, false);
-	return WifiStation.connect();
-}
-
 /**
  * Usend only to list available networks. We don't connect to real network in this mode.
  * It should be disabled just after listing available networks.
  **/
 void WiFiManager::startTempStationMode() {
 	tempStationUsersCnt++;
-	refreshStation();
+	startStation();
 }
 
 void WiFiManager::stopTempStationMode() {
 	tempStationUsersCnt--;
-	refreshStation();
+	startStation();
 }
 
 

@@ -24,7 +24,7 @@ describe('config actions', function() {
                 var expectedRomUrl = 'abc' + rnd;
                 var expectedSpiffUrl = 'defg' + rnd;
                 return agent
-                    .post("config/ota/set")
+                    .post("config/ota/set?actionName=saveOnly") // We dont want to perform OTA update in tests
                     .send({
                         'romUrl': expectedRomUrl,
                         'spiffUrl': expectedSpiffUrl

@@ -10,7 +10,8 @@ public:
 	WiFiManager(ConfigProvider<WiFiStationConfig>& stationConfigProvider,
 			    ConfigProvider<WiFiApConfig>& apConfigProvider);
 
-	void refreshNetwork();
+	void initNetwork();
+	void startNetwork();
 	void startTempStationMode();
 	void stopTempStationMode();
 
@@ -22,11 +23,11 @@ private:
 	const WiFiApConfig loadApConfig();
 	const WiFiStationConfig loadStationConfig();
 
-	void refreshAccessPoint();
-	bool startAccessPoint(const WiFiApConfig& currentApConfig);
+	void initAccessPoint();
+	void startAccessPoint();
 
-	void refreshStation();
-	bool connectStation(const WiFiStationConfig& currentStationConfig);
+	void initStation();
+	void startStation();
 
 	static void onAccessPointConnect(MacAddress mac, uint16_t aid);
 	static void onAccessPointDisconnect(MacAddress mac, uint16_t aid);

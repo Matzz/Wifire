@@ -5,7 +5,6 @@
 
 void SerialHandler::setup() {
 	Serial.begin(SERIAL_BAUD_RATE); // 115200 by default
-	commandHandler.registerSystemCommands();
 	Debug.setDebug(Serial);
 	Serial.systemDebugOutput(true);
 	Serial.commandProcessing(true);

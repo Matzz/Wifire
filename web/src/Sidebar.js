@@ -35,7 +35,6 @@ class Sidebar extends React.Component {
     super(props);
     autoBind(this);
     this.apiHandler = props.apiHandler;
-    this.apiHandler.addUpdateAuthCallback(this.updateAuth);
     this.state = {
       auth: ApiHandler.emptyAuth
     };
@@ -44,7 +43,11 @@ class Sidebar extends React.Component {
     this.setState({"auth": auth});
   }
   componentDidMount() {
+    this.apiHandler.addUpdateAuthCallback(this.updateAuth);
     this.updateAuth(this.apiHandler.getAuthJson());
+  }
+  componentWillUnmount() {
+    this.apiHandler.removeUpdateAuthCallback(this.updateAuth);
   }
   hasRole(role) {
     let roles = this.state.auth.roles;

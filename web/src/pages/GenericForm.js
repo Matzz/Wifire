@@ -7,7 +7,8 @@ export class GenericForm extends React.Component {
         super(props);
         this.formHelper = new AsyncFormHelper(props.type, props.apiHandler, new StateProxy(this));
         this.state = {
-            inputs: {}
+            inputs: {},
+            actionName: ""
         };
         autoBind(this);
     }
@@ -118,6 +119,11 @@ export class GenericForm extends React.Component {
             default: return this.input(name, input);
         }
     }
+
+    setActionName(event) {
+        this.setState({actionName: event.target.value});
+    }
+
     render() {
         if (!this.state.dataLoaded) {
             return null;
@@ -136,18 +142,29 @@ export class GenericForm extends React.Component {
                 </div>
             )
         }
+        let submitButtons = this.props.submitButtons || [{text: "Submit", actionName:"submit"}];
 
         return (
             <form className="form-horizontal"
                 id={'formId' in this.state ? this.state.formId : 'form'}
                 onSubmit={this.onSubmitCallback}
             >
-                { 'title' in this.props && <h2>{this.props.title}</h2>}
-                { 'header' in this.props && this.props.header}
-                { controls}
+                { 'title' in this.props && <h2>{this.props.title}</h2> }
+                { 'header' in this.props && this.props.header }
+                { controls }
 
                 <div className="col-sm-offset-3">
-                    <button type="submit" className="btn btn-primary" id="form_submit">{ this.props.submitMsg || "Submit"}</button>
+                    <input type="hidden" id="form_action_name" value={this.state.actionName} name="actionName" />
+                    {
+                        submitButtons.map((btn) => {
+                            return <button type="submit" className="btn btn-primary ml-2"
+                                key={btn.actionName}
+                                value={btn.actionName}
+                                onClick={this.setActionName}>
+                                    { btn.text }
+                                </button>
+                        })
+                    }
                 </div>
             </form>
         )

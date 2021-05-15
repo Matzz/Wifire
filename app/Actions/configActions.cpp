@@ -40,8 +40,10 @@ void otaSetConfigAction(HttpRequest &request, HttpResponse &response) {
 	Injector &di = Injector::getInstance();
 	auto& provider = di.getOtaConfigProvider();
 	handleConfigSet(request, response, provider);
-	// auto& updater = di.getOtaUpdater();
-	// updater.update();
+	if(request.getQueryParameter("actionName") == "saveAndUpdate") {
+		auto& updater = di.getOtaUpdater();
+		updater.update();
+	}
 }
 
 void stationRefreshNetworks(HttpRequest &request, HttpResponse &response) {

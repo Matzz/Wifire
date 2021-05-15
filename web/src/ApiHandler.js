@@ -22,6 +22,10 @@ export default class ApiHandler {
     addUpdateAuthCallback(fn) {
         this.authUpdateCallbacks.push(fn);
     }
+
+    removeUpdateAuthCallback(fn) {
+        this.authUpdateCallbacks = this.authUpdateCallbacks.filter(el => el !== fn);
+    }
 	
 	getAuthJson() {
 		var authJson = null;
@@ -66,7 +70,10 @@ export default class ApiHandler {
 		  .fail(this.handleRequestFailure);
 	}
 	
-	postJSON(url, data) {
+	postJSON(url, data, queryParams) {
+		if(queryParams) {
+			url = url + '?' + $.param(queryParams);
+		}
 		var cfg = {
 			url: url,
 			data: JSON.stringify(data),
@@ -78,10 +85,6 @@ export default class ApiHandler {
 	
 	getFormData(formEl) {
 		return $(formEl).serializeJSON({checkboxUncheckedValue: "false"});
-	}
-	
-	postForm(url, formEl) {
-		return this.postJSON(url, this.getFormData(formEl));
 	}
 
 	handleAuthUpdate() {

@@ -53,9 +53,7 @@ export default class Status extends React.Component {
 
     render() {
         let keys = Object.keys(this.state.rows);
-        console.log(keys);
         let heap = keys.filter((key) => key.startsWith("heap"));
-        console.log("heap", heap);
         let ap = keys.filter((key) => key.startsWith("wifiAp"));
         let station = keys.filter((key) => key.startsWith("wifiStation"));
         let nonOther = heap + station + ap;
