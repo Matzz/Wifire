@@ -31,23 +31,27 @@ void OtaUpdater::update() {
 	}
 	auto config = *configOrError.getIfRight();
 
-	debug_i("OTA - Updating...");
-	RbootHttpUpdater* otaUpdater = new RbootHttpUpdater();
 	uint8 slot = activeSlot();
+	debug_i("OTA - Updating slot %d", slot);
+	RbootHttpUpdater* otaUpdater = new RbootHttpUpdater();
 
 	// flash rom to position indicated in the rBoot config rom table
 	rboot_config boot_config = rboot_get_config();
 	
+	debug_i("Addig romUrl %d = %s", boot_config.roms[slot], config.romUrl.c_str());
 	otaUpdater->addItem(boot_config.roms[slot], config.romUrl);
 
 	auto part = SpiffsManager::findSpiffsPartition(slot);
 	if(part) {
+		debug_i("Addig spiffUrl %d = %s", part.address(), config.spiffUrl.c_str());
 		// use user supplied values (defaults for 4mb flash in hardware config)
 		otaUpdater->addItem(part.address(), config.spiffUrl, part.size());
+	} else {
+		debug_i("Not found spiff partition.");
 	}
 	otaUpdater->setCallback(callback);
 
-	// start update
+	debug_i("OTA - Start upgrade...");
 	otaUpdater->start();
 	delete otaUpdater;
 }

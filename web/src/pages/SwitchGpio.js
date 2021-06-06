@@ -7,8 +7,22 @@ export default class SwitchGpio extends React.Component {
         super(props);
         autoBind(this);
 		this.state = {};
+		this.timers = {};
 		this.apiHandler = props.apiHandler;
     }
+
+    componentDidMount() {
+		this.loadConfiguration();
+    }
+
+	componentWillUnmount() {
+		Object.keys(this.timers).forEach(idx => {
+			if(this.timers[idx] !== null) {
+				clearTimeout(this.timers[idx]);
+				this.timers[idx] = null;
+			}
+		});
+	}
 
 	loadConfiguration() {
         var url = "/gpio/available";
@@ -40,6 +54,16 @@ export default class SwitchGpio extends React.Component {
 		let pinName = this.state.gpio[idx].name;
         var url = "/gpio/switch";
 		let data = {name: pinName, state: newPinValue ? "on" : "off"};
+		let swichTime = parseInt(this.state.gpio[idx].switchTime) || 0;
+
+		let useTimer = swichTime > 0 && newPinValue;
+		if(this.timers[idx]) {
+			clearTimeout(this.timers[idx]);
+			this.timers[idx] = null;
+		}
+		if(useTimer) {
+			data.time_ms = swichTime * 1000;
+		}
 		this.apiHandler
             .getJSON(url, data)
             .done(function (responseData) {
@@ -48,13 +72,21 @@ export default class SwitchGpio extends React.Component {
                     dataLoaded: true,
                 	pinSwichInProgress: false
                 });
+				if(useTimer) {
+					this.pinTurnOffTimer(idx, swichTime);
+				}
                 return responseData;
             }.bind(this));
 	}
-	
-    componentDidMount() {
-		this.loadConfiguration();
-    }
+
+	pinTurnOffTimer(idx, switchTime) {
+		setTimeout(function() {
+			var state = this.state;
+			state.state[idx] = 0;
+			this.setState(state);
+			this.timers[idx] = null;
+		}.bind(this), switchTime * 1000);
+	}
 
 	swichablePinsRender(gpios, state) {
 		let fields = Object.keys(gpios).map(idx => {
@@ -62,30 +94,37 @@ export default class SwitchGpio extends React.Component {
 			let isSwichable = !pin['isInput'] && pin['isSafe'];
 			let html;
 			if(isSwichable) {
-				let afterSwichState = state[idx] ? "Off" : "On";
-				html = <div key={idx}>
-					<div className="col-10 custom-control custom-switch custom-switch-lg">
-						<input
-							type="checkbox"
-							className="custom-control-input"
-							id={"swich-btn"+idx}
-							key={idx}
-							onChange={this.swichPin}
-							data-pin={idx}
-							checked={state[idx] ? true : false}
-							value="1"
-							/>
-							<label className="custom-control-label" htmlFor={"swich-btn"+idx}>
-								<b>{ pin["name"] }</b>&nbsp;
-								Click to turn {afterSwichState}
-							</label>
-					</div>
-					<br />
-				</div>;
+				let pinState = state[idx];
+				let pinName = pin["name"];
+				html = this.pinHtml(idx, pinState, pinName);
+
 			}
 			return html;
 		});
 		return fields;
+	}
+
+	pinHtml(idx, pinState, pinName) {
+		let afterSwichState = pinState ? "Off" : "On";
+		return <div key={idx}>
+			<div className="col-10 custom-control custom-switch custom-switch-lg">
+				<input
+					type="checkbox"
+					className="custom-control-input"
+					id={"swich-btn"+idx}
+					key={idx}
+					onChange={this.swichPin}
+					data-pin={idx}
+					checked={pinState ? true : false}
+					value="1"
+					/>
+					<label className="custom-control-label" htmlFor={"swich-btn"+idx}>
+						<b>{ pinName }</b>&nbsp;
+						Click to turn {afterSwichState}
+					</label>
+				</div>
+				<br />
+			</div>
 	}
 
 	nonSwichablePinsRender(gpios, state) {

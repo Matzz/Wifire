@@ -41,7 +41,6 @@ export default class EditGpio extends React.Component {
 		gpio[pinId].isInput = $(event.target).val() === 'true';
 		gpio[pinId].switchTime = "";
 		this.setState({gpio: gpio});
-		console.log(gpio[pinId]);
 	}
 
 	render() {
@@ -51,7 +50,6 @@ export default class EditGpio extends React.Component {
 		var inputs = this.state.formData.gpio; // We dont use preformated state.inputs here
 		let fields = Object.keys(inputs).map(idx => {
 			let pin = inputs[idx];
-			console.log('pin', pin);
 			var pinHtml;
 			if(inputs[idx].isSafe) {
 				pinHtml = (<>
@@ -68,7 +66,7 @@ export default class EditGpio extends React.Component {
 							name={ this.fieldName(idx, 'switchTime', 'number') }
 							defaultValue={pin["switchTime"]}
 							value={ this.state.formData['switchTime'] }
-							className="form-check-input position-static" />
+							className="form-control w-25 position-static" />
 							: ""
 						}
 					</td>
@@ -110,7 +108,7 @@ export default class EditGpio extends React.Component {
 						<th scope="col">Pin number</th>
 						<th scope="col">Pin name</th>
 						<th scope="col">Mode</th>
-						<th scope="col">Swich time</th>
+						<th scope="col">Turn on time (seconds)</th>
 						<th scope="col">Pull up</th>
 					</tr>
 				</thead>
