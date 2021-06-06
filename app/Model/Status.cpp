@@ -22,7 +22,7 @@ void Codec<Status>::encode(JsonObject& json, const Status &cfg) {
     json["wifiStationChannel"] = cfg.wifiStationChannel;
     json["wifiStationIsConnected"] = cfg.wifiStationIsConnected;
     json["wifiStationIsConnectionFailed"] = cfg.wifiStationIsConnectionFailed;
-    json["wifiStationDhcpEnaled"] = cfg.wifiStationDhcpEnaled;
+    json["wifiStationDhcpEnabled"] = cfg.wifiStationDhcpEnabled;
     json["wifiStationConnectionStatus"] = cfg.wifiStationConnectionStatus;
     json["wifiStationHostname"] = cfg.wifiStationHostname;
     json["wifiStationIp"] = CodecHelpers::ipToString(cfg.wifiStationIp);

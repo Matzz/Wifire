@@ -18,6 +18,7 @@ public:
 	String name = String::nullstr;
 	bool isInput = true; // true = input, false = output
 	bool pull = false;
+	uint32_t switchTime = 0;
 };
 
 class GPIOConfig {

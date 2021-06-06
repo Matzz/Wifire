@@ -1,4 +1,5 @@
 import React from 'react';
+import $ from 'jquery';
 import autoBind from 'react-autobind';
 import { StateProxy, AsyncFormHelper } from "../AsyncFormHelper";
 
@@ -28,6 +29,21 @@ export default class EditGpio extends React.Component {
 		return "gpio[" + i + "][" + name + "]:"+fieldType;
 	}
 
+	inputTypeChange(event) {
+		event.preventDefault();
+		// formData
+		// this.setState({formData[]})
+		let fieldName = $(event.target).attr('name');
+		let match = fieldName.match(/^gpio\[(\d+)\].*$/);
+		let pinId = match[1];
+		var gpio = this.state.formData.gpio;
+		gpio[pinId] = gpio[pinId] || {};
+		gpio[pinId].isInput = $(event.target).val() === 'true';
+		gpio[pinId].switchTime = "";
+		this.setState({gpio: gpio});
+		console.log(gpio[pinId]);
+	}
+
 	render() {
         if(!this.state.dataLoaded) {
             return null;
@@ -35,14 +51,26 @@ export default class EditGpio extends React.Component {
 		var inputs = this.state.formData.gpio; // We dont use preformated state.inputs here
 		let fields = Object.keys(inputs).map(idx => {
 			let pin = inputs[idx];
+			console.log('pin', pin);
 			var pinHtml;
 			if(inputs[idx].isSafe) {
 				pinHtml = (<>
 					<td>
-						<select name={ this.fieldName(idx, 'isInput', 'boolean') } defaultValue={pin["isInput"]} className="custom-select">
+						<select name={ this.fieldName(idx, 'isInput', 'boolean') } defaultValue={pin["isInput"]} className="custom-select" onChange={this.inputTypeChange}>
 							<option value="true">Input</option>
 							<option value="false">Output</option>
 						</select>
+					</td>
+					<td>
+						{ !pin.isInput ? 
+						<input
+							type="number"
+							name={ this.fieldName(idx, 'switchTime', 'number') }
+							defaultValue={pin["switchTime"]}
+							value={ this.state.formData['switchTime'] }
+							className="form-check-input position-static" />
+							: ""
+						}
 					</td>
 					<td>
 						<div className="form-check">
@@ -56,7 +84,7 @@ export default class EditGpio extends React.Component {
 					</td>
 				</>);
 			} else {
-				pinHtml = (<td colSpan="2">It is not safe to use that pin</td>);
+				pinHtml = (<td colSpan="3">It is not safe to use that pin</td>);
 			}
 			return <tr key={idx}>
 				<th>{ idx }</th>
@@ -82,6 +110,7 @@ export default class EditGpio extends React.Component {
 						<th scope="col">Pin number</th>
 						<th scope="col">Pin name</th>
 						<th scope="col">Mode</th>
+						<th scope="col">Swich time</th>
 						<th scope="col">Pull up</th>
 					</tr>
 				</thead>

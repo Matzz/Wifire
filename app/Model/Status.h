@@ -28,7 +28,7 @@ public:
     unsigned char wifiStationChannel = 0;
     bool wifiStationIsConnected = false;
     bool wifiStationIsConnectionFailed = false;
-    bool wifiStationDhcpEnaled = false;
+    bool wifiStationDhcpEnabled = false;
     String wifiStationConnectionStatus = String::nullstr;
     String wifiStationHostname = String::nullstr;
     IpAddress wifiStationIp = IPADDR_ANY;

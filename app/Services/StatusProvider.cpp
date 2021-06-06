@@ -54,7 +54,7 @@ Status StatusProvider::getStatus(bool showPassword)  {
 	status.wifiStationChannel = WifiStation.getChannel();
 	status.wifiStationIsConnected = WifiStation.isConnected();
 	status.wifiStationIsConnectionFailed = WifiStation.isConnectionFailed();
-	status.wifiStationDhcpEnaled = WifiStation.isEnabledDHCP();
+	status.wifiStationDhcpEnabled = WifiStation.isEnabledDHCP();
 	status.wifiStationConnectionStatus = WifiStation.getConnectionStatusName();
 	status.wifiStationHostname = WifiStation.getHostname();
 	status.wifiStationIp = WifiStation.getIP();

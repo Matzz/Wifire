@@ -36,6 +36,9 @@ void Codec<GPIOConfig>::encode(JsonObject& json, const GPIOConfig &cfg) {
 		pinObj["name"] = cfg.gpio[i].name;
 		pinObj["isInput"] = cfg.gpio[i].isInput;
 		pinObj["pull"] = cfg.gpio[i].pull;
+		if(cfg.gpio[i].switchTime > 0) {
+			pinObj["switchTime"] = cfg.gpio[i].switchTime;
+		}
 	}
 }
 
@@ -47,11 +50,15 @@ Either<String, GPIOConfig> Codec<GPIOConfig>::decode(JsonObject& json) {
 		String key = String(i);
 		if(gpioObj.containsKey(key)) {
 			auto pinObj = gpioObj[key].as<JsonObject>();
-			cfg.gpio[i] = {
+			PinConfig pinCfg = {
 				pinObj["name"].as<String>(),
 				CodecHelpers::getOrElse(pinObj, "isInput", true),
 				CodecHelpers::getOrElse(pinObj, "pull", false)
 				};
+			if(pinObj.containsKey("switchTime")) {
+				pinCfg.switchTime = pinObj["switchTime"];
+			}
+			cfg.gpio[i] = pinCfg;
 		} else {
 			cfg.gpio[i] = {"GPIO_"+String(i), true, false};
 		}

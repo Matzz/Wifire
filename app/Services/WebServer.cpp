@@ -19,6 +19,7 @@ WebServer::WebServer(const int port, UserSessionManager& sessionManager) :
 }
 
 void WebServer::start() {
+	debug_i("Starting web server. Port: %d", port);
 	server.listen(port);
 }
 
