@@ -10,7 +10,7 @@
     "jquery": "^3.5.1",
     "jquery-serializejson": "^3.2.1",
     "js-cookie": "^2.2.1",
-    "node-sass": "^5.0.0",
+    "node-sass": "^7.0.0",
     "react": "^17.0.1",
     "react-autobind": "^1.0.6",
     "react-dom": "^17.0.1",
